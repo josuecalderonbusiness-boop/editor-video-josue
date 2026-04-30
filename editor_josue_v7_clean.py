@@ -181,7 +181,63 @@ def crear_carpetas():
 
 
 # ─────────────────────────────────────────
-#  PASO 1 — ELIMINAR SILENCIOS
+#  PROXY — comprime video para analisis rapido
+# ─────────────────────────────────────────
+def crear_proxy(entrada, proxy):
+    print("   Creando proxy 720p para analisis...")
+    cmd = [
+        "ffmpeg", "-y", "-i", entrada,
+        "-vf", "scale=1280:720",
+        "-c:v", "libx264", "-crf", "28",
+        "-c:a", "aac", "-b:a", "128k",
+        "-preset", "ultrafast", proxy
+    ]
+    r = subprocess.run(cmd, capture_output=True, text=True)
+    if r.returncode != 0:
+        print(f"   Error creando proxy: {r.stderr[-200:]}")
+        return False
+    tam = os.path.getsize(proxy) / (1024*1024)
+    print(f"   Proxy listo: {tam:.0f}MB")
+    return True
+
+
+def aplicar_cortes_a_original(original, segmentos, salida):
+    """Aplica los timestamps del proxy al video original en alta calidad."""
+    lista_tmp = "tmp_orig_concat.txt"
+    clips_tmp = []
+    with open(lista_tmp, "w", encoding="utf-8") as f:
+        for idx, (t_s, t_e) in enumerate(segmentos):
+            if t_e - t_s < 0.1:
+                continue
+            clip_tmp = f"tmp_orig_seg_{idx}.mp4"
+            clips_tmp.append(clip_tmp)
+            cmd_corte = [
+                "ffmpeg", "-y",
+                "-ss", str(t_s), "-to", str(t_e),
+                "-i", original,
+                "-c:v", "copy", "-c:a", "aac",
+                "-avoid_negative_ts", "make_zero", clip_tmp
+            ]
+            subprocess.run(cmd_corte, capture_output=True, text=True)
+            f.write(f"file '{clip_tmp}'\n")
+
+    cmd_concat = [
+        "ffmpeg", "-y", "-f", "concat", "-safe", "0",
+        "-i", lista_tmp, "-c", "copy", salida
+    ]
+    r = subprocess.run(cmd_concat, capture_output=True, text=True)
+
+    if os.path.exists(lista_tmp):
+        os.remove(lista_tmp)
+    for c in clips_tmp:
+        if os.path.exists(c):
+            os.remove(c)
+
+    return r.returncode == 0
+
+
+# ─────────────────────────────────────────
+#  PASO 1 — ELIMINAR SILENCIOS (audio-first)
 # ─────────────────────────────────────────
 def eliminar_silencios(entrada, salida, log=None):
     print("\nEliminando silencios...")
@@ -189,76 +245,100 @@ def eliminar_silencios(entrada, salida, log=None):
     silencio_min = CONFIG["silencio_minimo"]
     margen       = CONFIG["margen_corte"]
 
-    clip      = VideoFileClip(entrada)
-    audio     = clip.audio
-    fps_audio = audio.fps
-    muestras  = audio.to_soundarray(fps=fps_audio)
-    if muestras.ndim > 1:
-        muestras = muestras.mean(axis=1)
+    # Detectar duracion total con ffprobe
+    r_dur = subprocess.run(
+        ["ffprobe", "-v", "error", "-show_entries", "format=duration",
+         "-of", "default=noprint_wrappers=1:nokey=1", entrada],
+        capture_output=True, text=True
+    )
+    try:
+        duracion_total = float(r_dur.stdout.strip())
+    except Exception:
+        duracion_total = 0.0
 
-    ventana  = int(fps_audio * 0.02)
-    n_vent   = len(muestras) // ventana
-    volumen  = []
-    for i in range(n_vent):
-        chunk = muestras[i * ventana:(i + 1) * ventana]
-        rms   = np.sqrt(np.mean(chunk ** 2))
-        db    = 20 * np.log10(rms + 1e-10)
-        volumen.append(db)
+    # PASO A — extraer solo el audio (liviano, ~50MB para 16 min)
+    print("   Extrayendo audio para analisis...")
+    tmp_audio_sil = "tmp_sil_audio.mp3"
+    subprocess.run(
+        ["ffmpeg", "-y", "-i", entrada, "-vn", "-acodec", "mp3", "-ab", "64k", tmp_audio_sil],
+        capture_output=True, text=True
+    )
 
-    dv        = 0.02
-    tiene_voz = [v > umbral_db for v in volumen]
+    # PASO B — detectar silencios sobre el audio liviano
+    print("   Detectando silencios...")
+    cmd_detect = [
+        "ffmpeg", "-y", "-i", tmp_audio_sil,
+        "-af", f"silencedetect=noise={umbral_db}dB:d={silencio_min}",
+        "-f", "null", "-"
+    ]
+    r = subprocess.run(cmd_detect, capture_output=True, text=True)
+    stderr = r.stderr
+    if os.path.exists(tmp_audio_sil):
+        os.remove(tmp_audio_sil)
+
+    inicios = [float(x) for x in re.findall(r"silence_start: ([\d.]+)", stderr)]
+    fines   = [float(x) for x in re.findall(r"silence_end: ([\d.]+)", stderr)]
+
+    # Construir segmentos a MANTENER
+    silencios = list(zip(inicios, fines))
     segmentos = []
-    en_voz    = False
-    inicio    = 0
-    for i, voz in enumerate(tiene_voz):
-        t = i * dv
-        if voz and not en_voz:
-            inicio = t
-            en_voz = True
-        elif not voz and en_voz:
-            fin = t
-            if (fin - inicio) > 0.1:
-                segmentos.append((inicio, fin))
-            en_voz = False
-    if en_voz:
-        segmentos.append((inicio, clip.duration))
+    cursor    = 0.0
+    for t_ini_s, t_fin_s in silencios:
+        t_i = max(0.0, t_ini_s - margen)
+        t_f = min(duracion_total, t_fin_s + margen)
+        if cursor < t_i:
+            segmentos.append((cursor, t_i))
+            if log:
+                log.registrar("SILENCIO", t_i, t_f, "pausa/silencio")
+        cursor = t_f
+    if cursor < duracion_total:
+        segmentos.append((cursor, duracion_total))
 
-    unidos = []
-    for seg in segmentos:
-        if unidos and (seg[0] - unidos[-1][1]) < silencio_min:
-            unidos[-1] = (unidos[-1][0], seg[1])
-        else:
-            unidos.append(list(seg))
-
-    if not unidos:
-        print("Sin voz detectada.")
-        clip.write_videofile(salida, codec="libx264", audio_codec="aac",
-                             logger=None, fps=CONFIG["fps"])
-        clip.close()
+    if not segmentos:
+        print("   Sin segmentos de voz detectados.")
+        shutil.copy2(entrada, salida)
         return
 
-    if log:
-        cursor = 0.0
-        for ini, fin in unidos:
-            t_i = max(0, ini - margen)
-            if cursor < t_i:
-                log.registrar("SILENCIO", cursor, t_i, "pausa/silencio")
-            cursor = min(clip.duration, fin + margen)
+    tiempo_cortado = duracion_total - sum(f - i for i, f in segmentos)
+    print(f"   Segmentos: {len(segmentos)} | Cortado: {tiempo_cortado:.1f}s")
 
-    tiempo_cortado = clip.duration - sum(f - i for i, f in unidos)
-    print(f"   Segmentos: {len(unidos)} | Cortado: {tiempo_cortado:.1f}s")
+    # PASO C — aplicar cortes al video original sin recodificar
+    print("   Aplicando cortes al video original...")
+    lista_tmp = "tmp_sil_concat.txt"
+    clips_tmp = []
+    with open(lista_tmp, "w", encoding="utf-8") as f:
+        for idx, (t_s, t_e) in enumerate(segmentos):
+            if t_e - t_s < 0.1:
+                continue
+            clip_tmp = f"tmp_sil_seg_{idx}.mp4"
+            clips_tmp.append(clip_tmp)
+            cmd_corte = [
+                "ffmpeg", "-y",
+                "-ss", str(t_s), "-to", str(t_e),
+                "-i", entrada,
+                "-c:v", "copy", "-c:a", "aac",
+                "-avoid_negative_ts", "make_zero", clip_tmp
+            ]
+            subprocess.run(cmd_corte, capture_output=True, text=True)
+            f.write(f"file '{clip_tmp}'\n")
 
-    clips_voz = []
-    for ini, fin in unidos:
-        t_i = max(0, ini - margen)
-        t_f = min(clip.duration, fin + margen)
-        clips_voz.append(clip.subclipped(t_i, t_f))
+    cmd_concat = [
+        "ffmpeg", "-y", "-f", "concat", "-safe", "0",
+        "-i", lista_tmp, "-c", "copy", salida
+    ]
+    r2 = subprocess.run(cmd_concat, capture_output=True, text=True)
 
-    video_final = concatenate_videoclips(clips_voz)
-    video_final.write_videofile(salida, codec="libx264", audio_codec="aac",
-                                fps=CONFIG["fps"], logger=None)
-    clip.close()
-    video_final.close()
+    if os.path.exists(lista_tmp):
+        os.remove(lista_tmp)
+    for c in clips_tmp:
+        if os.path.exists(c):
+            os.remove(c)
+
+    if r2.returncode != 0:
+        print(f"   Error FFmpeg concat: {r2.stderr[-200:]}")
+        shutil.copy2(entrada, salida)
+        return
+
     print("Silencios eliminados.")
 
 
@@ -792,6 +872,7 @@ def editar_reel(nombre_archivo, fuente="montserrat", guion=None,
         sys.exit(1)
 
     nombre_base   = os.path.splitext(nombre_archivo)[0]
+    tmp_proxy     = f"tmp_{nombre_base}_proxy.mp4"
     tmp_sin_sil   = f"tmp_{nombre_base}_sin_sil.mp4"
     tmp_limpio    = f"tmp_{nombre_base}_limpio.mp4"
     tmp_916       = f"tmp_{nombre_base}_916.mp4"
@@ -799,12 +880,22 @@ def editar_reel(nombre_archivo, fuente="montserrat", guion=None,
     sufijo        = fuente if subtitulos else "limpio"
     archivo_final = os.path.join(CARPETA_OUTPUT, f"{nombre_base}_{sufijo}.mp4")
 
+    # Detectar si el video es grande (>500MB) para usar proxy
+    tam_mb = os.path.getsize(ruta_entrada) / (1024 * 1024)
+    usar_proxy = tam_mb > 500
+    if usar_proxy:
+        print(f"   Video grande ({tam_mb:.0f}MB) — usando proxy workflow")
+
     CONFIG["silencio_minimo"] = 1.5 if tipo == "workshop" else 0.5
     log = LogEdicion(nombre_archivo)
 
     try:
         # PASO 1: Eliminar silencios
-        eliminar_silencios(ruta_entrada, tmp_sin_sil, log=log)
+        if usar_proxy:
+            crear_proxy(ruta_entrada, tmp_proxy)
+            eliminar_silencios(tmp_proxy, tmp_sin_sil, log=log)
+        else:
+            eliminar_silencios(ruta_entrada, tmp_sin_sil, log=log)
 
         # PASO 2: Limpiar errores con GPT-4o
         if guion:
@@ -852,7 +943,7 @@ def editar_reel(nombre_archivo, fuente="montserrat", guion=None,
         print(f"{'='*55}\n")
 
     finally:
-        for tmp in [tmp_sin_sil, tmp_limpio, tmp_916, tmp_audio]:
+        for tmp in [tmp_proxy, tmp_sin_sil, tmp_limpio, tmp_916, tmp_audio]:
             if os.path.exists(tmp):
                 os.remove(tmp)
 
