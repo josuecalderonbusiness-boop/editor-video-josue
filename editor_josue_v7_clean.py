@@ -22,6 +22,13 @@ import shutil
 import argparse
 import datetime
 
+# Cargar variables de entorno desde .env
+try:
+    from dotenv import load_dotenv
+    load_dotenv()
+except ImportError:
+    pass
+
 try:
     import numpy as np
     from moviepy import VideoFileClip, concatenate_videoclips, VideoClip
@@ -31,11 +38,10 @@ except Exception:
     np = None
 
 # ─────────────────────────────────────────
-#  API KEYS — PONLAS AQUÍ
+#  API KEYS — se leen desde .env
 # ─────────────────────────────────────────
-OPENAI_API_KEY = "PEGA_TU_KEY_AQUI"
-CLAUDE_API_KEY = "PEGA_TU_KEY_AQUI"   # ← opcional, para cuando tengas crédito
-
+OPENAI_API_KEY = os.getenv("OPENAI_API_KEY", "")   # ← pon tu key en .env
+CLAUDE_API_KEY = os.getenv("CLAUDE_API_KEY", "")   # ← opcional
 
 # ─────────────────────────────────────────
 #  MAPA DE FUENTES
@@ -896,5 +902,3 @@ EJEMPLOS:
 
 if __name__ == "__main__":
     main()
-
-
