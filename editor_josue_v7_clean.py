@@ -775,7 +775,7 @@ def quemar_estilo_001(video, srt, salida, fuente="montserrat"):
 #  FLUJO PRINCIPAL
 # ─────────────────────────────────────────
 def editar_reel(nombre_archivo, fuente="montserrat", guion=None,
-                subtitulos=False, solo_limpiar=False, limpia_audio=False):
+                subtitulos=False, solo_limpiar=False, limpia_audio=False, tipo="reel"):
 
     print(f"\n{'='*55}")
     print(f"  EDITOR JOSUE v7.0 (OpenAI Whisper + GPT-4o)")
@@ -799,6 +799,7 @@ def editar_reel(nombre_archivo, fuente="montserrat", guion=None,
     sufijo        = fuente if subtitulos else "limpio"
     archivo_final = os.path.join(CARPETA_OUTPUT, f"{nombre_base}_{sufijo}.mp4")
 
+    CONFIG["silencio_minimo"] = 1.5 if tipo == "workshop" else 0.5
     log = LogEdicion(nombre_archivo)
 
     try:
@@ -880,6 +881,7 @@ EJEMPLOS:
     parser.add_argument("--subtitulos",   action="store_true")
     parser.add_argument("--solo-limpiar", action="store_true")
     parser.add_argument("--limpia-audio", action="store_true")
+    parser.add_argument("--tipo", choices=["reel","workshop"], default="reel")
 
     args = parser.parse_args()
 
@@ -896,9 +898,14 @@ EJEMPLOS:
             guion=args.guion,
             subtitulos=args.subtitulos,
             solo_limpiar=args.solo_limpiar,
-            limpia_audio=args.limpia_audio
+            limpia_audio=args.limpia_audio,
+            tipo=args.tipo
         )
 
 
 if __name__ == "__main__":
     main()
+
+
+
+
