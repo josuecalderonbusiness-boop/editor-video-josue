@@ -1,0 +1,11 @@
+.env
+uploads/
+output/
+input/
+logs/
+subtitulos/
+__pycache__/
+*.pyc
+tmp_*.mp4
+tmp_*.mp3
+tmp_*.txt

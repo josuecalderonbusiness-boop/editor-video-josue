@@ -1,0 +1,6 @@
+flask==3.0.3
+openai==2.33.0
+moviepy==1.0.3
+numpy
+pillow
+python-dotenv
