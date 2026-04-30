@@ -855,7 +855,7 @@ def quemar_estilo_001(video, srt, salida, fuente="montserrat"):
 #  FLUJO PRINCIPAL
 # ─────────────────────────────────────────
 def editar_reel(nombre_archivo, fuente="montserrat", guion=None,
-                subtitulos=False, solo_limpiar=False, limpia_audio=False, tipo="reel"):
+                subtitulos=False, solo_limpiar=False, limpia_audio=False):
 
     print(f"\n{'='*55}")
     print(f"  EDITOR JOSUE v7.0 (OpenAI Whisper + GPT-4o)")
@@ -882,11 +882,10 @@ def editar_reel(nombre_archivo, fuente="montserrat", guion=None,
 
     # Detectar si el video es grande (>500MB) para usar proxy
     tam_mb = os.path.getsize(ruta_entrada) / (1024 * 1024)
-    usar_proxy = tam_mb > 500
+    usar_proxy = False  # desactivado � audio-first es mas eficiente
     if usar_proxy:
         print(f"   Video grande ({tam_mb:.0f}MB) — usando proxy workflow")
 
-    CONFIG["silencio_minimo"] = 1.5 if tipo == "workshop" else 0.5
     log = LogEdicion(nombre_archivo)
 
     try:
@@ -972,7 +971,6 @@ EJEMPLOS:
     parser.add_argument("--subtitulos",   action="store_true")
     parser.add_argument("--solo-limpiar", action="store_true")
     parser.add_argument("--limpia-audio", action="store_true")
-    parser.add_argument("--tipo", choices=["reel","workshop"], default="reel")
 
     args = parser.parse_args()
 
@@ -989,14 +987,9 @@ EJEMPLOS:
             guion=args.guion,
             subtitulos=args.subtitulos,
             solo_limpiar=args.solo_limpiar,
-            limpia_audio=args.limpia_audio,
-            tipo=args.tipo
+            limpia_audio=args.limpia_audio
         )
 
 
 if __name__ == "__main__":
     main()
-
-
-
-

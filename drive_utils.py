@@ -15,24 +15,29 @@ def get_drive_service():
     else:
         with open("token.json", "r") as f:
             creds = Credentials.from_authorized_user_info(json.load(f), SCOPES)
-    
     if creds.expired and creds.refresh_token:
         creds.refresh(Request())
-    
     return build('drive', 'v3', credentials=creds)
 
 
 def descargar_archivo(file_id, destino_local):
     service = get_drive_service()
     request = service.files().get_media(fileId=file_id)
+    
     with open(destino_local, 'wb') as f:
-        downloader = MediaIoBaseDownload(f, request)
+        downloader = MediaIoBaseDownload(f, request, chunksize=50*1024*1024)  # 50MB por chunk
         done = False
         while not done:
             status, done = downloader.next_chunk()
             pct = int(status.progress() * 100)
-            print(f"   Descargando desde Drive... {pct}%", flush=True)
-    print(f"   Descarga completa: {destino_local}")
+            print(f"Descargando desde Drive... {pct}%", flush=True)
+    
+    # Verificar que el archivo se descargo completo
+    tam = os.path.getsize(destino_local)
+    if tam < 1024 * 1024:  # menos de 1MB = algo salio mal
+        raise Exception(f"Archivo descargado muy pequeño ({tam} bytes) — descarga incompleta")
+    
+    print(f"Descarga completa: {destino_local} ({tam / (1024*1024*1024):.2f}GB)", flush=True)
 
 
 def subir_archivo(ruta_local, nombre_drive, carpeta_id=None):
@@ -40,12 +45,12 @@ def subir_archivo(ruta_local, nombre_drive, carpeta_id=None):
     metadata = {'name': nombre_drive}
     if carpeta_id:
         metadata['parents'] = [carpeta_id]
-    media = MediaFileUpload(ruta_local, mimetype='video/mp4', resumable=True)
+    media = MediaFileUpload(ruta_local, mimetype='video/mp4', resumable=True, chunksize=50*1024*1024)
     file = service.files().create(
         body=metadata, media_body=media, fields='id,webViewLink'
     ).execute()
     link = file.get('webViewLink')
-    print(f"   Subido a Drive: {link}")
+    print(f"Subido a Drive: {link}", flush=True)
     return file.get('id'), link
 
 
