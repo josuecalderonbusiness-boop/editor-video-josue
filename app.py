@@ -1,4 +1,4 @@
-from flask import Flask, render_template, request, jsonify, send_file, Response
+﻿from flask import Flask, render_template, request, jsonify, send_file, Response
 import subprocess
 import os
 import threading
@@ -14,7 +14,6 @@ OUTPUT_FOLDER = 'output'
 os.makedirs(UPLOAD_FOLDER, exist_ok=True)
 os.makedirs(OUTPUT_FOLDER, exist_ok=True)
 
-# Estado de los jobs
 jobs = {}
 
 @app.route('/')
@@ -34,7 +33,7 @@ def procesar():
     solo_limpiar = request.form.get('solo_limpiar') == 'true'
 
     if not video:
-        return jsonify({'error': 'No se subió video'}), 400
+        return jsonify({'error': 'No se subio video'}), 400
 
     video_path = os.path.join(UPLOAD_FOLDER, f'{job_id}_{video.filename}')
     video.save(video_path)
@@ -58,7 +57,6 @@ def procesar():
         if solo_limpiar:
             cmd.append('--solo-limpiar')
 
-        # Copiar archivos a input/
         os.makedirs('input', exist_ok=True)
         os.rename(video_path, os.path.join('input', os.path.basename(video_path)))
         if guion_path:
@@ -72,7 +70,6 @@ def procesar():
                 jobs[job_id]['log'].append(line)
         proc.wait()
 
-        # Buscar output
         nombre_base = os.path.splitext(os.path.basename(video_path))[0]
         for f in os.listdir('output'):
             if nombre_base in f:
@@ -84,8 +81,107 @@ def procesar():
     t = threading.Thread(target=correr_editor)
     t.daemon = True
     t.start()
-
     return jsonify({'job_id': job_id})
+
+
+@app.route('/procesar-drive', methods=['POST'])
+def procesar_drive():
+    job_id = str(uuid.uuid4())[:8]
+    jobs[job_id] = {'status': 'iniciando', 'progress': 0, 'log': [], 'output': None, 'drive_link': None}
+
+    data = request.json
+    drive_file_id = data.get('drive_file_id', '').strip()
+    guion_texto   = data.get('guion', '').strip()
+    tipo          = data.get('tipo', 'reel')
+    subtitulos    = data.get('subtitulos', False)
+    limpia_audio  = data.get('limpia_audio', False)
+    solo_limpiar  = data.get('solo_limpiar', True)
+
+    if not drive_file_id:
+        return jsonify({'error': 'Falta el ID del archivo de Drive'}), 400
+
+    carpeta_output_id = os.getenv('DRIVE_OUTPUT_FOLDER_ID', '')
+
+    def correr_editor_drive():
+        try:
+            from drive_utils import descargar_archivo, subir_archivo
+
+            # 1. Descargar video desde Drive
+            nombre_video = f'drive_{job_id}.mp4'
+            video_local  = os.path.join('input', nombre_video)
+            os.makedirs('input', exist_ok=True)
+
+            jobs[job_id]['status'] = 'descargando'
+            jobs[job_id]['log'].append('Descargando video desde Google Drive...')
+            descargar_archivo(drive_file_id, video_local)
+            jobs[job_id]['log'].append('Descarga completa. Iniciando procesamiento...')
+
+            # 2. Guardar guion si viene
+            guion_nombre = None
+            if guion_texto:
+                guion_nombre = f'guion_{job_id}.txt'
+                with open(os.path.join('input', guion_nombre), 'w', encoding='utf-8') as f:
+                    f.write(guion_texto)
+
+            # 3. Correr editor
+            jobs[job_id]['status'] = 'procesando'
+            cmd = ['python', 'editor_josue_v7_clean.py', 'reel',
+                   nombre_video, '--tipo', tipo]
+            if guion_nombre:
+                cmd += ['--guion', guion_nombre]
+            if subtitulos:
+                cmd.append('--subtitulos')
+            if limpia_audio:
+                cmd.append('--limpia-audio')
+            if solo_limpiar:
+                cmd.append('--solo-limpiar')
+
+            proc = subprocess.Popen(cmd, stdout=subprocess.PIPE,
+                                    stderr=subprocess.STDOUT, text=True)
+            for line in proc.stdout:
+                line = line.strip()
+                if line:
+                    jobs[job_id]['log'].append(line)
+            proc.wait()
+
+            if proc.returncode != 0:
+                jobs[job_id]['status'] = 'error'
+                jobs[job_id]['log'].append('Error en el procesamiento.')
+                return
+
+            # 4. Buscar archivo de output
+            nombre_base = os.path.splitext(nombre_video)[0]
+            archivo_output = None
+            for f in os.listdir('output'):
+                if nombre_base in f:
+                    archivo_output = f
+                    break
+
+            if not archivo_output:
+                jobs[job_id]['status'] = 'error'
+                jobs[job_id]['log'].append('No se encontro el archivo de salida.')
+                return
+
+            # 5. Subir resultado a Drive
+            jobs[job_id]['status'] = 'subiendo'
+            jobs[job_id]['log'].append('Subiendo video procesado a Google Drive...')
+            ruta_output = os.path.join('output', archivo_output)
+            _, link = subir_archivo(ruta_output, f'procesado_{job_id}.mp4', carpeta_output_id)
+
+            jobs[job_id]['status'] = 'listo'
+            jobs[job_id]['output'] = archivo_output
+            jobs[job_id]['drive_link'] = link
+            jobs[job_id]['log'].append(f'Listo. Video en Drive: {link}')
+
+        except Exception as e:
+            jobs[job_id]['status'] = 'error'
+            jobs[job_id]['log'].append(f'Error: {str(e)}')
+
+    t = threading.Thread(target=correr_editor_drive)
+    t.daemon = True
+    t.start()
+    return jsonify({'job_id': job_id})
+
 
 @app.route('/status/<job_id>')
 def status(job_id):
