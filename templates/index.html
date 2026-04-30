@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="es">
 <head>
 <meta charset="UTF-8">
@@ -16,6 +16,7 @@
     --muted: #5a5a7a;
     --success: #4af7a0;
     --warning: #f7c74a;
+    --drive: #4a90f7;
   }
 
   * { box-sizing: border-box; margin: 0; padding: 0; }
@@ -44,18 +45,9 @@
     z-index: 0;
   }
 
-  .container {
-    width: 100%;
-    max-width: 600px;
-    position: relative;
-    z-index: 1;
-  }
+  .container { width: 100%; max-width: 600px; position: relative; z-index: 1; }
 
-  .header {
-    margin-bottom: 40px;
-    text-align: center;
-  }
-
+  .header { margin-bottom: 40px; text-align: center; }
   .header h1 {
     font-family: 'Syne', sans-serif;
     font-weight: 800;
@@ -66,22 +58,9 @@
     -webkit-text-fill-color: transparent;
     background-clip: text;
   }
+  .header p { color: var(--muted); font-size: 0.8rem; margin-top: 8px; letter-spacing: 0.1em; text-transform: uppercase; }
 
-  .header p {
-    color: var(--muted);
-    font-size: 0.8rem;
-    margin-top: 8px;
-    letter-spacing: 0.1em;
-    text-transform: uppercase;
-  }
-
-  .card {
-    background: var(--surface);
-    border: 1px solid var(--border);
-    border-radius: 16px;
-    padding: 28px;
-    margin-bottom: 16px;
-  }
+  .card { background: var(--surface); border: 1px solid var(--border); border-radius: 16px; padding: 28px; margin-bottom: 16px; }
 
   .section-label {
     font-size: 0.7rem;
@@ -93,12 +72,7 @@
     font-weight: 600;
   }
 
-  /* TIPO SELECTOR */
-  .tipo-grid {
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    gap: 10px;
-  }
+  .tipo-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
 
   .tipo-btn {
     border: 1px solid var(--border);
@@ -113,22 +87,30 @@
     font-weight: 700;
     font-size: 0.9rem;
   }
-
   .tipo-btn .icon { font-size: 1.5rem; display: block; margin-bottom: 6px; }
   .tipo-btn .desc { font-family: 'DM Mono', monospace; font-size: 0.65rem; color: var(--muted); margin-top: 4px; font-weight: 300; }
+  .tipo-btn.active { border-color: var(--accent); color: var(--text); background: rgba(124,106,247,0.1); }
+  .tipo-btn.active.workshop { border-color: var(--accent2); background: rgba(247,106,138,0.1); }
 
-  .tipo-btn.active {
-    border-color: var(--accent);
-    color: var(--text);
-    background: rgba(124,106,247,0.1);
+  /* MODO FUENTE */
+  .modo-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 16px; }
+  .modo-btn {
+    border: 1px solid var(--border);
+    background: transparent;
+    color: var(--muted);
+    border-radius: 10px;
+    padding: 14px 12px;
+    cursor: pointer;
+    transition: all 0.2s;
+    text-align: center;
+    font-family: 'Syne', sans-serif;
+    font-weight: 700;
+    font-size: 0.8rem;
   }
+  .modo-btn .icon { font-size: 1.3rem; display: block; margin-bottom: 4px; }
+  .modo-btn.active { border-color: var(--drive); color: var(--text); background: rgba(74,144,247,0.1); }
+  .modo-btn.active.upload { border-color: var(--accent); background: rgba(124,106,247,0.1); }
 
-  .tipo-btn.active.workshop {
-    border-color: var(--accent2);
-    background: rgba(247,106,138,0.1);
-  }
-
-  /* FILE UPLOAD */
   .upload-zone {
     border: 1px dashed var(--border);
     border-radius: 10px;
@@ -139,7 +121,6 @@
     position: relative;
     overflow: hidden;
   }
-
   .upload-zone:hover, .upload-zone.drag { border-color: var(--accent); background: rgba(124,106,247,0.05); }
   .upload-zone input { position: absolute; inset: 0; opacity: 0; cursor: pointer; width: 100%; }
   .upload-zone .icon { font-size: 1.8rem; margin-bottom: 8px; }
@@ -149,7 +130,52 @@
 
   .upload-row { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
 
-  /* OPCIONES */
+  /* DRIVE INPUT */
+  .drive-section { display: none; }
+  .drive-section.visible { display: block; }
+
+  .drive-input-wrap { position: relative; margin-bottom: 12px; }
+  .drive-input {
+    width: 100%;
+    background: #080810;
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 14px 16px;
+    color: var(--text);
+    font-family: 'DM Mono', monospace;
+    font-size: 0.78rem;
+    outline: none;
+    transition: border-color 0.2s;
+  }
+  .drive-input:focus { border-color: var(--drive); }
+  .drive-input::placeholder { color: var(--muted); }
+
+  .drive-hint {
+    font-size: 0.65rem;
+    color: var(--muted);
+    margin-top: 6px;
+    line-height: 1.6;
+  }
+  .drive-hint a { color: var(--drive); text-decoration: none; }
+
+  .guion-textarea {
+    width: 100%;
+    background: #080810;
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 14px 16px;
+    color: var(--text);
+    font-family: 'DM Mono', monospace;
+    font-size: 0.75rem;
+    outline: none;
+    transition: border-color 0.2s;
+    resize: vertical;
+    min-height: 100px;
+    line-height: 1.6;
+  }
+  .guion-textarea:focus { border-color: var(--accent); }
+  .guion-textarea::placeholder { color: var(--muted); }
+
   .opciones-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
 
   .toggle-btn {
@@ -166,24 +192,10 @@
     align-items: center;
     gap: 8px;
   }
-
-  .toggle-btn.active {
-    border-color: var(--success);
-    color: var(--text);
-    background: rgba(74,247,160,0.08);
-  }
-
-  .toggle-btn .dot {
-    width: 6px; height: 6px;
-    border-radius: 50%;
-    background: var(--muted);
-    flex-shrink: 0;
-    transition: background 0.2s;
-  }
-
+  .toggle-btn.active { border-color: var(--success); color: var(--text); background: rgba(74,247,160,0.08); }
+  .toggle-btn .dot { width: 6px; height: 6px; border-radius: 50%; background: var(--muted); flex-shrink: 0; transition: background 0.2s; }
   .toggle-btn.active .dot { background: var(--success); }
 
-  /* BOTÓN PROCESAR */
   .btn-procesar {
     width: 100%;
     padding: 18px;
@@ -199,12 +211,10 @@
     transition: all 0.2s;
     text-transform: uppercase;
   }
-
   .btn-procesar:hover { transform: translateY(-2px); box-shadow: 0 8px 30px rgba(124,106,247,0.3); }
   .btn-procesar:active { transform: translateY(0); }
   .btn-procesar:disabled { opacity: 0.4; cursor: not-allowed; transform: none; }
 
-  /* LOG */
   .log-box {
     background: #080810;
     border: 1px solid var(--border);
@@ -216,13 +226,12 @@
     overflow-y: auto;
     color: #7070a0;
   }
-
   .log-box .line-ok { color: var(--success); }
   .log-box .line-cut { color: var(--warning); }
   .log-box .line-header { color: var(--accent); font-weight: 500; }
   .log-box .line-err { color: var(--accent2); }
+  .log-box .line-drive { color: var(--drive); }
 
-  /* STATUS */
   .status-bar {
     display: flex;
     align-items: center;
@@ -233,19 +242,8 @@
     border: 1px solid rgba(74,247,160,0.2);
     margin-bottom: 12px;
   }
-
-  .status-dot {
-    width: 8px; height: 8px;
-    border-radius: 50%;
-    background: var(--success);
-    animation: pulse 1.5s infinite;
-  }
-
-  @keyframes pulse {
-    0%, 100% { opacity: 1; }
-    50% { opacity: 0.3; }
-  }
-
+  .status-dot { width: 8px; height: 8px; border-radius: 50%; background: var(--success); animation: pulse 1.5s infinite; }
+  @keyframes pulse { 0%, 100% { opacity: 1; } 50% { opacity: 0.3; } }
   .status-text { font-size: 0.78rem; color: var(--success); }
 
   .btn-descargar {
@@ -262,15 +260,36 @@
     transition: all 0.2s;
     text-transform: uppercase;
     letter-spacing: 0.05em;
+    margin-bottom: 8px;
   }
-
   .btn-descargar:hover { background: rgba(74,247,160,0.2); }
+
+  .btn-drive-link {
+    width: 100%;
+    padding: 14px;
+    border-radius: 12px;
+    border: 1px solid var(--drive);
+    background: rgba(74,144,247,0.1);
+    color: var(--drive);
+    font-family: 'Syne', sans-serif;
+    font-weight: 700;
+    font-size: 0.85rem;
+    cursor: pointer;
+    transition: all 0.2s;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    text-decoration: none;
+    display: block;
+    text-align: center;
+  }
+  .btn-drive-link:hover { background: rgba(74,144,247,0.2); }
 
   .hidden { display: none; }
 
   @media (max-width: 480px) {
     .upload-row { grid-template-columns: 1fr; }
     .opciones-grid { grid-template-columns: 1fr; }
+    .modo-grid { grid-template-columns: 1fr 1fr; }
   }
 </style>
 </head>
@@ -298,24 +317,60 @@
     </div>
   </div>
 
-  <!-- ARCHIVOS -->
+  <!-- FUENTE DEL VIDEO -->
   <div class="card">
-    <div class="section-label">Archivos</div>
-    <div class="upload-row">
-      <div class="upload-zone" id="zone-video">
-        <input type="file" id="input-video" accept="video/*" onchange="setFile('video', this)">
-        <div class="icon">🎬</div>
-        <div class="label">Video</div>
-        <div class="hint">MP4, MOV, cualquier formato</div>
-        <div class="filename" id="name-video"></div>
+    <div class="section-label">Fuente del video</div>
+    <div class="modo-grid">
+      <button class="modo-btn active upload" id="btn-modo-upload" onclick="setModo('upload')">
+        <span class="icon">💻</span>
+        Subir archivo
+      </button>
+      <button class="modo-btn" id="btn-modo-drive" onclick="setModo('drive')">
+        <span class="icon">☁️</span>
+        Google Drive
+      </button>
+    </div>
+
+    <!-- MODO UPLOAD -->
+    <div id="seccion-upload">
+      <div class="upload-row">
+        <div class="upload-zone" id="zone-video">
+          <input type="file" id="input-video" accept="video/*" onchange="setFile('video', this)">
+          <div class="icon">🎬</div>
+          <div class="label">Video</div>
+          <div class="hint">MP4, MOV, cualquier formato</div>
+          <div class="filename" id="name-video"></div>
+        </div>
+        <div class="upload-zone" id="zone-guion">
+          <input type="file" id="input-guion" accept=".txt" onchange="setFile('guion', this)">
+          <div class="icon">📄</div>
+          <div class="label">Guion</div>
+          <div class="hint">.txt · opcional</div>
+          <div class="filename" id="name-guion"></div>
+        </div>
       </div>
-      <div class="upload-zone" id="zone-guion">
-        <input type="file" id="input-guion" accept=".txt" onchange="setFile('guion', this)">
-        <div class="icon">📄</div>
-        <div class="label">Guion</div>
-        <div class="hint">.txt · opcional</div>
-        <div class="filename" id="name-guion"></div>
+    </div>
+
+    <!-- MODO DRIVE -->
+    <div id="seccion-drive" class="drive-section">
+      <div class="drive-input-wrap">
+        <input
+          type="text"
+          class="drive-input"
+          id="drive-file-id"
+          placeholder="ID del video en Google Drive"
+        >
+        <div class="drive-hint">
+          Abre el video en Drive → clic derecho → Compartir → Copiar enlace<br>
+          El ID es la parte larga de la URL: drive.google.com/file/d/<strong>ESTE_ES_EL_ID</strong>/view
+        </div>
       </div>
+      <div class="section-label" style="margin-top:16px;">Guion (pega el texto)</div>
+      <textarea
+        class="guion-textarea"
+        id="drive-guion-texto"
+        placeholder="Pega aquí el texto del guion... (opcional)"
+      ></textarea>
     </div>
   </div>
 
@@ -354,12 +409,16 @@
       <button class="btn-descargar hidden" id="btn-descargar" onclick="descargar()">
         ⬇ Descargar Video Editado
       </button>
+      <a class="btn-drive-link hidden" id="btn-drive-link" href="#" target="_blank">
+        ☁️ Ver en Google Drive
+      </a>
     </div>
   </div>
 </div>
 
 <script>
 let tipo = 'reel';
+let modo = 'upload';
 let opciones = { solo_limpiar: true, subtitulos: false, limpia_audio: false, convertir_916: false };
 let jobId = null;
 let polling = null;
@@ -371,6 +430,14 @@ function setTipo(t) {
   document.getElementById('btn-workshop').classList.toggle('active', t === 'workshop');
 }
 
+function setModo(m) {
+  modo = m;
+  document.getElementById('btn-modo-upload').classList.toggle('active', m === 'upload');
+  document.getElementById('btn-modo-drive').classList.toggle('active', m === 'drive');
+  document.getElementById('seccion-upload').style.display = m === 'upload' ? 'block' : 'none';
+  document.getElementById('seccion-drive').classList.toggle('visible', m === 'drive');
+}
+
 function setFile(tipo, input) {
   const name = input.files[0]?.name || '';
   document.getElementById('name-' + tipo).textContent = name;
@@ -379,8 +446,6 @@ function setFile(tipo, input) {
 
 function toggle(key) {
   opciones[key] = !opciones[key];
-  const btn = document.getElementById('opt-' + key.replace('_', '').replace('limpiar','solo').replace('subtitulos','subs').replace('limpia_audio','audio').replace('convertir_916','916'));
-  // map de ids
   const map = { solo_limpiar: 'opt-solo', subtitulos: 'opt-subs', limpia_audio: 'opt-audio', convertir_916: 'opt-916' };
   document.getElementById(map[key]).classList.toggle('active', opciones[key]);
 }
@@ -389,10 +454,11 @@ function addLog(line) {
   const box = document.getElementById('log-box');
   const div = document.createElement('div');
   let cls = '';
-  if (line.includes('LISTO') || line.includes('eliminad') || line.includes('listo')) cls = 'line-ok';
+  if (line.includes('LISTO') || line.includes('eliminad') || line.includes('listo') || line.includes('Listo')) cls = 'line-ok';
   else if (line.includes('Corte') || line.includes('Repeticion') || line.includes('cortado')) cls = 'line-cut';
   else if (line.includes('===') || line.includes('EDITOR')) cls = 'line-header';
   else if (line.includes('Error') || line.includes('error')) cls = 'line-err';
+  else if (line.includes('Drive') || line.includes('Descargando') || line.includes('Subiendo')) cls = 'line-drive';
   div.className = cls;
   div.textContent = line;
   box.appendChild(div);
@@ -400,14 +466,27 @@ function addLog(line) {
 }
 
 async function procesar() {
-  const videoInput = document.getElementById('input-video');
-  if (!videoInput.files[0]) { alert('Selecciona un video'); return; }
-
   document.getElementById('btn-procesar').disabled = true;
   document.getElementById('seccion-proceso').classList.remove('hidden');
   document.getElementById('btn-descargar').classList.add('hidden');
+  document.getElementById('btn-drive-link').classList.add('hidden');
   document.getElementById('log-box').innerHTML = '';
   logCount = 0;
+
+  if (modo === 'drive') {
+    await procesarDrive();
+  } else {
+    await procesarUpload();
+  }
+}
+
+async function procesarUpload() {
+  const videoInput = document.getElementById('input-video');
+  if (!videoInput.files[0]) {
+    alert('Selecciona un video');
+    document.getElementById('btn-procesar').disabled = false;
+    return;
+  }
 
   const fd = new FormData();
   fd.append('video', videoInput.files[0]);
@@ -421,7 +500,38 @@ async function procesar() {
   const res = await fetch('/procesar', { method: 'POST', body: fd });
   const data = await res.json();
   jobId = data.job_id;
+  polling = setInterval(checkStatus, 2000);
+}
 
+async function procesarDrive() {
+  const driveId = document.getElementById('drive-file-id').value.trim();
+  if (!driveId) {
+    alert('Pega el ID del video de Google Drive');
+    document.getElementById('btn-procesar').disabled = false;
+    return;
+  }
+
+  // Extraer ID si pegan el enlace completo
+  let fileId = driveId;
+  const match = driveId.match(/\/d\/([a-zA-Z0-9_-]+)/);
+  if (match) fileId = match[1];
+
+  const guionTexto = document.getElementById('drive-guion-texto').value.trim();
+
+  const res = await fetch('/procesar-drive', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({
+      drive_file_id: fileId,
+      guion: guionTexto,
+      tipo: tipo,
+      solo_limpiar: opciones.solo_limpiar,
+      subtitulos: opciones.subtitulos,
+      limpia_audio: opciones.limpia_audio
+    })
+  });
+  const data = await res.json();
+  jobId = data.job_id;
   polling = setInterval(checkStatus, 2000);
 }
 
@@ -430,20 +540,30 @@ async function checkStatus() {
   const res = await fetch('/status/' + jobId);
   const data = await res.json();
 
-  // Mostrar nuevas líneas del log
   const newLines = data.log.slice(logCount);
   newLines.forEach(addLog);
   logCount = data.log.length;
 
-  document.getElementById('status-text').textContent =
-    data.status === 'listo' ? '✅ Listo' :
-    data.status === 'error' ? '❌ Error' :
-    '⚙️ Procesando...';
+  const statusMap = {
+    listo: '✅ Listo',
+    error: '❌ Error',
+    descargando: '☁️ Descargando desde Drive...',
+    procesando: '⚙️ Procesando...',
+    subiendo: '☁️ Subiendo a Drive...',
+  };
+  document.getElementById('status-text').textContent = statusMap[data.status] || 'Procesando...';
 
   if (data.status === 'listo') {
     clearInterval(polling);
-    document.getElementById('btn-descargar').classList.remove('hidden');
     document.getElementById('btn-procesar').disabled = false;
+    if (data.output) {
+      document.getElementById('btn-descargar').classList.remove('hidden');
+    }
+    if (data.drive_link) {
+      const linkBtn = document.getElementById('btn-drive-link');
+      linkBtn.href = data.drive_link;
+      linkBtn.classList.remove('hidden');
+    }
   } else if (data.status === 'error') {
     clearInterval(polling);
     document.getElementById('btn-procesar').disabled = false;
