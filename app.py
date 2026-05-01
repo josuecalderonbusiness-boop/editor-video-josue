@@ -47,7 +47,7 @@ def procesar():
         jobs[job_id]['status'] = 'procesando'
         cmd = ['python', 'editor_josue_v7_clean.py', 'reel',
                os.path.basename(video_path),
-               '--tipo', tipo]
+               ]
         if guion_path:
             cmd += ['--guion', os.path.basename(guion_path)]
         if subtitulos:
@@ -126,7 +126,7 @@ def procesar_drive():
             # 3. Correr editor
             jobs[job_id]['status'] = 'procesando'
             cmd = ['python', 'editor_josue_v7_clean.py', 'reel',
-                   nombre_video, '--tipo', tipo]
+                   nombre_video, ]
             if guion_nombre:
                 cmd += ['--guion', guion_nombre]
             if subtitulos:
