@@ -304,7 +304,7 @@ def eliminar_silencios(entrada, salida, log=None):
 
     # PASO C — aplicar cortes al video original sin recodificar
     print("   Aplicando cortes al video original...")
-    lista_tmp = os.path.join(os.path.dirname(video_entrada) or ".", "tmp_sil_concat.txt")
+    lista_tmp = os.path.join(os.path.dirname(entrada) or ".", "tmp_sil_concat.txt")
     clips_tmp = []
     with open(lista_tmp, "w", encoding="utf-8") as f:
         for idx, (t_s, t_e) in enumerate(segmentos):
