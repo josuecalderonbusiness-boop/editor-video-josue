@@ -793,9 +793,12 @@ Si no hay nada que cortar: {{"cortes": []}}"""
         for c in cortes_raw:
             t_ini = float(c["inicio"])
             t_fin = float(c["fin"])
-            dur   = t_fin - t_ini
             tipo  = c.get("tipo", "error")
             desc  = c.get("descripcion", "")
+            # Retroceder 2 segundos para incluir silencio y contexto previo
+            if tipo in ["repito", "intento_fallido"]:
+                t_ini = max(0, t_ini - 2.0)
+            dur = t_fin - t_ini
             if dur >= 0.3:
                 emoji = "Repeticion" if tipo == "intento_fallido" else "Corte"
                 print(f"   [{emoji}] {desc} ({t_ini:.2f}s -> {t_fin:.2f}s, {dur:.1f}s)")
