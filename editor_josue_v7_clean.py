@@ -242,7 +242,7 @@ def aplicar_cortes_a_original(original, segmentos, salida):
 def eliminar_silencios(entrada, salida, log=None):
     print("\nEliminando silencios...")
     umbral_db    = CONFIG["umbral_db"]
-    silencio_min = 1.5 if "workshop" in nombre_archivo.lower() else CONFIG["silencio_minimo"]
+    silencio_min = CONFIG["silencio_minimo"]
     margen       = CONFIG["margen_corte"]
 
     # Detectar duracion total con ffprobe
