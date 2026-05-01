@@ -1,4 +1,4 @@
-#!/usr/bin/env python3
+﻿#!/usr/bin/env python3
 # ============================================================
 #   EDITOR DE VIDEO PERSONAL — JOSUÉ CALDERÓN  v7.0
 #   Sistema automático: silencio + limpieza con IA + exportación
@@ -882,7 +882,7 @@ def editar_reel(nombre_archivo, fuente="montserrat", guion=None,
 
     # Detectar si el video es grande (>500MB) para usar proxy
     tam_mb = os.path.getsize(ruta_entrada) / (1024 * 1024)
-    usar_proxy = False  # desactivado � audio-first es mas eficiente
+    usar_proxy = False  # desactivado � audio-first es mas eficiente
     if usar_proxy:
         print(f"   Video grande ({tam_mb:.0f}MB) — usando proxy workflow")
 
