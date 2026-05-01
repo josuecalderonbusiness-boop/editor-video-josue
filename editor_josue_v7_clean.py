@@ -242,7 +242,7 @@ def aplicar_cortes_a_original(original, segmentos, salida):
 def eliminar_silencios(entrada, salida, log=None):
     print("\nEliminando silencios...")
     umbral_db    = CONFIG["umbral_db"]
-    silencio_min = CONFIG["silencio_minimo"]
+    silencio_min = 1.5 if "workshop" in nombre_archivo.lower() else CONFIG["silencio_minimo"]
     margen       = CONFIG["margen_corte"]
 
     # Detectar duracion total con ffprobe
@@ -426,7 +426,8 @@ def transcribir_con_openai(audio_path):
                 language="es",
                 response_format="verbose_json",
                 timestamp_granularities=["word"],
-                prompt="Transcribe exactamente lo que escuchas, incluyendo palabras incompletas, cortadas o mal pronunciadas. No corrijas ni interpretes."
+                prompt="Transcribe literalmente todo lo que escuchas sin corregir nada. Si alguien dice 'repito' escribe 'repito'. Si alguien dice una palabra incompleta escribela incompleta. Si hay ruido o comentarios fuera de tema escribelos. No interpretes ni corrijas absolutamente nada.",
+temperature=0.0
             )
 
         audio_words = []
@@ -540,20 +541,27 @@ def detectar_errores_con_gpt4(guion_texto, audio_words):
     lineas = [f"  {w['t_ini']:.2f}s  {w['orig']}" for w in audio_words]
     transcripcion_str = "\n".join(lineas)
 
-    prompt = f"""Eres un editor de video profesional. Te voy a dar el guion de una clase y la transcripcion de lo que el coach realmente dijo. Tu trabajo es identificar exactamente que se debe cortar para que el audio final suene profesional y limpio.
+    prompt = f"""Eres un editor de video profesional con 15 años de experiencia editando clases y workshops. Te doy el guion y la transcripcion real de un coach con dislexia del habla.
 
-El coach tiene dislexia del habla. Cuando se equivoca dice "repito" y vuelve a empezar la frase. Tambien a veces hace comentarios fuera del tema de la clase.
+Tu unica tarea: identificar los momentos del audio que suenan como errores del habla y marcarlos para cortar. El resultado debe sonar como si el coach hubiera grabado perfecto.
 
-Lee el guion completo primero para entender el contenido. Luego lee la transcripcion con timestamps. Usando tu criterio como editor experto, identifica:
+ERRORES QUE DEBES BUSCAR:
 
-- Todo lo que suena como un error del habla
-- Frases que el coach empezo y no termino correctamente
-- Comentarios que no son parte de la clase
-- Repeticiones donde dijo "repito" y volvio a empezar
+1. El coach dice "repito" — significa que se equivoco y va a repetir. Debes cortar desde donde empezo la frase fallida hasta despues del "repito". La segunda vez que dice la frase es la correcta y se conserva. Busca en los timestamps el momento exacto donde empezo a decir esa frase por primera vez.
 
-Para cada corte, usa los timestamps para indicar exactamente donde empieza y termina lo que se debe eliminar. El resultado final debe sonar como si el coach lo hubiera dicho perfecto desde el principio.
+2. Comentarios personales fuera de la clase — cosas que le dice a alguien en la sala, comentarios sobre el mismo, interrupciones. Ejemplos: "silencio papi", "ay espera", "se me olvido cronometrar", "perdon". Corta todo eso.
 
-IMPORTANTE: No cortes contenido valido de la clase aunque este parafraseado diferente al guion. Solo errores del habla y comentarios fuera de contexto. Tu trabajo es limpiar el audio de un coach hispanohablante que tiene dislexia del habla.
+3. Palabras repetidas seguidas sin "repito" — tartamudeo. Conserva la ultima repeticion.
+
+4. Palabras incompletas seguidas de la misma palabra completa.
+
+LO QUE NUNCA DEBES CORTAR:
+- Contenido de la clase aunque este parafraseado diferente al guion
+- Introducciones como "leccion nueve", "dimension cuatro"
+- Pausas normales
+- Si tienes duda — NO cortes
+
+Analiza la transcripcion como lo haria un editor humano inteligente que escucha el audio y decide que suena mal para el espectador final. Tu trabajo es limpiar el audio de un coach hispanohablante que tiene dislexia del habla.
 
 Tienes dos insumos:
 1. El GUION — lo que el coach tenía planeado decir
