@@ -316,7 +316,7 @@ def eliminar_silencios(entrada, salida, log=None):
                 "ffmpeg", "-y",
                 "-ss", str(t_s), "-to", str(t_e),
                 "-i", entrada,
-                "-c:v", "copy", "-c:a", "aac",
+                "-c:v", "copy", "-c:a", "aac", "-af", "afade=t=in:st=0:d=0.05",
                 "-avoid_negative_ts", "make_zero", clip_tmp
             ]
             subprocess.run(cmd_corte, capture_output=True, text=True)
@@ -324,7 +324,7 @@ def eliminar_silencios(entrada, salida, log=None):
 
     cmd_concat = [
         "ffmpeg", "-y", "-f", "concat", "-safe", "0",
-        "-i", lista_tmp, "-c", "copy", salida
+        "-i", lista_tmp, "-c:v", "copy", "-c:a", "aac", salida
     ]
     r2 = subprocess.run(cmd_concat, capture_output=True, text=True)
 
