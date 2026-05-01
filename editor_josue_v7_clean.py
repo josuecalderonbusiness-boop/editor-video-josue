@@ -345,6 +345,29 @@ def eliminar_silencios(entrada, salida, log=None):
 # ─────────────────────────────────────────
 #  PASO 2 — CONVERTIR A 9:16
 # ─────────────────────────────────────────
+def aplicar_color_workshop(entrada, salida):
+    print("\nAplicando correccion de color profesional...")
+    filtro = (
+        "eq=brightness=-0.03:contrast=1.08:saturation=0.88,"
+        "curves=r='0/0 0.22/0.18 0.75/0.72 1/1':"
+               "g='0/0 0.22/0.21 0.75/0.73 1/0.97':"
+               "b='0/0 0.22/0.20 0.75/0.70 1/0.94',"
+        "unsharp=3:3:0.4:3:3:0.0"
+    )
+    cmd = [
+        "ffmpeg", "-y", "-i", entrada,
+        "-vf", filtro,
+        "-c:v", "libx264", "-crf", "18", "-preset", "slow",
+        "-c:a", "copy", salida
+    ]
+    r = subprocess.run(cmd, capture_output=True, text=True)
+    if r.returncode != 0:
+        print(f"Error correccion color: {r.stderr[-200:]}")
+        return False
+    print("Correccion de color aplicada.")
+    return True
+
+
 def convertir_916(entrada, salida):
     print("\nConvirtiendo a 9:16...")
     res    = CONFIG["resolucion"]
@@ -855,7 +878,7 @@ def quemar_estilo_001(video, srt, salida, fuente="montserrat"):
 #  FLUJO PRINCIPAL
 # ─────────────────────────────────────────
 def editar_reel(nombre_archivo, fuente="montserrat", guion=None,
-                subtitulos=False, solo_limpiar=False, limpia_audio=False):
+                subtitulos=False, solo_limpiar=False, limpia_audio=False, color_workshop=False):
 
     print(f"\n{'='*55}")
     print(f"  EDITOR JOSUE v7.0 (OpenAI Whisper + GPT-4o)")
@@ -917,7 +940,14 @@ def editar_reel(nombre_archivo, fuente="montserrat", guion=None,
 
         # PASO 3: Convertir o guardar
         if solo_limpiar:
-            shutil.copy2(video_para_procesar, archivo_final)
+            if color_workshop:
+                tmp_color = f"tmp_{nombre_base}_color.mp4"
+                aplicar_color_workshop(video_para_procesar, tmp_color)
+                shutil.copy2(tmp_color, archivo_final)
+                if os.path.exists(tmp_color):
+                    os.remove(tmp_color)
+            else:
+                shutil.copy2(video_para_procesar, archivo_final)
             print(f"\nVideo limpio guardado: {archivo_final}")
         else:
             convertir_916(video_para_procesar, tmp_916)
@@ -939,6 +969,7 @@ def editar_reel(nombre_archivo, fuente="montserrat", guion=None,
         if guion:        print(f"  Errores limpiados con GPT-4o")
         if subtitulos:   print(f"  Subtitulos aplicados")
         if limpia_audio: print(f"  Audio limpiado")
+        if color_workshop: print(f"  Color workshop: activado")
         print(f"{'='*55}\n")
 
     finally:
@@ -971,6 +1002,7 @@ EJEMPLOS:
     parser.add_argument("--subtitulos",   action="store_true")
     parser.add_argument("--solo-limpiar", action="store_true")
     parser.add_argument("--limpia-audio", action="store_true")
+    parser.add_argument("--color-workshop", action="store_true")
 
     args = parser.parse_args()
 
@@ -987,7 +1019,8 @@ EJEMPLOS:
             guion=args.guion,
             subtitulos=args.subtitulos,
             solo_limpiar=args.solo_limpiar,
-            limpia_audio=args.limpia_audio
+            limpia_audio=args.limpia_audio,
+            color_workshop=getattr(args, "color_workshop", False)
         )
 
 
