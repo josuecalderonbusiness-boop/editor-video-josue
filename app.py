@@ -133,6 +133,8 @@ def procesar_drive():
                 while not done:
                     status, done = downloader.next_chunk()
                     pct = int(status.progress() * 100)
+                    jobs[job_id]['log'][-1] = f'Descargando desde Drive... {pct}%'
+                    pct = int(status.progress() * 100)
                     jobs[job_id]['log'].append(f'Descargando desde Drive... {pct}%')
             jobs[job_id]['log'].append(f'Descarga completa.')
             jobs[job_id]['log'].append('Descarga completa. Iniciando procesamiento...')
