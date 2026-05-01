@@ -63,11 +63,17 @@ def procesar():
             os.rename(guion_path, os.path.join('input', os.path.basename(guion_path)))
 
         proc = subprocess.Popen(cmd, stdout=subprocess.PIPE,
-                                stderr=subprocess.STDOUT, text=True)
+                                stderr=subprocess.STDOUT, text=True, bufsize=1)
         for line in proc.stdout:
             line = line.strip()
             if line:
                 jobs[job_id]['log'].append(line)
+                jobs[job_id]['status'] = (
+                    'descargando' if 'Descargando' in line else
+                    'procesando' if any(x in line for x in ['Eliminando', 'Transcribiendo', 'GPT-4o', 'Aplicando']) else
+                    'subiendo' if 'Subiendo' in line else
+                    jobs[job_id]['status']
+                )
         proc.wait()
 
         nombre_base = os.path.splitext(os.path.basename(video_path))[0]
