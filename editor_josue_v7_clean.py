@@ -304,7 +304,7 @@ def eliminar_silencios(entrada, salida, log=None):
 
     # PASO C — aplicar cortes al video original sin recodificar
     print("   Aplicando cortes al video original...")
-    lista_tmp = "tmp_sil_concat.txt"
+    lista_tmp = os.path.join(os.path.dirname(video_entrada) or ".", "tmp_sil_concat.txt")
     clips_tmp = []
     with open(lista_tmp, "w", encoding="utf-8") as f:
         for idx, (t_s, t_e) in enumerate(segmentos):
@@ -636,7 +636,7 @@ def aplicar_cortes_con_fade(video_entrada, segmentos, video_salida):
         return False
 
     fade_s    = CONFIG["fade_audio_ms"] / 1000.0
-    lista_tmp = "tmp_fade_concat.txt"
+    lista_tmp = os.path.join(os.path.dirname(video_entrada) or ".", "tmp_fade_concat.txt")
     clips_tmp = []
 
     print(f"   Aplicando fade de {CONFIG['fade_audio_ms']}ms en cada corte...")
@@ -758,6 +758,9 @@ def limpiar_errores_con_guion(video_entrada, guion_txt, video_salida,
         return video_entrada
 
     exito = aplicar_cortes_con_fade(video_entrada, segmentos, video_salida)
+    if not exito:
+        print("   Fade falló, aplicando cortes sin fade...")
+        exito = aplicar_cortes_a_original(video_entrada, segmentos, video_salida)
     return video_salida if exito else video_entrada
 
 
