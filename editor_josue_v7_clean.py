@@ -540,7 +540,17 @@ def detectar_errores_con_gpt4(guion_texto, audio_words):
     lineas = [f"  {w['t_ini']:.2f}s  {w['orig']}" for w in audio_words]
     transcripcion_str = "\n".join(lineas)
 
-    prompt = f"""Eres un editor de video profesional especializado en contenido de coaches y formadores hispanohablantes. Trabajas con un creador que tiene dislexia del habla y usa la palabra "repito" como señal explícita de que va a repetir una frase correctamente.
+    prompt = f"""Eres un editor de video experto con criterio humano. Tu trabajo es limpiar el audio de un coach hispanohablante que tiene dislexia del habla.
+
+Tienes dos insumos:
+1. El GUION — lo que el coach tenía planeado decir
+2. La TRANSCRIPCION con timestamps — lo que realmente dijo
+
+Tu tarea NO es verificar que el audio coincida palabra por palabra con el guion. Tu tarea es identificar los errores del habla — los momentos donde el coach tropezó, se interrumpió, se repitió o dijo algo fuera de contexto — y marcarlos para cortar.
+
+Usa el guion para ENTENDER el contenido y el contexto, no para comparar literalmente. El coach puede parafrasear, reordenar palabras, agregar ejemplos o hacer transiciones propias — todo eso es válido y NO se corta.
+
+PIENSA COMO UN EDITOR HUMANO: si estuvieras viendo el video, ¿qué momentos sonarían raros, repetidos o fuera de lugar para el espectador? Eso es lo que cortas.
 
 CONTEXTO IMPORTANTE:
 - El guion es una GUIA de contenido, no un script palabra por palabra
@@ -564,54 +574,55 @@ GUION ORIGINAL (lo que DEBIA decir):
 TRANSCRIPCION DEL AUDIO con timestamps en segundos (lo que REALMENTE dijo):
 {transcripcion_str}
 
-QUE CORTAR — EN ORDEN DE PRIORIDAD:
+QUE CORTAR — SOLO ERRORES DEL HABLA:
 
-1. PATRON "REPITO": La palabra "repito" es una señal explicita del creador de que va a repetir la frase correctamente.
-PROCEDIMIENTO EXACTO:
-- Localiza la palabra "repito" en los timestamps
-- Busca HACIA ATRAS en la transcripcion hasta encontrar donde empezo a decir esa misma frase — busca la primera palabra que se repite despues del "repito"
-- El corte empieza exactamente donde empezo la frase fallida
-- El corte termina justo despues de la palabra "repito"
-- Lo que queda es la version correcta completa
+1. PATRON "REPITO" — el mas importante:
+El coach usa "repito" como señal explicita de que va a volver a decir una frase correctamente.
+COMO IDENTIFICAR EL CORTE:
+- Encuentra "repito" en los timestamps
+- Mira las palabras que vienen DESPUES del "repito" — esa es la version correcta
+- Busca hacia ATRAS hasta encontrar donde empezo a decir ESA MISMA frase — cuando aparece la primera palabra de la version correcta por primera vez
+- Corta desde ahi hasta el final de "repito" inclusive
+- La version correcta que viene despues queda intacta
 
-Ejemplo con timestamps:
-  3.2s "Sales"
-  3.8s "de"
-  4.1s "aqui"
-  4.5s "con"
-  4.9s "tres"
-  5.3s "sistemas"
-  5.8s "que"
-  6.1s "la"
-  6.4s "mayoria"
-  6.8s "repito"   ← señal de corte
-  7.5s "Sales"    ← aqui empieza la version correcta
-  8.0s "de"
-  8.3s "aqui"...
+Ejemplo real:
+  6.3s  "Sales"
+  6.8s  "de"
+  7.1s  "aqui"
+  7.5s  "con"
+  7.9s  "tres"
+  8.3s  "repito"    ← señal
+  9.0s  "Sales"     ← inicio version correcta
+  9.5s  "de"
+  9.8s  "aqui"
+  10.2s "con"
+  10.6s "tres"
+  11.0s "sistemas"
 
-En este ejemplo: cortar desde 3.2s hasta 7.4s (todo hasta antes de "Sales" la segunda vez)
-Conservar desde 7.5s en adelante.
+Cortar: 6.3s → 9.0s (desde el primer "Sales" hasta antes del segundo "Sales")
+Conservar: desde 9.0s en adelante
 
-REGLA CRITICA: El inicio del corte es donde empezo a decir la misma frase que va a repetir — no desde el inicio del parrafo, no desde el inicio de la oracion anterior. Solo la frase especifica que fallo.
-REGLA ABSOLUTA: La palabra "repito" NUNCA queda en el audio final.
+2. COMENTARIOS FUERA DEL CONTENIDO:
+Frases que claramente no son parte de la clase — comentarios a alguien en la sala, interrupciones propias, observaciones personales.
+Ejemplos tipicos: "silencio papi", "ay espera", "un momento", "perdon", "me equivoque", "ahi se me olvido cronometrar"
+Cortar la frase completa incluyendo la pausa que genera.
 
-2. COMENTARIOS FUERA DE CONTEXTO: Palabras o frases que claramente no son parte del contenido.
-Ejemplos: "silencio papi", "un momento", "perdon", "espera", cualquier comentario dirigido a alguien en la sala.
-Estas frases se cortan completas.
+3. TARTAMUDEO:
+La misma silaba o palabra repetida 2 o mas veces seguidas.
+Ejemplo: "y y y entonces" — cortar los primeros "y y", dejar el ultimo "y entonces"
 
-3. TARTAMUDEO: La misma silaba o palabra repetida 2 o mas veces seguidas SIN "repito".
-Ejemplo: "y y y entonces" — cortar los primeros "y y", dejar el ultimo.
+4. PALABRA TRABADA:
+Palabra incompleta seguida inmediatamente de la misma palabra completa, a menos de 1.5 segundos.
+Ejemplo: "siste... sistemas" — cortar "siste..."
 
-4. PALABRA TRABADA: Palabra incompleta o distorsionada seguida de la misma palabra correcta, a menos de 1.5 segundos de distancia.
-Ejemplo: "consu... consumiendo" — cortar "consu..."
+QUE NUNCA CORTAR:
+- Contenido del guion aunque este parafraseado o con palabras diferentes
+- Introducciones de seccion como "leccion nueve", "dimension cuatro", "punto siguiente"
+- Transiciones propias del coach aunque no esten en el guion
+- Pausas normales para pensar
+- Cuando tengas duda — NO cortes. Es mejor dejar algo que no deberia estar que cortar algo valido.
 
-QUE NO CORTAR:
-- Introducciones de seccion: "leccion nueve", "punto uno", "ahora bien", "siguiente" — son validas aunque no esten en el guion escrito
-- Variaciones naturales de fraseo — el guion es una guia, no un script exacto
-- Palabras ligeramente mal pronunciadas pero entendibles
-- Cuando tengas duda, NO cortes
-
-REGLA CRITICA: Si una frase aparece DOS veces seguidas, la PRIMERA es el error, la SEGUNDA es la correcta. Cortar siempre la primera.
+REGLA DE ORO: Solo cortas errores del habla. Nunca cortas contenido.
 
 RESPONDE UNICAMENTE con JSON valido, sin explicaciones, sin markdown:
 {{"cortes": [{{"inicio": 34.80, "fin": 38.12, "tipo": "repito", "descripcion": "frase repetida con repito"}}]}}
