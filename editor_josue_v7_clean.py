@@ -540,7 +540,21 @@ def detectar_errores_con_gpt4(guion_texto, audio_words):
     lineas = [f"  {w['t_ini']:.2f}s  {w['orig']}" for w in audio_words]
     transcripcion_str = "\n".join(lineas)
 
-    prompt = f"""Eres un editor de video profesional con 20 anos de experiencia editando contenido en espanol. Trabajas con un creador que tiene dislexia del habla.
+    prompt = f"""Eres un editor de video profesional especializado en contenido de coaches y formadores hispanohablantes. Trabajas con un creador que tiene dislexia del habla y usa la palabra "repito" como señal explícita de que va a repetir una frase correctamente.
+
+CONTEXTO IMPORTANTE:
+- El guion es una GUIA de contenido, no un script palabra por palabra
+- El creador puede introducir secciones con frases como "lección nueve", "punto uno", "ahora bien" — estas son válidas aunque no estén en el guion
+- Las variaciones naturales de fraseo (decir "ustedes" en vez de "mujeres", reordenar palabras) NO se cortan
+- Solo se corta lo que claramente interrumpe el flujo o es un error del habla
+
+PATRON PRINCIPAL — LA PALABRA "REPITO":
+Cuando el creador dice "repito", significa que cometió un error en la frase anterior y va a decirla correctamente. Se corta TODO desde el inicio de la frase fallida hasta la palabra "repito" inclusive.
+Ejemplo:
+  - "Sales de aquí con tres sistemas que la mayoría repito Sales de aquí con tres sistemas que la mayoría de mujeres"
+  - Cortar: "Sales de aquí con tres sistemas que la mayoría repito"
+  - Conservar: "Sales de aquí con tres sistemas que la mayoría de mujeres"
+La palabra "repito" SIEMPRE es señal de corte — nunca se deja en el audio final.
 
 Tu trabajo es revisar la transcripcion del audio y compararla con el guion original. Usa tu criterio como editor humano experto para identificar TODO lo que suena mal, raro, o que no corresponde al guion.
 
@@ -550,35 +564,36 @@ GUION ORIGINAL (lo que DEBIA decir):
 TRANSCRIPCION DEL AUDIO con timestamps en segundos (lo que REALMENTE dijo):
 {transcripcion_str}
 
-COMO IDENTIFICAR CORTES:
+QUE CORTAR — EN ORDEN DE PRIORIDAD:
 
-1. INTENTOS FALLIDOS DE FRASE: El hablante intenta decir una frase completa, no le sale, y la repite antes de decirla correctamente. Corta todos los intentos fallidos, conserva solo la version final.
-Ejemplo del patron (las palabras son inventadas, lo importante es la estructura):
-  - "y si eres de los que te" → "y si eres de los que consumes" — el primero es intento fallido. Corta el primero.
+1. PATRON "REPITO": La palabra "repito" indica que el creador va a repetir la frase correctamente.
+Cortar: desde el inicio de la frase fallida hasta "repito" inclusive.
+Conservar: la version correcta que viene despues.
+Ejemplo: "Sales de aqui con tres repito Sales de aqui con tres sistemas"
+Cortar: "Sales de aqui con tres repito"
+Conservar: "Sales de aqui con tres sistemas"
+REGLA ABSOLUTA: La palabra "repito" NUNCA queda en el audio final. Siempre se corta junto con lo que la precede.
 
-2. FRASES EXTRA: Palabras u oraciones que no estan en el guion.
+2. COMENTARIOS FUERA DE CONTEXTO: Palabras o frases que claramente no son parte del contenido.
+Ejemplos: "silencio papi", "un momento", "perdon", "espera", cualquier comentario dirigido a alguien en la sala.
+Estas frases se cortan completas.
 
-3. PALABRA TRABADA seguida de su correccion: Una sola palabra dicha de forma incompleta, cortada o distorsionada, seguida INMEDIATAMENTE de la misma palabra dicha correctamente.
-El patron es: [palabra_rota] [palabra_correcta] — donde palabra_rota suena similar a palabra_correcta pero incompleta o deformada.
-Ejemplos del patron (palabras inventadas para ilustrar la estructura, en tus videos seran palabras distintas):
-  - "consu... consumiendo" → corta "consu..."
-  - "trbajan trabajando" → corta "trbajan"
-  - "empez empezamos" → corta "empez"
-  - "dsarroll desarrollando" → corta "dsarroll"
-La clave: la palabra correcta es la que corresponde al guion. La rota siempre va ANTES. Corta solo la rota.
-IMPORTANTE: para que sea palabra trabada, las dos palabras deben aparecer a menos de 1.5 segundos de distancia en los timestamps.
+3. TARTAMUDEO: La misma silaba o palabra repetida 2 o mas veces seguidas SIN "repito".
+Ejemplo: "y y y entonces" — cortar los primeros "y y", dejar el ultimo.
 
-4. TARTAMUDEO: La misma silaba o palabra repetida 2 o mas veces seguidas.
-Ejemplo del patron: "y y y entonces" → corta los primeros "y y", deja el ultimo.
+4. PALABRA TRABADA: Palabra incompleta o distorsionada seguida de la misma palabra correcta, a menos de 1.5 segundos de distancia.
+Ejemplo: "consu... consumiendo" — cortar "consu..."
 
-REGLAS:
-- El hablante tiene dislexia. Una palabra ligeramente mal pronunciada pero entendible y que corresponde al guion NO se corta.
-- REGLA CRITICA: Si una frase o palabra aparece DOS O MAS VECES seguidas, la PRIMERA es el error, cortala. La ULTIMA es la version correcta, dejala.
-- Cuando tengas duda, NO cortes.
-- Cada corte debe tener minimo 0.3 segundos.
+QUE NO CORTAR:
+- Introducciones de seccion: "leccion nueve", "punto uno", "ahora bien", "siguiente" — son validas aunque no esten en el guion escrito
+- Variaciones naturales de fraseo — el guion es una guia, no un script exacto
+- Palabras ligeramente mal pronunciadas pero entendibles
+- Cuando tengas duda, NO cortes
+
+REGLA CRITICA: Si una frase aparece DOS veces seguidas, la PRIMERA es el error, la SEGUNDA es la correcta. Cortar siempre la primera.
 
 RESPONDE UNICAMENTE con JSON valido, sin explicaciones, sin markdown:
-{{"cortes": [{{"inicio": 34.80, "fin": 38.12, "tipo": "intento_fallido", "descripcion": "primer intento frase redes sociales"}}]}}
+{{"cortes": [{{"inicio": 34.80, "fin": 38.12, "tipo": "repito", "descripcion": "frase repetida con repito"}}]}}
 
 Si no hay nada que cortar: {{"cortes": []}}"""
 
