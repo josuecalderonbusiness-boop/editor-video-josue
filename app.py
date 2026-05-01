@@ -119,7 +119,18 @@ def procesar_drive():
 
             jobs[job_id]['status'] = 'descargando'
             jobs[job_id]['log'].append('Descargando video desde Google Drive...')
-            descargar_archivo(drive_file_id, video_local)
+            from drive_utils import get_drive_service
+            from googleapiclient.http import MediaIoBaseDownload
+            service = get_drive_service()
+            request = service.files().get_media(fileId=drive_file_id)
+            with open(video_local, 'wb') as f:
+                downloader = MediaIoBaseDownload(f, request, chunksize=50*1024*1024)
+                done = False
+                while not done:
+                    status, done = downloader.next_chunk()
+                    pct = int(status.progress() * 100)
+                    jobs[job_id]['log'].append(f'Descargando desde Drive... {pct}%')
+            jobs[job_id]['log'].append(f'Descarga completa.')
             jobs[job_id]['log'].append('Descarga completa. Iniciando procesamiento...')
 
             # 2. Guardar guion si viene
