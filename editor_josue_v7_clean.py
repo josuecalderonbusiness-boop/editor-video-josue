@@ -566,13 +566,34 @@ TRANSCRIPCION DEL AUDIO con timestamps en segundos (lo que REALMENTE dijo):
 
 QUE CORTAR — EN ORDEN DE PRIORIDAD:
 
-1. PATRON "REPITO": La palabra "repito" indica que el creador va a repetir la frase correctamente.
-Cortar: desde el inicio de la frase fallida hasta "repito" inclusive.
-Conservar: la version correcta que viene despues.
-Ejemplo: "Sales de aqui con tres repito Sales de aqui con tres sistemas"
-Cortar: "Sales de aqui con tres repito"
-Conservar: "Sales de aqui con tres sistemas"
-REGLA ABSOLUTA: La palabra "repito" NUNCA queda en el audio final. Siempre se corta junto con lo que la precede.
+1. PATRON "REPITO": La palabra "repito" es una señal explicita del creador de que va a repetir la frase correctamente.
+PROCEDIMIENTO EXACTO:
+- Localiza la palabra "repito" en los timestamps
+- Busca HACIA ATRAS en la transcripcion hasta encontrar donde empezo a decir esa misma frase — busca la primera palabra que se repite despues del "repito"
+- El corte empieza exactamente donde empezo la frase fallida
+- El corte termina justo despues de la palabra "repito"
+- Lo que queda es la version correcta completa
+
+Ejemplo con timestamps:
+  3.2s "Sales"
+  3.8s "de"
+  4.1s "aqui"
+  4.5s "con"
+  4.9s "tres"
+  5.3s "sistemas"
+  5.8s "que"
+  6.1s "la"
+  6.4s "mayoria"
+  6.8s "repito"   ← señal de corte
+  7.5s "Sales"    ← aqui empieza la version correcta
+  8.0s "de"
+  8.3s "aqui"...
+
+En este ejemplo: cortar desde 3.2s hasta 7.4s (todo hasta antes de "Sales" la segunda vez)
+Conservar desde 7.5s en adelante.
+
+REGLA CRITICA: El inicio del corte es donde empezo a decir la misma frase que va a repetir — no desde el inicio del parrafo, no desde el inicio de la oracion anterior. Solo la frase especifica que fallo.
+REGLA ABSOLUTA: La palabra "repito" NUNCA queda en el audio final.
 
 2. COMENTARIOS FUERA DE CONTEXTO: Palabras o frases que claramente no son parte del contenido.
 Ejemplos: "silencio papi", "un momento", "perdon", "espera", cualquier comentario dirigido a alguien en la sala.
