@@ -528,6 +528,105 @@ def segundos_a_srt(s):
 # ─────────────────────────────────────────
 #  DETECTAR ERRORES CON GPT-4o
 # ─────────────────────────────────────────
+def detectar_errores_con_gpt4_audio(audio_path, guion_texto):
+    """
+    Envia el audio directamente a GPT-4o para detectar errores del habla.
+    GPT-4o escucha el audio real sin pasar por Whisper.
+    """
+    if not OPENAI_API_KEY:
+        print("   Advertencia: API key de OpenAI no configurada.")
+        return []
+
+    print("   GPT-4o analizando audio directamente...")
+
+    try:
+        import base64
+        from openai import OpenAI
+        client = OpenAI(api_key=OPENAI_API_KEY)
+
+        with open(audio_path, "rb") as f:
+            audio_data = base64.b64encode(f.read()).decode("utf-8")
+
+        prompt_sistema = """Eres un editor de video profesional con 15 años de experiencia editando clases y workshops en español.
+
+Vas a escuchar el audio de un coach que tiene dislexia del habla. También tienes el guion de lo que debía decir.
+
+Tu tarea es identificar EXACTAMENTE en qué segundos hay errores del habla que deben cortarse.
+
+ERRORES QUE DEBES DETECTAR:
+1. El coach dice "repito" — corta desde donde empezó la frase fallida hasta después del "repito". La segunda vez que dice la frase es la correcta.
+2. Comentarios fuera de la clase — "silencio papi", "ay espera", "se me olvidó cronometrar", cualquier cosa dirigida a alguien en la sala.
+3. Ruidos que no son voz — golpes, movimientos bruscos, sonidos extraños.
+4. Tartamudeo — misma sílaba o palabra repetida.
+5. Frases incompletas que quedaron colgadas sin terminar.
+
+LO QUE NUNCA DEBES CORTAR:
+- Contenido válido de la clase aunque esté parafraseado
+- Introducciones de sección como "lección nueve"
+- Pausas normales para pensar
+- Si tienes duda — NO cortes
+
+RESPONDE ÚNICAMENTE con JSON válido:
+{"cortes": [{"inicio": 4.0, "fin": 18.2, "tipo": "repito", "descripcion": "frase fallida con repito"}]}
+
+Si no hay nada que cortar: {"cortes": []}"""
+
+        response = client.chat.completions.create(
+            model="gpt-4o-audio-preview",
+            modalities=["text"],
+            messages=[
+                {
+                    "role": "user",
+                    "content": [
+                        {
+                            "type": "text",
+                            "text": f"{prompt_sistema}\n\nGUION:\n{guion_texto}"
+                        },
+                        {
+                            "type": "input_audio",
+                            "input_audio": {
+                                "data": audio_data,
+                                "format": "mp3"
+                            }
+                        }
+                    ]
+                }
+            ]
+        )
+
+        texto = response.choices[0].message.content.strip()
+        if texto.startswith("```"):
+            lineas_resp = [l for l in texto.split("\n") if not l.startswith("```")]
+            texto = "\n".join(lineas_resp).strip()
+
+        resultado = json.loads(texto)
+        cortes_raw = resultado.get("cortes", [])
+
+        if not cortes_raw:
+            print("   GPT-4o audio: sin errores detectados.")
+            return []
+
+        cortes = []
+        for c in cortes_raw:
+            t_ini = float(c["inicio"])
+            t_fin = float(c["fin"])
+            dur = t_fin - t_ini
+            tipo = c.get("tipo", "error")
+            desc = c.get("descripcion", "")
+            if dur >= 0.3:
+                print(f"   [Corte] {desc} ({t_ini:.2f}s -> {t_fin:.2f}s, {dur:.1f}s)")
+                cortes.append((t_ini, t_fin, desc))
+
+        return cortes
+
+    except json.JSONDecodeError as e:
+        print(f"   Respuesta inesperada de GPT-4o: {e}")
+        return []
+    except Exception as e:
+        print(f"   Error con GPT-4o audio: {e}")
+        return []
+
+
 def detectar_errores_con_gpt4(guion_texto, audio_words):
     """
     GPT-4o compara el guion vs transcripcion y devuelve rangos a cortar.
@@ -781,29 +880,15 @@ def limpiar_errores_con_guion(video_entrada, guion_txt, video_salida,
     extraer_audio(video_entrada, tmp_audio, limpia_audio=limpia_audio)
 
     # Transcribir con OpenAI Whisper API
+    # Detectar errores enviando audio directamente a GPT-4o
+    print("   Enviando audio a GPT-4o para analisis directo...")
+    cortes = detectar_errores_con_gpt4_audio(tmp_audio, guion_texto)
+
+    # Transcribir igual para subtitulos si se necesitan
     audio_words = transcribir_con_openai(tmp_audio)
 
     if os.path.exists(tmp_audio):
         os.remove(tmp_audio)
-
-    if not audio_words:
-        print("   No se pudo transcribir el audio.")
-        return video_entrada
-
-    # Mostrar transcripcion
-    print("\n   Transcripcion detectada:")
-    linea = "   "
-    for w in audio_words:
-        linea += w["orig"] + " "
-        if len(linea) > 78:
-            print(linea)
-            linea = "   "
-    if linea.strip():
-        print(linea)
-    print()
-
-    # Detectar errores con GPT-4o
-    cortes = detectar_errores_con_gpt4(guion_texto, audio_words)
 
     if not cortes:
         print("   Sin errores detectados - video limpio.")
