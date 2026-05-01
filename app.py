@@ -66,7 +66,11 @@ def procesar():
                                 stderr=subprocess.STDOUT, text=True, bufsize=1)
         for line in proc.stdout:
             line = line.strip()
-            if line:
+            if not line:
+                continue
+            if 'Descargando desde Drive' in line and jobs[job_id]['log'] and 'Descargando desde Drive' in jobs[job_id]['log'][-1]:
+                jobs[job_id]['log'][-1] = line
+            else:
                 jobs[job_id]['log'].append(line)
                 jobs[job_id]['status'] = (
                     'descargando' if 'Descargando' in line else
