@@ -547,7 +547,24 @@ Tu unica tarea: identificar los momentos del audio que suenan como errores del h
 
 ERRORES QUE DEBES BUSCAR:
 
-1. El coach dice "repito" — significa que se equivoco y va a repetir. Debes cortar desde donde empezo la frase fallida hasta despues del "repito". La segunda vez que dice la frase es la correcta y se conserva. Busca en los timestamps el momento exacto donde empezo a decir esa frase por primera vez.
+1. El coach dice "repito" — significa que se equivoco y va a repetir.
+COMO CALCULAR EL CORTE EXACTO:
+- Encuentra "repito" en los timestamps
+- Mira las palabras que vienen DESPUES — esa es la version correcta
+- Busca HACIA ATRAS hasta encontrar la primera palabra de esa version correcta
+- El corte empieza 2 segundos ANTES de esa primera palabra — para incluir el silencio previo
+- El corte termina en el timestamp de fin de "repito"
+
+Ejemplo:
+  4.0s  silencio
+  6.3s  "Sales"       ← inicio frase fallida
+  6.8s  "de"
+  7.1s  "aqui"
+  14.2s "repito"      ← señal
+  16.0s "Sales"       ← inicio version correcta
+
+Corte: desde 4.3s (2 segundos antes de 6.3s) hasta 15.9s (justo antes del segundo "Sales")
+Esto incluye el silencio previo y toda la frase fallida.
 
 2. Comentarios personales fuera de la clase — cosas que le dice a alguien en la sala, comentarios sobre el mismo, interrupciones. Ejemplos: "silencio papi", "ay espera", "se me olvido cronometrar", "perdon". Corta todo eso.
 
