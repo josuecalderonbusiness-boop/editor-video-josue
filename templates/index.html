@@ -452,6 +452,11 @@ function toggle(key) {
 
 function addLog(line) {
   const box = document.getElementById('log-box');
+  const lastDiv = box.lastElementChild;
+  if (lastDiv && lastDiv.textContent.includes('Descargando desde Drive') && line.includes('Descargando desde Drive')) {
+    lastDiv.textContent = line;
+    return;
+  }
   const div = document.createElement('div');
   let cls = '';
   if (line.includes('LISTO') || line.includes('eliminad') || line.includes('listo') || line.includes('Listo')) cls = 'line-ok';
