@@ -540,7 +540,20 @@ def detectar_errores_con_gpt4(guion_texto, audio_words):
     lineas = [f"  {w['t_ini']:.2f}s  {w['orig']}" for w in audio_words]
     transcripcion_str = "\n".join(lineas)
 
-    prompt = f"""Eres un editor de video experto con criterio humano. Tu trabajo es limpiar el audio de un coach hispanohablante que tiene dislexia del habla.
+    prompt = f"""Eres un editor de video profesional. Te voy a dar el guion de una clase y la transcripcion de lo que el coach realmente dijo. Tu trabajo es identificar exactamente que se debe cortar para que el audio final suene profesional y limpio.
+
+El coach tiene dislexia del habla. Cuando se equivoca dice "repito" y vuelve a empezar la frase. Tambien a veces hace comentarios fuera del tema de la clase.
+
+Lee el guion completo primero para entender el contenido. Luego lee la transcripcion con timestamps. Usando tu criterio como editor experto, identifica:
+
+- Todo lo que suena como un error del habla
+- Frases que el coach empezo y no termino correctamente
+- Comentarios que no son parte de la clase
+- Repeticiones donde dijo "repito" y volvio a empezar
+
+Para cada corte, usa los timestamps para indicar exactamente donde empieza y termina lo que se debe eliminar. El resultado final debe sonar como si el coach lo hubiera dicho perfecto desde el principio.
+
+IMPORTANTE: No cortes contenido valido de la clase aunque este parafraseado diferente al guion. Solo errores del habla y comentarios fuera de contexto. Tu trabajo es limpiar el audio de un coach hispanohablante que tiene dislexia del habla.
 
 Tienes dos insumos:
 1. El GUION — lo que el coach tenía planeado decir
