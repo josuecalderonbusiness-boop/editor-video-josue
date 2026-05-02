@@ -374,6 +374,17 @@
     </div>
   </div>
 
+  <!-- CORTES MANUALES -->
+  <div class="card">
+    <div class="section-label">Cortes manuales (opcional)</div>
+    <div class="upload-zone" id="zone-cortes">
+      <input type="file" id="input-cortes" accept=".txt" onchange="setFile('cortes', this)">
+      <div class="icon">✂️</div>
+      <div class="label">Archivo de cortes</div>
+      <div class="hint">.txt · formato: 04-18 (uno por línea)</div>
+      <div class="filename" id="name-cortes"></div>
+    </div>
+  </div>
   <!-- OPCIONES -->
   <div class="card">
     <div class="section-label">Opciones</div>
@@ -497,6 +508,8 @@ async function procesarUpload() {
   fd.append('video', videoInput.files[0]);
   const guionInput = document.getElementById('input-guion');
   if (guionInput.files[0]) fd.append('guion', guionInput.files[0]);
+  const cortesInput = document.getElementById('input-cortes');
+  if (cortesInput.files[0]) fd.append('cortes', cortesInput.files[0]);
   fd.append('tipo', tipo);
   fd.append('solo_limpiar', opciones.solo_limpiar);
   fd.append('subtitulos', opciones.subtitulos);

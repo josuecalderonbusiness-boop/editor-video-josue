@@ -43,6 +43,12 @@ def procesar():
         guion_path = os.path.join(UPLOAD_FOLDER, f'{job_id}_guion.txt')
         guion.save(guion_path)
 
+    cortes = request.files.get('cortes')
+    cortes_path = None
+    if cortes and cortes.filename:
+        cortes_path = os.path.join(UPLOAD_FOLDER, f'{job_id}_cortes.txt')
+        cortes.save(cortes_path)
+
     def correr_editor():
         jobs[job_id]['status'] = 'procesando'
         cmd = ['python', 'editor_josue_v7_clean.py', 'reel',
@@ -56,11 +62,15 @@ def procesar():
             cmd.append('--limpia-audio')
         if solo_limpiar:
             cmd.append('--solo-limpiar')
+        if cortes_path:
+            cmd += ['--cortes', os.path.basename(cortes_path)]
 
         os.makedirs('input', exist_ok=True)
         os.rename(video_path, os.path.join('input', os.path.basename(video_path)))
         if guion_path:
             os.rename(guion_path, os.path.join('input', os.path.basename(guion_path)))
+        if cortes_path:
+            os.rename(cortes_path, os.path.join('input', os.path.basename(cortes_path)))
 
         proc = subprocess.Popen(cmd, stdout=subprocess.PIPE,
                                 stderr=subprocess.STDOUT, text=True, bufsize=1)
