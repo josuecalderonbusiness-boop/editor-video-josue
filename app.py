@@ -31,6 +31,7 @@ def procesar():
     subtitulos = request.form.get('subtitulos') == 'true'
     limpia_audio = request.form.get('limpia_audio') == 'true'
     voz_pro = request.form.get('voz_pro') == 'true'
+    voz_pro = request.form.get('voz_pro') == 'true'
     solo_limpiar = request.form.get('solo_limpiar') == 'true'
 
     if not video:

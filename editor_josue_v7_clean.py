@@ -1060,6 +1060,32 @@ def quemar_estilo_001(video, srt, salida, fuente="montserrat"):
     print("Subtitulos aplicados.")
 
 
+
+# ─────────────────────────────────────────
+#  VOZ PROFESIONAL — calibrada para boya + Sony ZVE10
+# ─────────────────────────────────────────
+def aplicar_voz_pro(entrada, salida):
+    print("\nAplicando procesamiento de voz profesional...")
+    filtro = (
+        "equalizer=f=60:width_type=o:width=2:g=4,"
+        "equalizer=f=80:width_type=o:width=2:g=7,"
+        "equalizer=f=150:width_type=o:width=2:g=5,"
+        "equalizer=f=300:width_type=o:width=1:g=3,"
+        "equalizer=f=2000:width_type=o:width=1:g=-4,"
+        "equalizer=f=5000:width_type=o:width=2:g=-6,"
+        "equalizer=f=8000:width_type=o:width=2:g=-7,"
+        "acompressor=threshold=-20dB:ratio=3:attack=10:release=150:makeup=4,"
+        "loudnorm=I=-14:TP=-1.5:LRA=11"
+    )
+    cmd = ["ffmpeg", "-y", "-i", entrada, "-af", filtro, "-c:v", "copy", salida]
+    import subprocess
+    r = subprocess.run(cmd, capture_output=True, text=True)
+    if r.returncode != 0:
+        print(f"Error voz pro: {r.stderr[-200:]}")
+        return False
+    print("Voz profesional aplicada.")
+    return True
+
 # ─────────────────────────────────────────
 #  FLUJO PRINCIPAL
 # ─────────────────────────────────────────
@@ -1228,6 +1254,7 @@ EJEMPLOS:
     parser.add_argument("--subtitulos",   action="store_true")
     parser.add_argument("--solo-limpiar", action="store_true")
     parser.add_argument("--limpia-audio", action="store_true")
+    parser.add_argument("--voz-pro", action="store_true", help="Voz profesional estilo podcast")
     parser.add_argument("--color-workshop", action="store_true")
     parser.add_argument("--voz-pro", action="store_true", help="Procesamiento de voz profesional estilo podcast")
     parser.add_argument("--cortes", default=None)
@@ -1248,6 +1275,7 @@ EJEMPLOS:
             subtitulos=args.subtitulos,
             solo_limpiar=args.solo_limpiar,
             limpia_audio=args.limpia_audio,
+            voz_pro=getattr(args, "voz_pro", False),
             color_workshop=getattr(args, "color_workshop", False),
             cortes_manual=args.cortes
         )
@@ -1255,6 +1283,7 @@ EJEMPLOS:
 
 if __name__ == "__main__":
     main()
+
 
 
 
