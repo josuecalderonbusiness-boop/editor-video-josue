@@ -119,6 +119,7 @@ def procesar_drive():
     subtitulos    = data.get('subtitulos', False)
     limpia_audio  = data.get('limpia_audio', False)
     solo_limpiar  = data.get('solo_limpiar', True)
+    voz_pro       = data.get('voz_pro', False)
 
     if not drive_file_id:
         return jsonify({'error': 'Falta el ID del archivo de Drive'}), 400
@@ -170,6 +171,8 @@ def procesar_drive():
             if limpia_audio:
                 cmd.append('--limpia-audio')
             if solo_limpiar:
+            if voz_pro:
+                cmd.append('--voz-pro')
                 cmd.append('--solo-limpiar')
 
             proc = subprocess.Popen(cmd, stdout=subprocess.PIPE,
@@ -237,4 +240,5 @@ def descargar(job_id):
 if __name__ == '__main__':
     port = int(os.environ.get('PORT', 5000))
     app.run(host='0.0.0.0', port=port, debug=False)
+
 
