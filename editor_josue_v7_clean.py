@@ -1172,6 +1172,14 @@ def editar_reel(nombre_archivo, fuente="montserrat", guion=None,
             else:
                 video_para_procesar = tmp_sin_sil
 
+        # PASO 2.5: Voz profesional
+        if voz_pro:
+            tmp_voz = f'tmp_{nombre_base}_voz.mp4'
+            if aplicar_voz_pro(video_para_procesar, tmp_voz):
+                shutil.copy2(tmp_voz, video_para_procesar)
+                if os.path.exists(tmp_voz): os.remove(tmp_voz)
+
+
         elif guion:
             ruta_guion = guion
             if not os.path.exists(ruta_guion):
