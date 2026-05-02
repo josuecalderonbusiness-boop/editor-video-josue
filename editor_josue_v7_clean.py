@@ -1064,7 +1064,7 @@ def quemar_estilo_001(video, srt, salida, fuente="montserrat"):
 #  FLUJO PRINCIPAL
 # ─────────────────────────────────────────
 def editar_reel(nombre_archivo, fuente="montserrat", guion=None,
-                subtitulos=False, solo_limpiar=False, limpia_audio=False, color_workshop=False):
+                subtitulos=False, solo_limpiar=False, limpia_audio=False, color_workshop=False, cortes_manual=None):
 
     print(f"\n{'='*55}")
     print(f"  EDITOR JOSUE v7.0 (OpenAI Whisper + GPT-4o)")
@@ -1105,8 +1105,48 @@ def editar_reel(nombre_archivo, fuente="montserrat", guion=None,
         else:
             eliminar_silencios(ruta_entrada, tmp_sin_sil, log=log)
 
-        # PASO 2: Limpiar errores con GPT-4o
-        if guion:
+        # PASO 2: Cortes manuales o GPT-4o
+        if cortes_manual and os.path.exists(cortes_manual):
+            print(f"\nAplicando cortes manuales desde {cortes_manual}...")
+            segmentos_corte = []
+            with open(cortes_manual, "r", encoding="utf-8") as f:
+                for linea in f:
+                    linea = linea.strip()
+                    if not linea or linea.startswith("#"):
+                        continue
+                    partes = linea.split("-")
+                    if len(partes) == 2:
+                        t_ini = float(partes[0])
+                        t_fin = float(partes[1])
+                        segmentos_corte.append((t_ini, t_fin, "corte manual"))
+            if segmentos_corte:
+                # Anclar cada corte manual al silencio más cercano
+                from cortes_precisos import extraer_mapa_silencios, anclar_a_silencio_anterior, anclar_fin_a_silencio
+                tmp_audio_cortes = "tmp_cortes_manual.mp3"
+                extraer_audio(tmp_sin_sil, tmp_audio_cortes)
+                silencios = extraer_mapa_silencios(tmp_audio_cortes)
+                if os.path.exists(tmp_audio_cortes):
+                    os.remove(tmp_audio_cortes)
+                cortes_anclados = []
+                for t_i, t_f, desc in segmentos_corte:
+                    t_i_ancla = anclar_a_silencio_anterior(t_i, silencios, ventana_busqueda=3.0)
+                    t_f_ancla = anclar_a_silencio_anterior(t_f, silencios, ventana_busqueda=3.0)
+                    print(f"   [manual] {t_i}s-{t_f}s → ancla: {t_i_ancla:.2f}s-{t_f_ancla:.2f}s")
+                    cortes_anclados.append((t_i_ancla, t_f_ancla))
+                cortes_ordenados = sorted(cortes_anclados)
+                segmentos_mantener = []
+                cursor = 0.0
+                for t_i, t_f in cortes_ordenados:
+                    if cursor < t_i:
+                        segmentos_mantener.append((cursor, t_i))
+                    cursor = t_f
+                segmentos_mantener.append((cursor, 99999.0))
+                exito = aplicar_cortes_con_fade(tmp_sin_sil, segmentos_mantener, tmp_limpio)
+                video_para_procesar = tmp_limpio if exito else tmp_sin_sil
+            else:
+                video_para_procesar = tmp_sin_sil
+
+        elif guion:
             ruta_guion = guion
             if not os.path.exists(ruta_guion):
                 ruta_guion_alt = os.path.join(CARPETA_INPUT, guion)
@@ -1189,6 +1229,7 @@ EJEMPLOS:
     parser.add_argument("--solo-limpiar", action="store_true")
     parser.add_argument("--limpia-audio", action="store_true")
     parser.add_argument("--color-workshop", action="store_true")
+    parser.add_argument("--cortes", default=None)
 
     args = parser.parse_args()
 
@@ -1206,7 +1247,8 @@ EJEMPLOS:
             subtitulos=args.subtitulos,
             solo_limpiar=args.solo_limpiar,
             limpia_audio=args.limpia_audio,
-            color_workshop=getattr(args, "color_workshop", False)
+            color_workshop=getattr(args, "color_workshop", False),
+            cortes_manual=args.cortes
         )
 
 
