@@ -549,7 +549,8 @@ async function procesarDrive() {
       tipo: tipo,
       solo_limpiar: opciones.solo_limpiar,
       subtitulos: opciones.subtitulos,
-      limpia_audio: opciones.limpia_audio
+      limpia_audio: opciones.limpia_audio,
+      voz_pro: opciones.voz_pro
     })
   });
   const data = await res.json();
@@ -598,4 +599,5 @@ function descargar() {
 </script>
 </body>
 </html>
+
 
