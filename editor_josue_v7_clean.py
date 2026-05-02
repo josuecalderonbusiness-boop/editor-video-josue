@@ -1090,7 +1090,7 @@ def aplicar_voz_pro(entrada, salida):
 #  FLUJO PRINCIPAL
 # ─────────────────────────────────────────
 def editar_reel(nombre_archivo, fuente="montserrat", guion=None,
-                subtitulos=False, solo_limpiar=False, limpia_audio=False, color_workshop=False, cortes_manual=None):
+                subtitulos=False, solo_limpiar=False, limpia_audio=False, color_workshop=False, cortes_manual=None, voz_pro=False):
 
     print(f"\n{'='*55}")
     print(f"  EDITOR JOSUE v7.0 (OpenAI Whisper + GPT-4o)")
