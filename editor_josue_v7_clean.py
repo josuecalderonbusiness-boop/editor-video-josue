@@ -21,6 +21,11 @@ import json
 import shutil
 import argparse
 import datetime
+try:
+    from cortes_precisos import calcular_cortes_precisos
+    _CORTES_PRECISOS_OK = True
+except ImportError:
+    _CORTES_PRECISOS_OK = False
 
 # Cargar variables de entorno desde .env
 try:
@@ -304,7 +309,7 @@ def eliminar_silencios(entrada, salida, log=None):
 
     # PASO C — aplicar cortes al video original sin recodificar
     print("   Aplicando cortes al video original...")
-    lista_tmp = os.path.join(os.path.dirname(entrada) or ".", "tmp_sil_concat.txt")
+    lista_tmp = "tmp_sil_concat.txt"
     clips_tmp = []
     with open(lista_tmp, "w", encoding="utf-8") as f:
         for idx, (t_s, t_e) in enumerate(segmentos):
@@ -882,13 +887,18 @@ def limpiar_errores_con_guion(video_entrada, guion_txt, video_salida,
     tmp_audio = "tmp_guion_check.mp3"
     extraer_audio(video_entrada, tmp_audio, limpia_audio=limpia_audio)
 
-    # Transcribir con OpenAI Whisper API
-    # Detectar errores enviando audio directamente a GPT-4o
-    print("   Enviando audio a GPT-4o para analisis directo...")
-    cortes = detectar_errores_con_gpt4_audio(tmp_audio, guion_texto)
-
-    # Transcribir igual para subtitulos si se necesitan
+    # Transcribir con Whisper API
     audio_words = transcribir_con_openai(tmp_audio)
+
+    # Detectar cortes con motor preciso (ancla de silencios)
+    if _CORTES_PRECISOS_OK and audio_words:
+        print("   Usando motor de cortes precisos...")
+        cortes = calcular_cortes_precisos(
+            guion_texto, audio_words, tmp_audio, OPENAI_API_KEY
+        )
+    else:
+        print("   Fallback: GPT-4o audio directo...")
+        cortes = detectar_errores_con_gpt4_audio(tmp_audio, guion_texto)
 
     if os.path.exists(tmp_audio):
         os.remove(tmp_audio)
@@ -1202,3 +1212,5 @@ EJEMPLOS:
 
 if __name__ == "__main__":
     main()
+
+
