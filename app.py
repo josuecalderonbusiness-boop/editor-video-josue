@@ -30,6 +30,7 @@ def procesar():
     tipo = request.form.get('tipo', 'reel')
     subtitulos = request.form.get('subtitulos') == 'true'
     limpia_audio = request.form.get('limpia_audio') == 'true'
+    voz_pro = request.form.get('voz_pro') == 'true'
     solo_limpiar = request.form.get('solo_limpiar') == 'true'
 
     if not video:
@@ -234,3 +235,4 @@ def descargar(job_id):
 if __name__ == '__main__':
     port = int(os.environ.get('PORT', 5000))
     app.run(host='0.0.0.0', port=port, debug=False)
+

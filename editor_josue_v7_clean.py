@@ -1229,6 +1229,7 @@ EJEMPLOS:
     parser.add_argument("--solo-limpiar", action="store_true")
     parser.add_argument("--limpia-audio", action="store_true")
     parser.add_argument("--color-workshop", action="store_true")
+    parser.add_argument("--voz-pro", action="store_true", help="Procesamiento de voz profesional estilo podcast")
     parser.add_argument("--cortes", default=None)
 
     args = parser.parse_args()
@@ -1254,5 +1255,7 @@ EJEMPLOS:
 
 if __name__ == "__main__":
     main()
+
+
 
 
