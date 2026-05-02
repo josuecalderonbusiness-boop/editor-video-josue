@@ -401,6 +401,9 @@
       <button class="toggle-btn" id="opt-916" onclick="toggle('convertir_916')">
         <span class="dot"></span> Convertir 9:16
       </button>
+      <button class="toggle-btn" id="opt-voz" onclick="toggle('voz_pro')">
+        <span class="dot"></span> 🎙 Voz profesional
+      </button>
     </div>
   </div>
 
@@ -430,7 +433,7 @@
 <script>
 let tipo = 'reel';
 let modo = 'upload';
-let opciones = { solo_limpiar: true, subtitulos: false, limpia_audio: false, convertir_916: false };
+let opciones = { solo_limpiar: true, subtitulos: false, limpia_audio: false, convertir_916: false, voz_pro: false };
 let jobId = null;
 let polling = null;
 let logCount = 0;
@@ -457,7 +460,7 @@ function setFile(tipo, input) {
 
 function toggle(key) {
   opciones[key] = !opciones[key];
-  const map = { solo_limpiar: 'opt-solo', subtitulos: 'opt-subs', limpia_audio: 'opt-audio', convertir_916: 'opt-916' };
+  const map = { solo_limpiar: 'opt-solo', subtitulos: 'opt-subs', limpia_audio: 'opt-audio', convertir_916: 'opt-916', voz_pro: 'opt-voz' };
   document.getElementById(map[key]).classList.toggle('active', opciones[key]);
 }
 
@@ -514,6 +517,7 @@ async function procesarUpload() {
   fd.append('solo_limpiar', opciones.solo_limpiar);
   fd.append('subtitulos', opciones.subtitulos);
   fd.append('limpia_audio', opciones.limpia_audio);
+  fd.append('voz_pro', opciones.voz_pro);
 
   const res = await fetch('/procesar', { method: 'POST', body: fd });
   const data = await res.json();
