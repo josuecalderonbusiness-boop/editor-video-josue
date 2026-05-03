@@ -32,6 +32,7 @@ def procesar():
     limpia_audio = request.form.get('limpia_audio') == 'true'
     voz_pro = request.form.get('voz_pro') == 'true'
     solo_limpiar = request.form.get('solo_limpiar') == 'true'
+    animaciones = request.form.get('animaciones') == 'true'
 
     if not video:
         return jsonify({'error': 'No se subio video'}), 400
@@ -94,11 +95,33 @@ def procesar():
         proc.wait()
 
         nombre_base = os.path.splitext(os.path.basename(video_path))[0]
+        archivo_output = None
         for f in os.listdir('output'):
             if nombre_base in f:
-                jobs[job_id]['output'] = f
+                archivo_output = f
                 break
 
+        # Aplicar animaciones si se pidió
+        if animaciones and archivo_output and proc.returncode == 0:
+            jobs[job_id]['log'].append('Aplicando animaciones...')
+            ruta_input_anim  = os.path.join('output', archivo_output)
+            nombre_con_anim  = archivo_output.replace('.mp4', '_anim.mp4')
+            ruta_output_anim = os.path.join('output', nombre_con_anim)
+            cmd_anim = ['python', 'overlay_animaciones.py', ruta_input_anim, ruta_output_anim]
+            proc_anim = subprocess.Popen(cmd_anim, stdout=subprocess.PIPE,
+                                         stderr=subprocess.STDOUT, text=True, bufsize=1)
+            for line in proc_anim.stdout:
+                line = line.strip()
+                if line:
+                    jobs[job_id]['log'].append(line)
+            proc_anim.wait()
+            if proc_anim.returncode == 0 and os.path.exists(ruta_output_anim):
+                archivo_output = nombre_con_anim
+                jobs[job_id]['log'].append('Animaciones aplicadas.')
+            else:
+                jobs[job_id]['log'].append('Error al aplicar animaciones, se entrega video sin animaciones.')
+
+        jobs[job_id]['output'] = archivo_output
         jobs[job_id]['status'] = 'listo' if proc.returncode == 0 else 'error'
 
     t = threading.Thread(target=correr_editor)
@@ -120,6 +143,7 @@ def procesar_drive():
     limpia_audio  = data.get('limpia_audio', False)
     solo_limpiar  = data.get('solo_limpiar', True)
     voz_pro       = data.get('voz_pro', False)
+    animaciones   = data.get('animaciones', False)
 
     if not drive_file_id:
         return jsonify({'error': 'Falta el ID del archivo de Drive'}), 400
@@ -171,9 +195,9 @@ def procesar_drive():
             if limpia_audio:
                 cmd.append('--limpia-audio')
             if solo_limpiar:
+                cmd.append('--solo-limpiar')
             if voz_pro:
                 cmd.append('--voz-pro')
-                cmd.append('--solo-limpiar')
 
             proc = subprocess.Popen(cmd, stdout=subprocess.PIPE,
                                     stderr=subprocess.STDOUT, text=True)
@@ -201,7 +225,25 @@ def procesar_drive():
                 jobs[job_id]['log'].append('No se encontro el archivo de salida.')
                 return
 
-            # 5. Subir resultado a Drive
+            # 5. Aplicar animaciones si se pidió
+            if animaciones and archivo_output:
+                jobs[job_id]['log'].append('Aplicando animaciones...')
+                ruta_input_anim  = os.path.join('output', archivo_output)
+                nombre_con_anim  = archivo_output.replace('.mp4', '_anim.mp4')
+                ruta_output_anim = os.path.join('output', nombre_con_anim)
+                cmd_anim = ['python', 'overlay_animaciones.py', ruta_input_anim, ruta_output_anim]
+                proc_anim = subprocess.Popen(cmd_anim, stdout=subprocess.PIPE,
+                                             stderr=subprocess.STDOUT, text=True)
+                for line in proc_anim.stdout:
+                    line = line.strip()
+                    if line:
+                        jobs[job_id]['log'].append(line)
+                proc_anim.wait()
+                if proc_anim.returncode == 0 and os.path.exists(ruta_output_anim):
+                    archivo_output = nombre_con_anim
+                    jobs[job_id]['log'].append('Animaciones aplicadas.')
+
+            # 6. Subir resultado a Drive
             jobs[job_id]['status'] = 'subiendo'
             jobs[job_id]['log'].append('Subiendo video procesado a Google Drive...')
             ruta_output = os.path.join('output', archivo_output)
