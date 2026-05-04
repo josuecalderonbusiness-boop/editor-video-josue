@@ -422,7 +422,19 @@
       <div class="status-text" id="status-text">Procesando...</div>
     </div>
     <div class="log-box" id="log-box"></div>
-    <div style="margin-top:12px;">
+    <!-- ANIMACIONES JSON -->
+  <div id="seccion-animaciones-json" style="display:none; margin-top:12px;">
+    <div class="section-label" style="margin-bottom:8px;">Animaciones (opcional)</div>
+    <div class="upload-zone" id="zone-animjson">
+      <input type="file" id="input-animjson" accept=".json" onchange="setFile('animjson', this)">
+      <div class="icon">🎬</div>
+      <div class="label">animaciones_drive.json</div>
+      <div class="hint">Generado por subir_animaciones.py</div>
+      <div class="filename" id="name-animjson"></div>
+    </div>
+  </div>
+
+  <div style="margin-top:12px;">
       <button class="btn-descargar hidden" id="btn-descargar" onclick="descargar()">
         ⬇ Descargar Video Editado
       </button>
@@ -465,6 +477,9 @@ function toggle(key) {
   opciones[key] = !opciones[key];
   const map = { solo_limpiar: 'opt-solo', subtitulos: 'opt-subs', limpia_audio: 'opt-audio', convertir_916: 'opt-916', voz_pro: 'opt-voz', animaciones: 'opt-anim' };
   document.getElementById(map[key]).classList.toggle('active', opciones[key]);
+  if (key === 'animaciones') {
+    document.getElementById('seccion-animaciones-json').style.display = opciones.animaciones ? 'block' : 'none';
+  }
 }
 
 function addLog(line) {
@@ -543,6 +558,14 @@ async function procesarDrive() {
 
   const guionTexto = document.getElementById('drive-guion-texto').value.trim();
 
+  // Leer animaciones_drive.json si se subió
+  let animacionesData = null;
+  const animInput = document.getElementById('input-animjson');
+  if (animInput.files[0]) {
+    const txt = await animInput.files[0].text();
+    animacionesData = JSON.parse(txt);
+  }
+
   const res = await fetch('/procesar-drive', {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
@@ -554,7 +577,9 @@ async function procesarDrive() {
       subtitulos: opciones.subtitulos,
       limpia_audio: opciones.limpia_audio,
       voz_pro: opciones.voz_pro,
-      animaciones: opciones.animaciones
+      animaciones: opciones.animaciones,
+      animaciones_data: animacionesData,
+      sin_silencios: opciones.sin_silencios || false
     })
   });
   const data = await res.json();
