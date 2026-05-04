@@ -117,13 +117,13 @@ def aplicar_animaciones(video_entrada, timings_json, html_folder, video_salida):
 
 # Compatibilidad con llamada antigua (sin JSON)
 TIMINGS_DEFAULT = [
-    {"html": "an1.html", "start": 25,  "duration": 33},
-    {"html": "an2.html", "start": 128, "duration": 30},
-    {"html": "an3.html", "start": 254, "duration": 42},
-    {"html": "an4.html", "start": 335, "duration": 14},
-    {"html": "an5.html", "start": 389, "duration": 22},
-    {"html": "an6.html", "start": 458, "duration": 14},
-    {"html": "an7.html", "start": 745, "duration": 48},
+    {"html": "anim_an1.html", "start": 25,  "duration": 33},
+    {"html": "anim_an2.html", "start": 128, "duration": 30},
+    {"html": "anim_an3.html", "start": 254, "duration": 42},
+    {"html": "anim_an4.html", "start": 335, "duration": 14},
+    {"html": "anim_an5.html", "start": 389, "duration": 22},
+    {"html": "anim_an6.html", "start": 458, "duration": 14},
+    {"html": "anim_an7.html", "start": 745, "duration": 48},
 ]
 
 def aplicar_todas_las_animaciones(video_entrada, video_salida, html_folder="workshop-animaciones/compositions"):
