@@ -14,7 +14,7 @@ const {{ PuppeteerScreenRecorder }} = require('puppeteer-screen-recorder');
 (async () => {{
   const browser = await puppeteer.launch({{
     executablePath: '{CHROME}',
-    args: ['--no-sandbox','--disable-setuid-sandbox','--disable-dev-shm-usage','--disable-gpu','--window-size=1280,720'],
+    args: ['--no-sandbox','--disable-setuid-sandbox','--disable-dev-shm-usage','--disable-gpu','--use-gl=swiftshader','--use-software-gl','--ignore-gpu-blocklist','--disable-web-security','--window-size=1080,1920'],
     defaultViewport: {{ width: 1280, height: 720 }}
   }});
   const page = await browser.newPage();
