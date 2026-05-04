@@ -407,6 +407,9 @@
       <button class="toggle-btn" id="opt-anim" onclick="toggle('animaciones')">
         <span class="dot"></span> ✨ Animaciones
       </button>
+      <button class="toggle-btn" id="opt-sinsilencio" onclick="toggle('sin_silencios')">
+        <span class="dot"></span> 🚫 Sin silencios
+      </button>
     </div>
   </div>
 
@@ -448,7 +451,7 @@
 <script>
 let tipo = 'reel';
 let modo = 'upload';
-let opciones = { solo_limpiar: true, subtitulos: false, limpia_audio: false, convertir_916: false, voz_pro: false, animaciones: false };
+let opciones = { solo_limpiar: true, subtitulos: false, limpia_audio: false, convertir_916: false, voz_pro: false, animaciones: false, sin_silencios: false };
 let jobId = null;
 let polling = null;
 let logCount = 0;
@@ -475,7 +478,7 @@ function setFile(tipo, input) {
 
 function toggle(key) {
   opciones[key] = !opciones[key];
-  const map = { solo_limpiar: 'opt-solo', subtitulos: 'opt-subs', limpia_audio: 'opt-audio', convertir_916: 'opt-916', voz_pro: 'opt-voz', animaciones: 'opt-anim' };
+  const map = { solo_limpiar: 'opt-solo', subtitulos: 'opt-subs', limpia_audio: 'opt-audio', convertir_916: 'opt-916', voz_pro: 'opt-voz', animaciones: 'opt-anim', sin_silencios: 'opt-sinsilencio' };
   document.getElementById(map[key]).classList.toggle('active', opciones[key]);
   if (key === 'animaciones') {
     document.getElementById('seccion-animaciones-json').style.display = opciones.animaciones ? 'block' : 'none';
