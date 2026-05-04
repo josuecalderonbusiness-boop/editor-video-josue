@@ -57,7 +57,7 @@ def overlay_animacion(video_entrada, anim_mp4, t_inicio, duracion, video_salida)
         "-i", video_entrada,
         "-i", anim_mp4,
         "-filter_complex",
-        f"[1:v]setpts=PTS+{t_inicio}/TB[anim];[0:v][anim]overlay=0:0:enable='between(t,{t_inicio},{t_fin})'[v]",
+        f"[0:v]format=yuv420p[base];[1:v]scale=3840:2160,setpts=PTS+{t_inicio}/TB[anim];[base][anim]overlay=0:0:enable='between(t,{t_inicio},{t_fin})'[v]",
         "-map", "[v]", "-map", "0:a",
         "-c:v", "libx264", "-crf", "18", "-preset", "fast", "-c:a", "copy",
         video_salida
