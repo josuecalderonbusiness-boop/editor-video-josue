@@ -279,6 +279,24 @@ def descargar(job_id):
     path = os.path.join('output', job['output'])
     return send_file(path, as_attachment=True)
 
+@app.route('/diagnostico-render')
+def diagnostico_render():
+    import subprocess
+    try:
+        r = subprocess.run(
+            ['node', 'diagnostico_railway.js'],
+            capture_output=True,
+            text=True,
+            timeout=90,
+            cwd=os.path.dirname(os.path.abspath(__file__))
+        )
+        output = r.stdout + ('\n\nSTDERR:\n' + r.stderr if r.stderr else '')
+        return f'<pre style="background:#111;color:#eee;padding:20px;font-family:monospace;font-size:13px">{output}</pre>'
+    except subprocess.TimeoutExpired:
+        return '<pre>TIMEOUT</pre>', 500
+    except Exception as e:
+        return f'<pre>ERROR: {e}</pre>', 500
+
 if __name__ == '__main__':
     port = int(os.environ.get('PORT', 5000))
     app.run(host='0.0.0.0', port=port, debug=False)
