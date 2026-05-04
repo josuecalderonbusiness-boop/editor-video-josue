@@ -76,20 +76,20 @@ def aplicar_animaciones(video_entrada, timings_json, html_folder, video_salida):
     print("\n--- Capturando ---")
     caps = {}
     for t in timings:
+        nombre_base = os.path.splitext(t["html"])[0]
+        mp4_prerender = os.path.join(html_folder, nombre_base + ".mp4")
         html_path = os.path.join(html_folder, t["html"])
-        if not os.path.exists(html_path):
-            print(f"   FALTA: {html_path}")
-            continue
-        # Si el MP4 ya existe (descargado desde Drive), usarlo directamente
-        mp4_prerender = os.path.join(html_folder, os.path.splitext(t["html"])[0] + ".mp4")
+
         if os.path.exists(mp4_prerender):
             print(f"   Usando MP4 pre-renderizado: {mp4_prerender}")
             caps[t["html"]] = mp4_prerender
-        elif capturar_animacion(html_path, t["duration"], f"tmp_anim_{os.path.splitext(t['html'])[0]}.mp4"):
-            mp4_tmp = f"tmp_anim_{os.path.splitext(t['html'])[0]}.mp4"
-            caps[t["html"]] = mp4_tmp
+        elif os.path.exists(html_path):
+            if capturar_animacion(html_path, t["duration"], f"tmp_anim_{nombre_base}.mp4"):
+                caps[t["html"]] = f"tmp_anim_{nombre_base}.mp4"
+            else:
+                print(f"   Omitiendo {t['html']}")
         else:
-            print(f"   Omitiendo {t['html']}")
+            print(f"   FALTA: {mp4_prerender}")
 
     if not caps:
         shutil.copy2(video_entrada, video_salida)
