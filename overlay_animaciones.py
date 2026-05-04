@@ -65,7 +65,7 @@ def overlay_animacion(video_entrada, anim_mp4, t_inicio, duracion, video_salida)
     r = subprocess.run(cmd, capture_output=True, text=True)
     if r.returncode != 0:
         print(f"   FFmpeg error: {r.stderr[-800:]}")
-    print(f"   FFmpeg stdout: {r.stdout[-200:]}")
+        print(f"   FFmpeg stdout: {r.stdout[-200:]}")
     else:
         tam = os.path.getsize(video_salida) / (1024*1024)
         print(f"   OK overlay: {tam:.0f}MB")
