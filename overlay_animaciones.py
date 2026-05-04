@@ -1,56 +1,54 @@
-﻿import subprocess, os, shutil, sys
+import subprocess, os, shutil, sys, json
 
-ANIMATIONS_HTML = os.path.join(os.path.dirname(os.path.abspath(__file__)),
-                               "workshop-animaciones", "compositions", "main-graphics.html")
+ENV_DISPLAY = os.getenv("DISPLAY", ":99")
+CHROME = os.getenv("PUPPETEER_EXECUTABLE_PATH", "/usr/bin/chromium")
 
-TIMINGS = [
-    { "id": "an1", "start": 25,  "duration": 33 },
-    { "id": "an2", "start": 128, "duration": 30 },
-    { "id": "an3", "start": 254, "duration": 42 },
-    { "id": "an4", "start": 335, "duration": 14 },
-    { "id": "an5", "start": 389, "duration": 22 },
-    { "id": "an6", "start": 458, "duration": 14 },
-    { "id": "an7", "start": 745, "duration": 48 },
-]
+def capturar_animacion(html_path, duracion, salida_mp4):
+    print(f"   Capturando {os.path.basename(html_path)} ({duracion}s)...")
+    html_abs = os.path.abspath(html_path).replace("\\", "/")
+    fps = 30
 
-def capturar_animacion(anim_id, duracion, salida_mp4):
-    print(f"   Capturando {anim_id} ({duracion}s)...")
-    html_path = ANIMATIONS_HTML.replace("\\", "/")
-    script_js = f"""const puppeteer = require('puppeteer');
+    script_js = f"""
+const puppeteer = require('puppeteer');
 const {{ PuppeteerScreenRecorder }} = require('puppeteer-screen-recorder');
 (async () => {{
   const browser = await puppeteer.launch({{
-    args: ['--no-sandbox', '--disable-setuid-sandbox', '--allow-file-access-from-files']
+    executablePath: '{CHROME}',
+    args: ['--no-sandbox','--disable-setuid-sandbox','--disable-dev-shm-usage','--disable-gpu','--window-size=1280,720'],
+    defaultViewport: {{ width: 1280, height: 720 }}
   }});
   const page = await browser.newPage();
-  await page.setViewport({{ width: 1280, height: 720 }});
   const recorder = new PuppeteerScreenRecorder(page, {{
-    fps: 30,
+    fps: {fps},
     videoFrame: {{ width: 1280, height: 720 }},
     aspectRatio: '16:9',
+    recordDurationLimit: {duracion + 2},
   }});
-  await recorder.start('{salida_mp4}');
-  await page.goto('file:///{html_path}');
-  await page.evaluate((id) => {{
-    window.showAnimation(id);
-    if (id === 'an1') window.startAN1 && window.startAN1();
-  }}, '{anim_id}');
+  await recorder.start('{salida_mp4.replace(os.sep, "/")}');
+  await page.goto('file:///{html_abs}', {{ waitUntil: 'networkidle0', timeout: 15000 }});
   await new Promise(r => setTimeout(r, {duracion * 1000}));
   await recorder.stop();
   await browser.close();
-  console.log('OK: {salida_mp4}');
-}})().catch(e => {{ console.error(e); process.exit(1); }});
+  console.log('OK');
+}})().catch(e => {{ console.error('ERROR:', e.message); process.exit(1); }});
 """
-    script_path = f"tmp_cap_{anim_id}.js"
-    with open(script_path, "w", encoding="utf-8") as f:
+    js_path = f"tmp_cap_{os.path.basename(html_path)}.js"
+    with open(js_path, "w", encoding="utf-8") as f:
         f.write(script_js)
-    r = subprocess.run(["node", script_path], capture_output=True, text=True)
-    if os.path.exists(script_path):
-        os.remove(script_path)
+
+    env = os.environ.copy()
+    env["DISPLAY"] = ENV_DISPLAY
+    r = subprocess.run(["node", js_path], capture_output=True, text=True, env=env)
+    if os.path.exists(js_path):
+        os.remove(js_path)
     if r.returncode != 0:
         print(f"   Error: {r.stderr[-300:]}")
         return False
-    return os.path.exists(salida_mp4)
+    if not os.path.exists(salida_mp4) or os.path.getsize(salida_mp4) < 1000:
+        print(f"   Error: archivo vacio")
+        return False
+    return True
+
 
 def overlay_animacion(video_entrada, anim_mp4, t_inicio, duracion, video_salida):
     t_fin = t_inicio + duracion
@@ -65,61 +63,86 @@ def overlay_animacion(video_entrada, anim_mp4, t_inicio, duracion, video_salida)
         video_salida
     ]
     r = subprocess.run(cmd, capture_output=True, text=True)
-    if r.returncode != 0:
-        print(f"   Error FFmpeg: {r.stderr[-300:]}")
     return r.returncode == 0
 
-def aplicar_todas_las_animaciones(video_entrada, video_salida):
+
+def aplicar_animaciones(video_entrada, timings_json, html_folder, video_salida):
     print(f"\nAplicando animaciones a: {video_entrada}")
+    with open(timings_json, "r", encoding="utf-8") as f:
+        timings = json.load(f)
+    print(f"   {len(timings)} animaciones")
 
-    # Paso 1 — capturar todas las animaciones
-    print("\n--- Capturando animaciones ---")
-    archivos_anim = {}
-    for anim in TIMINGS:
-        mp4 = f"tmp_anim_{anim['id']}.mp4"
-        ok = capturar_animacion(anim["id"], anim["duration"], mp4)
-        if ok:
-            archivos_anim[anim["id"]] = mp4
+    # Capturar
+    print("\n--- Capturando ---")
+    caps = {}
+    for t in timings:
+        html_path = os.path.join(html_folder, t["html"])
+        if not os.path.exists(html_path):
+            print(f"   FALTA: {html_path}")
+            continue
+        mp4_tmp = f"tmp_anim_{os.path.splitext(t['html'])[0]}.mp4"
+        if capturar_animacion(html_path, t["duration"], mp4_tmp):
+            caps[t["html"]] = mp4_tmp
         else:
-            print(f"   ADVERTENCIA: {anim['id']} no se pudo capturar, se omite.")
+            print(f"   Omitiendo {t['html']}")
 
-    if not archivos_anim:
-        print("No se capturó ninguna animación. Abortando.")
+    if not caps:
+        shutil.copy2(video_entrada, video_salida)
         return False
 
-    # Paso 2 — overlay uno por uno
-    print("\n--- Aplicando overlays ---")
+    # Overlay
+    print("\n--- Overlays ---")
     video_actual = video_entrada
-    for i, anim in enumerate(TIMINGS):
-        anim_id = anim["id"]
-        if anim_id not in archivos_anim:
+    for i, t in enumerate(timings):
+        if t["html"] not in caps:
             continue
         tmp_out = f"tmp_overlay_{i}.mp4"
-        print(f"\n[{i+1}/7] {anim_id} en segundo {anim['start']}...")
-        ok = overlay_animacion(video_actual, archivos_anim[anim_id],
-                               anim["start"], anim["duration"], tmp_out)
+        print(f"[{i+1}/{len(timings)}] {t['html']} en {t['start']}s...")
+        ok = overlay_animacion(video_actual, caps[t["html"]], t["start"], t["duration"], tmp_out)
         if ok:
             if video_actual != video_entrada and os.path.exists(video_actual):
                 os.remove(video_actual)
             video_actual = tmp_out
-        else:
-            print(f"   Saltando {anim_id}.")
 
     shutil.copy2(video_actual, video_salida)
     if video_actual != video_entrada and os.path.exists(video_actual):
         os.remove(video_actual)
-
-    # Limpiar temporales
-    for mp4 in archivos_anim.values():
+    for mp4 in caps.values():
         if os.path.exists(mp4):
             os.remove(mp4)
 
     print(f"\nListo: {video_salida}")
     return True
 
+
+# Compatibilidad con llamada antigua (sin JSON)
+TIMINGS_DEFAULT = [
+    {"html": "an1.html", "start": 25,  "duration": 33},
+    {"html": "an2.html", "start": 128, "duration": 30},
+    {"html": "an3.html", "start": 254, "duration": 42},
+    {"html": "an4.html", "start": 335, "duration": 14},
+    {"html": "an5.html", "start": 389, "duration": 22},
+    {"html": "an6.html", "start": 458, "duration": 14},
+    {"html": "an7.html", "start": 745, "duration": 48},
+]
+
+def aplicar_todas_las_animaciones(video_entrada, video_salida, html_folder="workshop-animaciones/compositions"):
+    tmp_json = "tmp_timings.json"
+    with open(tmp_json, "w") as f:
+        json.dump(TIMINGS_DEFAULT, f)
+    ok = aplicar_animaciones(video_entrada, tmp_json, html_folder, video_salida)
+    if os.path.exists(tmp_json):
+        os.remove(tmp_json)
+    return ok
+
+
 if __name__ == "__main__":
-    if len(sys.argv) < 3:
+    if len(sys.argv) == 3:
+        ok = aplicar_todas_las_animaciones(sys.argv[1], sys.argv[2])
+    elif len(sys.argv) == 5:
+        ok = aplicar_animaciones(sys.argv[1], sys.argv[2], sys.argv[3], sys.argv[4])
+    else:
         print("Uso: py overlay_animaciones.py entrada.mp4 salida.mp4")
+        print("     py overlay_animaciones.py entrada.mp4 timings.json carpeta_html salida.mp4")
         sys.exit(1)
-    ok = aplicar_todas_las_animaciones(sys.argv[1], sys.argv[2])
     sys.exit(0 if ok else 1)
