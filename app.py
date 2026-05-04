@@ -237,7 +237,39 @@ def procesar_drive():
                 ruta_input_anim  = os.path.join('output', archivo_output)
                 nombre_con_anim  = archivo_output.replace('.mp4', '_anim.mp4')
                 ruta_output_anim = os.path.join('output', nombre_con_anim)
-                cmd_anim = ['python', 'overlay_animaciones.py', ruta_input_anim, ruta_output_anim]
+
+                # Descargar MP4 de animaciones desde Drive si viene animaciones_data
+                animaciones_data = data.get('animaciones_data')
+                timings_json_path = None
+                if animaciones_data:
+                    jobs[job_id]['log'].append('Descargando MP4 de animaciones desde Drive...')
+                    os.makedirs('tmp_animaciones', exist_ok=True)
+                    timings_local = []
+                    for anim in animaciones_data:
+                        mp4_local = os.path.join('tmp_animaciones', anim['archivo'])
+                        try:
+                            descargar_archivo(anim['drive_id'], mp4_local)
+                            timings_local.append({
+                                'html': anim['archivo'],
+                                'start': anim['start'],
+                                'duration': anim['duration']
+                            })
+                            jobs[job_id]['log'].append(f"  OK: {anim['archivo']}")
+                        except Exception as e:
+                            jobs[job_id]['log'].append(f"  Error descargando {anim['archivo']}: {e}")
+                    timings_json_path = 'tmp_timings_drive.json'
+                    import json as _json
+                    with open(timings_json_path, 'w') as f:
+                        _json.dump(timings_local, f)
+
+                if timings_json_path:
+                    cmd_anim = ['python', 'overlay_animaciones.py',
+                                ruta_input_anim, timings_json_path,
+                                'tmp_animaciones', ruta_output_anim]
+                else:
+                    cmd_anim = ['python', 'overlay_animaciones.py',
+                                ruta_input_anim, ruta_output_anim]
+
                 proc_anim = subprocess.Popen(cmd_anim, stdout=subprocess.PIPE,
                                              stderr=subprocess.STDOUT, text=True)
                 for line in proc_anim.stdout:
@@ -248,6 +280,13 @@ def procesar_drive():
                 if proc_anim.returncode == 0 and os.path.exists(ruta_output_anim):
                     archivo_output = nombre_con_anim
                     jobs[job_id]['log'].append('Animaciones aplicadas.')
+
+                # Limpiar temporales
+                import shutil as _shutil
+                if os.path.exists('tmp_animaciones'):
+                    _shutil.rmtree('tmp_animaciones')
+                if timings_json_path and os.path.exists(timings_json_path):
+                    os.remove(timings_json_path)
 
             # 6. Subir resultado a Drive
             jobs[job_id]['status'] = 'subiendo'
