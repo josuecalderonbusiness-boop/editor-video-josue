@@ -413,6 +413,18 @@
     </div>
   </div>
 
+  <!-- ANIMACIONES JSON -->
+  <div id="seccion-animaciones-json" style="display:none;" class="card">
+    <div class="section-label">Animaciones — JSON</div>
+    <div class="upload-zone" id="zone-animjson">
+      <input type="file" id="input-animjson" accept=".json" onchange="setFile('animjson', this)">
+      <div class="icon">🎬</div>
+      <div class="label">animaciones_drive.json</div>
+      <div class="hint">Generado por subir_animaciones.py</div>
+      <div class="filename" id="name-animjson"></div>
+    </div>
+  </div>
+
   <!-- BOTÓN -->
   <button class="btn-procesar" id="btn-procesar" onclick="procesar()">
     ▶ Procesar Video
@@ -425,19 +437,7 @@
       <div class="status-text" id="status-text">Procesando...</div>
     </div>
     <div class="log-box" id="log-box"></div>
-    <!-- ANIMACIONES JSON -->
-  <div id="seccion-animaciones-json" style="display:none; margin-top:12px;">
-    <div class="section-label" style="margin-bottom:8px;">Animaciones (opcional)</div>
-    <div class="upload-zone" id="zone-animjson">
-      <input type="file" id="input-animjson" accept=".json" onchange="setFile('animjson', this)">
-      <div class="icon">🎬</div>
-      <div class="label">animaciones_drive.json</div>
-      <div class="hint">Generado por subir_animaciones.py</div>
-      <div class="filename" id="name-animjson"></div>
-    </div>
-  </div>
-
-  <div style="margin-top:12px;">
+    <div style="margin-top:12px;">
       <button class="btn-descargar hidden" id="btn-descargar" onclick="descargar()">
         ⬇ Descargar Video Editado
       </button>
