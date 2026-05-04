@@ -33,6 +33,7 @@ def procesar():
     voz_pro = request.form.get('voz_pro') == 'true'
     solo_limpiar = request.form.get('solo_limpiar') == 'true'
     animaciones = request.form.get('animaciones') == 'true'
+    sin_silencios = request.form.get('sin_silencios') == 'true'
 
     if not video:
         return jsonify({'error': 'No se subio video'}), 400
@@ -68,6 +69,8 @@ def procesar():
             cmd.append('--voz-pro')
         if cortes_path:
             cmd += ['--cortes', os.path.basename(cortes_path)]
+        if sin_silencios:
+            cmd.append('--sin-silencios')
 
         os.makedirs('input', exist_ok=True)
         os.rename(video_path, os.path.join('input', os.path.basename(video_path)))

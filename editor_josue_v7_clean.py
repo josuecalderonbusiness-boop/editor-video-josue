@@ -1090,7 +1090,7 @@ def aplicar_voz_pro(entrada, salida):
 #  FLUJO PRINCIPAL
 # ─────────────────────────────────────────
 def editar_reel(nombre_archivo, fuente="montserrat", guion=None,
-                subtitulos=False, solo_limpiar=False, limpia_audio=False, color_workshop=False, cortes_manual=None, voz_pro=False):
+                subtitulos=False, solo_limpiar=False, limpia_audio=False, color_workshop=False, cortes_manual=None, voz_pro=False, sin_silencios=False):
 
     print(f"\n{'='*55}")
     print(f"  EDITOR JOSUE v7.0 (OpenAI Whisper + GPT-4o)")
@@ -1125,7 +1125,10 @@ def editar_reel(nombre_archivo, fuente="montserrat", guion=None,
 
     try:
         # PASO 1: Eliminar silencios
-        if usar_proxy:
+        if sin_silencios:
+            print("\nSaltando eliminacion de silencios (video ya editado).")
+            shutil.copy2(ruta_entrada, tmp_sin_sil)
+        elif usar_proxy:
             crear_proxy(ruta_entrada, tmp_proxy)
             eliminar_silencios(tmp_proxy, tmp_sin_sil, log=log)
         else:
@@ -1265,6 +1268,7 @@ EJEMPLOS:
     parser.add_argument("--voz-pro", action="store_true", help="Voz profesional estilo podcast")
     parser.add_argument("--color-workshop", action="store_true")
     parser.add_argument("--cortes", default=None)
+    parser.add_argument("--sin-silencios", action="store_true", help="No eliminar silencios (video ya editado)")
 
     args = parser.parse_args()
 
@@ -1284,7 +1288,8 @@ EJEMPLOS:
             limpia_audio=args.limpia_audio,
             voz_pro=getattr(args, "voz_pro", False),
             color_workshop=getattr(args, "color_workshop", False),
-            cortes_manual=args.cortes
+            cortes_manual=args.cortes,
+            sin_silencios=getattr(args, "sin_silencios", False)
         )
 
 
