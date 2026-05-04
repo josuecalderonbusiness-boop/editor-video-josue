@@ -147,6 +147,7 @@ def procesar_drive():
     solo_limpiar  = data.get('solo_limpiar', True)
     voz_pro       = data.get('voz_pro', False)
     animaciones   = data.get('animaciones', False)
+    sin_silencios = data.get('sin_silencios', False)
 
     if not drive_file_id:
         return jsonify({'error': 'Falta el ID del archivo de Drive'}), 400
@@ -201,6 +202,8 @@ def procesar_drive():
                 cmd.append('--solo-limpiar')
             if voz_pro:
                 cmd.append('--voz-pro')
+            if sin_silencios:
+                cmd.append('--sin-silencios')
 
             proc = subprocess.Popen(cmd, stdout=subprocess.PIPE,
                                     stderr=subprocess.STDOUT, text=True)
