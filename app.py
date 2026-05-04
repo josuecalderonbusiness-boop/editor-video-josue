@@ -250,7 +250,7 @@ def procesar_drive():
                         try:
                             descargar_archivo(anim['drive_id'], mp4_local)
                             timings_local.append({
-                                'html': anim['archivo'],
+                                'html': anim['archivo'].replace('.mp4', '.html'),
                                 'start': anim['start'],
                                 'duration': anim['duration']
                             })
