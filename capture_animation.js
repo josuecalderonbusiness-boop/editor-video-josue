@@ -20,23 +20,35 @@ async function capturarAnimacion(htmlPath, outputPath, duracionMs) {
   });
 
   const page = await browser.newPage();
-  await page.setViewport({ width: 1080, height: 1920 });
-
-  const recorder = new PuppeteerScreenRecorder(page, {
-    fps: 30,
-    videoFrame: { width: 1080, height: 1920 },
-    videoCrf: 18,
-    videoCodec: 'libx264',
-    videoPreset: 'ultrafast',
-    autopad: { color: 'black' },
-  });
+  await page.setViewport({ width: 1280, height: 720 });
 
   const fileUrl = htmlPath.startsWith('http')
     ? htmlPath
     : `file://${path.resolve(htmlPath)}`;
 
   await page.goto(fileUrl, { waitUntil: 'networkidle0', timeout: 30000 });
-  await new Promise(r => setTimeout(r, 500));
+
+  // Esperar fonts-loaded con timeout generoso
+  try {
+    await page.waitForFunction(
+      () => document.body.classList.contains('fonts-loaded'),
+      { timeout: 5000 }
+    );
+  } catch(e) {
+    // Si no tiene fonts-loaded, esperar fijo 2s
+    await new Promise(r => setTimeout(r, 2000));
+  }
+
+  await new Promise(r => setTimeout(r, 100));
+
+  const recorder = new PuppeteerScreenRecorder(page, {
+    fps: 30,
+    videoFrame: { width: 1280, height: 720 },
+    videoCrf: 18,
+    videoCodec: 'libx264',
+    videoPreset: 'ultrafast',
+    autopad: { color: 'black' },
+  });
 
   await recorder.start(outputPath);
   await new Promise(r => setTimeout(r, duracionMs));
