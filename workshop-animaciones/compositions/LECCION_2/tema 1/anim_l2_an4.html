@@ -1,0 +1,262 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<style>
+  body:not(.fonts-loaded) * { animation-play-state: paused !important; transition: none !important; }
+</style>
+<script>
+  document.fonts.ready.then(() => {
+    setTimeout(() => { document.body.classList.add("fonts-loaded"); }, 1500);
+  });
+</script>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=1280, height=720">
+<title>anim_l2_an4 — Pregunta 03</title>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,900;1,400;1,700&family=Cormorant+Garamond:ital,wght@1,300;1,600&family=Inter:wght@300&display=swap" rel="stylesheet">
+<style>
+* { margin:0; padding:0; box-sizing:border-box; }
+body { width:1280px; height:720px; overflow:hidden; background:#EDE3CE; }
+
+.pizarra {
+  width:1280px; height:720px; position:relative; overflow:hidden;
+  background-color: #EDE3CE;
+  background-image:
+    linear-gradient(rgba(90,18,32,0.06) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(90,18,32,0.06) 1px, transparent 1px);
+  background-size: 52px 52px;
+}
+
+.borde-izq {
+  position:absolute; left:0; top:0; bottom:0; width:8px;
+  background: linear-gradient(180deg, #5A1220, #8B2D3F, #5A1220);
+  z-index:10;
+}
+.borde-sup {
+  position:absolute; top:0; left:0; right:0; height:5px;
+  background: linear-gradient(90deg, #D4A843, #B8892A, #E8C870, transparent);
+  width:0; animation: lineaGrow 0.8s ease forwards 0.3s;
+  z-index:10;
+}
+.linea-dec {
+  position:absolute; bottom:0; left:0; right:0; height:4px;
+  background: linear-gradient(90deg, #5A1220, #D4A843, transparent);
+  width:0; animation: lineaGrow 1s ease forwards 0.5s;
+  z-index:10;
+}
+@keyframes lineaGrow { to { width:100%; } }
+
+/* Signos flotantes */
+.qs { position:absolute; inset:0; pointer-events:none; overflow:hidden; z-index:1; }
+.q {
+  position:absolute;
+  font-family:'Playfair Display',serif; font-weight:900;
+  color:#5A1220; opacity:0;
+  animation: qFloat var(--dur) ease-in-out infinite var(--delay);
+  text-shadow: 0 0 30px rgba(90,18,32,0.4), 0 0 60px rgba(90,18,32,0.2);
+}
+@keyframes qFloat {
+  0%   { opacity:0; transform:translateY(20px) scale(0.85); }
+  15%  { opacity:var(--op); }
+  70%  { opacity:var(--op); transform:translateY(-40px) scale(1.05); }
+  100% { opacity:0; transform:translateY(-80px) scale(0.9); }
+}
+
+/* ============ SLIDE 1 ============ */
+#s1 {
+  position:absolute; inset:0; z-index:5;
+  display:flex; flex-direction:column;
+  align-items:center; justify-content:center;
+  /* El slide completo desaparece en 10.5s, antes de que entre s2 en 11.5s */
+  animation: fadeOutSlow 0.7s ease forwards 10.5s;
+}
+
+/* Texto grande: ALGUNA PARTE DE TI */
+.s1-grande {
+  font-family:'Playfair Display',serif; font-weight:900;
+  font-size:158px; line-height:0.88; color:#3D0C11;
+  text-align:center; letter-spacing:-3px;
+  text-shadow: 3px 4px 0 rgba(61,12,17,0.15);
+  opacity:0;
+  animation: fadeUpIn 0.7s ease forwards 0.4s, fadeOutSlow 0.8s ease forwards 6.5s;
+}
+
+/* Contenedor del texto pequeño que emerge */
+.s1-pequeño-wrap {
+  position:absolute; inset:0;
+  display:flex; align-items:center; justify-content:center;
+  opacity:0;
+  animation: fadeUpIn 0.6s ease forwards 7.5s;
+}
+.s1-pequeño-inner {
+  display:flex; align-items:center; gap:28px;
+}
+.s1-pequeño-texto {
+  font-family:'Cormorant Garamond',serif; font-style:italic; font-weight:300;
+  font-size:62px; color:#8B2D3F; letter-spacing:0.03em;
+}
+/* La palabra "pequeña" en círculo */
+.s1-pequena-circulo {
+  position:relative; display:inline-flex;
+  align-items:center; justify-content:center;
+}
+.s1-pequena-word {
+  font-family:'Playfair Display',serif; font-style:italic; font-weight:900;
+  font-size:72px; color:#5A1220;
+  position:relative; z-index:2;
+  text-shadow: 0 0 20px rgba(90,18,32,0.3);
+}
+.circulo-svg {
+  position:absolute;
+  top:50%; left:50%;
+  transform:translate(-50%, -52%);
+  overflow:visible;
+}
+.circulo-path {
+  fill:none; stroke:#B8892A; stroke-width:3;
+  stroke-linecap:round;
+  stroke-dasharray:320;
+  stroke-dashoffset:320;
+  filter: drop-shadow(0 0 8px rgba(184,137,42,0.5));
+  animation: drawCircle 0.8s ease-out forwards 8.2s;
+}
+@keyframes drawCircle {
+  to { stroke-dashoffset: 0; }
+}
+
+/* ============ SLIDE 2 ============ */
+#s2 {
+  position:absolute; inset:0; z-index:6;
+  display:flex; align-items:center; justify-content:center;
+  opacity:0;
+  background: #EDE3CE;
+  background-image:
+    linear-gradient(rgba(90,18,32,0.06) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(90,18,32,0.06) 1px, transparent 1px);
+  background-size: 52px 52px;
+  animation: fadeUpIn 0.8s ease forwards 11.5s;
+}
+
+.pensamiento-wrap {
+  display:flex; flex-direction:column; align-items:center;
+  gap:0px;
+  background: linear-gradient(135deg, rgba(61,12,17,0.06), rgba(90,18,32,0.04));
+  border-radius:24px;
+  padding:52px 80px 60px;
+  border: 1.5px solid rgba(90,18,32,0.12);
+  box-shadow: 4px 6px 0 rgba(61,12,17,0.08), 0 16px 40px rgba(61,12,17,0.06);
+  position:relative;
+  max-width:1080px;
+}
+
+/* Comilla de apertura */
+.p-comilla-open {
+  font-family:'Playfair Display',serif; font-weight:900;
+  font-size:160px; color:#B8892A; line-height:0.5;
+  text-shadow: 0 0 30px rgba(184,137,42,0.4);
+  align-self:flex-start;
+  margin-left:-20px;
+  opacity:0; animation: fadeUpIn 0.5s ease forwards 12.0s;
+}
+
+.pensamiento-texto {
+  font-family:'Playfair Display',serif; font-style:italic; font-weight:700;
+  font-size:96px; color:#3D0C11; line-height:1.05;
+  text-align:center; letter-spacing:-1px;
+  opacity:0; animation: fadeUpIn 0.7s ease forwards 12.5s;
+}
+.pensamiento-texto em {
+  color:#5A1220;
+  font-size:88px;
+}
+
+/* Comilla de cierre */
+.p-comilla-close {
+  font-family:'Playfair Display',serif; font-weight:900;
+  font-size:160px; color:#B8892A; line-height:0.5;
+  text-shadow: 0 0 30px rgba(184,137,42,0.4);
+  align-self:flex-end;
+  margin-right:-20px;
+  opacity:0; animation: fadeUpIn 0.5s ease forwards 13.5s;
+}
+
+/* Puntos suspensivos pensamiento */
+.p-puntos {
+  font-family:'Cormorant Garamond',serif; font-style:italic; font-weight:300;
+  font-size:52px; color:#8B2D3F;
+  opacity:0; animation: fadeUpIn 0.5s ease forwards 14.2s;
+  letter-spacing:0.1em;
+}
+
+/* Signo final grande dorado */
+.s2-signo-final {
+  position:absolute; right:60px; bottom:40px;
+  font-family:'Playfair Display',serif; font-weight:900;
+  font-size:140px; color:#E8C870; line-height:1;
+  text-shadow: 0 0 40px rgba(232,200,112,0.5), 0 0 80px rgba(232,200,112,0.25);
+  opacity:0; animation: fadeUpIn 0.6s ease forwards 15.0s;
+}
+
+/* ============ ANIMACIONES GLOBALES ============ */
+@keyframes fadeUpIn {
+  from { opacity:0; transform:translateY(24px); filter:blur(6px); }
+  to   { opacity:1; transform:translateY(0); filter:blur(0); }
+}
+@keyframes fadeOutSlow {
+  from { opacity:1; }
+  to   { opacity:0; }
+}
+</style>
+</head>
+<body>
+<div class="pizarra">
+  <div class="borde-izq"></div>
+  <div class="borde-sup"></div>
+  <div class="linea-dec"></div>
+
+  <div class="qs">
+    <span class="q" style="left:4%;top:7%;font-size:95px;--dur:5.2s;--delay:0.4s;--op:0.11">?</span>
+    <span class="q" style="left:81%;top:4%;font-size:62px;--dur:4.6s;--delay:1.3s;--op:0.09">?</span>
+    <span class="q" style="left:93%;top:48%;font-size:108px;--dur:6.1s;--delay:0.3s;--op:0.07">?</span>
+    <span class="q" style="left:71%;top:82%;font-size:72px;--dur:5.4s;--delay:2s;--op:0.10">?</span>
+    <span class="q" style="left:2%;top:74%;font-size:92px;--dur:4.9s;--delay:2.4s;--op:0.08">?</span>
+    <span class="q" style="left:52%;top:2%;font-size:52px;--dur:5.3s;--delay:3.2s;--op:0.09">?</span>
+    <span class="q" style="left:86%;top:87%;font-size:78px;--dur:4.3s;--delay:0.7s;--op:0.07">?</span>
+    <span class="q" style="left:29%;top:89%;font-size:49px;--dur:5.9s;--delay:2.9s;--op:0.08">?</span>
+    <span class="q" style="left:16%;top:1%;font-size:66px;--dur:4.1s;--delay:1.7s;--op:0.09">?</span>
+    <span class="q" style="left:40%;top:91%;font-size:44px;--dur:6.3s;--delay:0.5s;--op:0.07">?</span>
+  </div>
+
+  <!-- SLIDE 1: ALGUNA PARTE DE TI → pequeña en círculo -->
+  <div id="s1">
+    <div class="s1-grande">ALGUNA<br>PARTE<br>DE TI</div>
+
+    <div class="s1-pequeño-wrap">
+      <div class="s1-pequeño-inner">
+        <span class="s1-pequeño-texto">aunque sea</span>
+        <div class="s1-pequena-circulo">
+          <span class="s1-pequena-word">pequeña</span>
+          <svg class="circulo-svg" width="320" height="120" viewBox="0 0 320 120">
+            <ellipse class="circulo-path" cx="160" cy="60" rx="148" ry="52"/>
+          </svg>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- SLIDE 2: pensamiento "si él cambiara, todo estaría bien" -->
+  <div id="s2">
+    <div class="pensamiento-wrap">
+      <div class="p-comilla-open">"</div>
+      <div class="pensamiento-texto">
+        si <em>él cambiara,</em><br>
+        todo estaría bien
+      </div>
+      <div class="p-comilla-close">"</div>
+      <div class="p-puntos">¿todavía lo crees?</div>
+    </div>
+    <div class="s2-signo-final">?</div>
+  </div>
+
+</div>
+</body>
+</html>

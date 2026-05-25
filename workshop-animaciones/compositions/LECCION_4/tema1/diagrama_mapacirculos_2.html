@@ -1,0 +1,371 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<style>
+  body:not(.fonts-loaded) * { animation-play-state: paused !important; transition: none !important; }
+</style>
+<script>
+  document.fonts.ready.then(() => {
+    setTimeout(() => { document.body.classList.add("fonts-loaded"); }, 1500);
+  });
+</script>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=1280, height=720">
+<title>DIAGRAMA — Punto de Influencia fase 2</title>
+<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Cormorant+Garamond:ital,wght@1,600&display=swap" rel="stylesheet">
+<style>
+  * { margin:0; padding:0; box-sizing:border-box; }
+  body { width:1280px; height:720px; overflow:hidden; background:#0000FF; }
+
+  .scene {
+    width:1280px; height:720px;
+    position:relative; background:#0000FF;
+  }
+  .scene.out { animation: sceneOut .9s ease-in forwards; }
+  @keyframes sceneOut { to { opacity:0; } }
+
+  svg { position:absolute; top:0; left:0; width:1280px; height:720px; }
+
+  /* ── Chips pequeños — zona exterior, muy chicos, poco ruido ── */
+  .chip-small {
+    display: inline-block;
+    background: rgba(139,45,63,0.45);
+    border: 1.5px solid rgba(201,112,128,0.5);
+    border-radius: 6px;
+    padding: 4px 12px;
+    font-family: 'Bebas Neue', Impact, sans-serif;
+    font-size: 16px;
+    letter-spacing: 0.06em;
+    color: rgba(249,243,232,0.6);
+    white-space: nowrap;
+  }
+
+  /* ── Rayos de ataque — líneas que salen de ella hacia afuera ── */
+  .rayo-ataque {
+    stroke: #E8C870;
+    stroke-width: 3;
+    stroke-linecap: round;
+    opacity: 0;
+    stroke-dasharray: 300;
+    stroke-dashoffset: 300;
+  }
+
+  /* ── Ella se pone roja y se encoge ── */
+  @keyframes ellaRoja {
+    0%   { fill: #F9F3E8; }
+    100% { fill: #FF3B3B; }
+  }
+  @keyframes ellaPulse {
+    0%,100% { opacity: 1; transform-origin: 640px 395px; transform: scale(1); }
+    50%     { opacity: 0.55; transform-origin: 640px 395px; transform: scale(0.88); }
+  }
+  @keyframes encogerse {
+    0%   { transform-origin: 640px 395px; transform: scale(1); }
+    100% { transform-origin: 640px 395px; transform: scale(0.45); }
+  }
+
+  /* circulo dorado encoge */
+  @keyframes circuloEncoge {
+    0%   { r: 140; }
+    100% { r: 65; }
+  }
+
+  /* ── Fade in de todo al inicio (continúa desde fase 1) ── */
+  @keyframes sceneIn { from { opacity:0; } to { opacity:1; } }
+
+  /* ── Chips pequeños aparecen al inicio ── */
+  @keyframes chipSmallIn {
+    from { opacity:0; transform: scale(1.1); }
+    to   { opacity:1; transform: scale(1); }
+  }
+
+  /* ── Rayo de ataque se dibuja y desaparece ── */
+  @keyframes rayoDisparo {
+    0%   { stroke-dashoffset: 300; opacity: 1; }
+    60%  { stroke-dashoffset: 0;   opacity: 1; }
+    100% { stroke-dashoffset: 0;   opacity: 0; }
+  }
+
+  /* ── Impacto en chip — parpadea cuando el rayo llega ── */
+  @keyframes chipImpacto {
+    0%,100% { opacity: 1; }
+    50%     { opacity: 0.2; }
+  }
+
+  /* drift suave chips pequeños */
+  @keyframes drift-sm-a { 0%,100%{transform:translateY(0)}  50%{transform:translateY(-5px)} }
+  @keyframes drift-sm-b { 0%,100%{transform:translateY(0)}  50%{transform:translateY(4px)} }
+  @keyframes drift-sm-c { 0%,100%{transform:translateY(-3px)} 50%{transform:translateY(3px)} }
+</style>
+</head>
+<body>
+<div class="scene" id="scene">
+<svg id="svg-main" viewBox="0 0 1280 720" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <filter id="glow-cream" x="-80%" y="-80%" width="260%" height="260%">
+      <feGaussianBlur stdDeviation="12" result="blur"/>
+      <feMerge><feMergeNode in="blur"/><feMergeNode in="SourceGraphic"/></feMerge>
+    </filter>
+    <filter id="glow-red" x="-80%" y="-80%" width="260%" height="260%">
+      <feGaussianBlur stdDeviation="16" result="blur"/>
+      <feMerge><feMergeNode in="blur"/><feMergeNode in="SourceGraphic"/></feMerge>
+    </filter>
+    <filter id="glow-gold" x="-40%" y="-40%" width="180%" height="180%">
+      <feGaussianBlur stdDeviation="7" result="blur"/>
+      <feMerge><feMergeNode in="blur"/><feMergeNode in="SourceGraphic"/></feMerge>
+    </filter>
+    <filter id="glow-wine" x="-30%" y="-30%" width="160%" height="160%">
+      <feGaussianBlur stdDeviation="8" result="blur"/>
+      <feMerge><feMergeNode in="blur"/><feMergeNode in="SourceGraphic"/></feMerge>
+    </filter>
+  </defs>
+
+  <!-- ══════════════════════════════════════════════ -->
+  <!-- ESTADO INICIAL — igual a como terminó fase 1  -->
+  <!-- ══════════════════════════════════════════════ -->
+
+  <!-- Círculo exterior borgoña -->
+  <circle id="circulo-2" cx="640" cy="395" r="275"
+    fill="none" stroke="#8B2D3F" stroke-width="13"
+    filter="url(#glow-wine)"/>
+
+  <!-- Círculo interior dorado — va a encogerse -->
+  <circle id="circulo-1" cx="640" cy="395" r="140"
+    fill="none" stroke="#E8C870" stroke-width="10"
+    filter="url(#glow-gold)"/>
+
+  <!-- ══ CHIPS PEQUEÑOS — zona exterior, poco ruido ══ -->
+
+  <!-- Los mismos 8 de la fase anterior pero diminutos -->
+  <g style="animation: drift-sm-a 5s ease-in-out infinite;">
+    <foreignObject x="10" y="148" width="200" height="36">
+      <div xmlns="http://www.w3.org/1999/xhtml" class="chip-small" id="chip1">El carácter de él.</div>
+    </foreignObject>
+  </g>
+  <g style="animation: drift-sm-b 6s ease-in-out infinite;">
+    <foreignObject x="910" y="118" width="260" height="36">
+      <div xmlns="http://www.w3.org/1999/xhtml" class="chip-small" id="chip2">Su historia de vida.</div>
+    </foreignObject>
+  </g>
+  <g style="animation: drift-sm-c 4.5s ease-in-out infinite;">
+    <foreignObject x="10" y="315" width="168" height="36">
+      <div xmlns="http://www.w3.org/1999/xhtml" class="chip-small" id="chip3">Sus silencios.</div>
+    </foreignObject>
+  </g>
+  <g style="animation: drift-sm-a 5.5s ease-in-out 1s infinite;">
+    <foreignObject x="1050" y="288" width="188" height="36">
+      <div xmlns="http://www.w3.org/1999/xhtml" class="chip-small" id="chip4">Sus decisiones.</div>
+    </foreignObject>
+  </g>
+  <g style="animation: drift-sm-b 7s ease-in-out .5s infinite;">
+    <foreignObject x="10" y="495" width="280" height="36">
+      <div xmlns="http://www.w3.org/1999/xhtml" class="chip-small" id="chip5">Sus reacciones automáticas.</div>
+    </foreignObject>
+  </g>
+  <g style="animation: drift-sm-c 4.8s ease-in-out 1.2s infinite;">
+    <foreignObject x="1050" y="468" width="188" height="36">
+      <div xmlns="http://www.w3.org/1999/xhtml" class="chip-small" id="chip6">Sus prioridades.</div>
+    </foreignObject>
+  </g>
+  <g style="animation: drift-sm-a 6.2s ease-in-out .8s infinite;">
+    <foreignObject x="200" y="640" width="288" height="36">
+      <div xmlns="http://www.w3.org/1999/xhtml" class="chip-small" id="chip7">Lo que la crianza le instaló.</div>
+    </foreignObject>
+  </g>
+  <g style="animation: drift-sm-b 5.2s ease-in-out .3s infinite;">
+    <foreignObject x="720" y="610" width="252" height="36">
+      <div xmlns="http://www.w3.org/1999/xhtml" class="chip-small" id="chip8">La forma en que lo criaron.</div>
+    </foreignObject>
+  </g>
+
+  <!-- ══════════════════════════════════════════════ -->
+  <!-- ELLA — estrella + silueta, arranca normal     -->
+  <!-- luego JS la hace roja y la encoge             -->
+  <!-- ══════════════════════════════════════════════ -->
+
+  <!-- Rayos base (siempre visibles al inicio) -->
+  <line id="ray1" x1="640" y1="325" x2="640" y2="300" stroke="#F9F3E8" stroke-width="5" stroke-linecap="round"/>
+  <line id="ray2" x1="640" y1="465" x2="640" y2="490" stroke="#F9F3E8" stroke-width="5" stroke-linecap="round"/>
+  <line id="ray3" x1="605" y1="395" x2="580" y2="395" stroke="#F9F3E8" stroke-width="5" stroke-linecap="round"/>
+  <line id="ray4" x1="675" y1="395" x2="700" y2="395" stroke="#F9F3E8" stroke-width="5" stroke-linecap="round"/>
+  <line id="ray5" x1="618" y1="348" x2="600" y2="330" stroke="#F9F3E8" stroke-width="5" stroke-linecap="round"/>
+  <line id="ray6" x1="662" y1="348" x2="680" y2="330" stroke="#F9F3E8" stroke-width="5" stroke-linecap="round"/>
+  <line id="ray7" x1="618" y1="442" x2="600" y2="460" stroke="#F9F3E8" stroke-width="5" stroke-linecap="round"/>
+  <line id="ray8" x1="662" y1="442" x2="680" y2="460" stroke="#F9F3E8" stroke-width="5" stroke-linecap="round"/>
+
+  <!-- Grupo de ella — todo el personaje en un <g> para encogerse junto -->
+  <g id="ella-grupo">
+    <!-- estrella -->
+    <polygon id="star-core"
+      points="640,336 648,356 670,356 654,368 660,388 640,376 620,388 626,368 610,356 632,356"
+      fill="#F9F3E8" filter="url(#glow-cream)"/>
+    <!-- cabeza -->
+    <circle id="ella-cabeza" cx="640" cy="408" r="11" fill="#F9F3E8"/>
+    <!-- cuerpo -->
+    <line id="ella-cuerpo" x1="640" y1="419" x2="640" y2="442" stroke="#F9F3E8" stroke-width="5" stroke-linecap="round"/>
+    <!-- brazos -->
+    <line id="ella-brazos" x1="624" y1="428" x2="656" y2="428" stroke="#F9F3E8" stroke-width="4" stroke-linecap="round"/>
+    <!-- piernas -->
+    <line id="ella-pierna1" x1="640" y1="442" x2="630" y2="458" stroke="#F9F3E8" stroke-width="4" stroke-linecap="round"/>
+    <line id="ella-pierna2" x1="640" y1="442" x2="650" y2="458" stroke="#F9F3E8" stroke-width="4" stroke-linecap="round"/>
+    <!-- halo -->
+    <circle id="ella-halo" cx="640" cy="408" r="48" fill="none" stroke="rgba(249,243,232,0.25)" stroke-width="3"/>
+  </g>
+
+  <!-- ══════════════════════════════════════════════ -->
+  <!-- RAYOS DE ATAQUE — salen de ella hacia chips   -->
+  <!-- Se dibujan con JS secuencialmente             -->
+  <!-- ══════════════════════════════════════════════ -->
+
+  <!-- rayo → chip1 (izq alta) -->
+  <line id="ataque1" x1="605" y1="390" x2="110" y2="166"
+    class="rayo-ataque" stroke="#FF3B3B"/>
+  <!-- rayo → chip2 (der alta) -->
+  <line id="ataque2" x1="675" y1="390" x2="1040" y2="136"
+    class="rayo-ataque" stroke="#FF3B3B"/>
+  <!-- rayo → chip3 (izq media) -->
+  <line id="ataque3" x1="600" y1="395" x2="110" y2="333"
+    class="rayo-ataque" stroke="#FF3B3B"/>
+  <!-- rayo → chip4 (der media) -->
+  <line id="ataque4" x1="680" y1="395" x2="1144" y2="306"
+    class="rayo-ataque" stroke="#FF3B3B"/>
+  <!-- rayo → chip5 (izq baja) -->
+  <line id="ataque5" x1="600" y1="430" x2="110" y2="513"
+    class="rayo-ataque" stroke="#FF3B3B"/>
+  <!-- rayo → chip6 (der baja) -->
+  <line id="ataque6" x1="680" y1="430" x2="1144" y2="486"
+    class="rayo-ataque" stroke="#FF3B3B"/>
+
+</svg>
+</div>
+
+<script>
+  // ── Constantes de tiempo (ms) ──────────────────────────────
+  const INICIO_ATAQUES = 1200;   // cuando empiezan los rayos
+  const INTERVALO_RAYO = 600;    // cada cuánto sale un rayo
+  const INICIO_ROJA    = 2000;   // ella empieza a ponerse roja
+  const INICIO_ENCOGE  = 3500;   // ella y el círculo empiezan a encogerse
+  const DURACION_MS    = 8500;   // fade out total
+
+  // ── Helpers ───────────────────────────────────────────────
+  const $ = id => document.getElementById(id);
+
+  // Anima un rayo (stroke-dashoffset con WAAPI)
+  function dispararRayo(id, delay) {
+    const el = $(id);
+    setTimeout(() => {
+      el.animate([
+        { strokeDashoffset: 300, opacity: 1 },
+        { strokeDashoffset: 0,   opacity: 1,  offset: 0.6 },
+        { strokeDashoffset: 0,   opacity: 0 }
+      ], { duration: 700, fill: 'forwards', easing: 'ease-out' });
+    }, delay);
+  }
+
+  // Hace parpadear un chip al recibir el impacto
+  function impactoChip(chipEl, delay) {
+    setTimeout(() => {
+      chipEl.animate([
+        { opacity: 1 },
+        { opacity: 0.1 },
+        { opacity: 0.8 },
+        { opacity: 0.15 },
+        { opacity: 0.6 }
+      ], { duration: 500, fill: 'forwards', easing: 'ease-in-out' });
+    }, delay + 550);
+  }
+
+  // ── Rayos secuenciales ─────────────────────────────────────
+  const ataques = [
+    { rayo: 'ataque1', chip: 'chip1' },
+    { rayo: 'ataque2', chip: 'chip2' },
+    { rayo: 'ataque3', chip: 'chip3' },
+    { rayo: 'ataque4', chip: 'chip4' },
+    { rayo: 'ataque5', chip: 'chip5' },
+    { rayo: 'ataque6', chip: 'chip6' },
+  ];
+
+  ataques.forEach((a, i) => {
+    const delay = INICIO_ATAQUES + i * INTERVALO_RAYO;
+    dispararRayo(a.rayo, delay);
+    const chipEl = document.getElementById(a.chip).querySelector('div');
+    if (chipEl) impactoChip(chipEl, delay);
+  });
+
+  // ── Ella se pone roja ──────────────────────────────────────
+  const ellaPartes = ['star-core','ella-cabeza','ella-cuerpo','ella-brazos',
+                      'ella-pierna1','ella-pierna2',
+                      'ray1','ray2','ray3','ray4','ray5','ray6','ray7','ray8'];
+
+  setTimeout(() => {
+    // color rojo
+    ellaPartes.forEach(id => {
+      const el = $(id);
+      if (!el) return;
+      const attr = el.tagName === 'line' ? 'stroke' : 'fill';
+      el.animate(
+        [{ [attr]: '#F9F3E8' }, { [attr]: '#FF3B3B' }],
+        { duration: 800, fill: 'forwards', easing: 'ease-in' }
+      );
+    });
+    $('ella-halo').animate(
+      [{ stroke: 'rgba(249,243,232,0.25)' }, { stroke: 'rgba(255,59,59,0.35)' }],
+      { duration: 800, fill: 'forwards' }
+    );
+    // filtro rojo en estrella
+    $('star-core').style.filter = 'url(#glow-red)';
+  }, INICIO_ROJA);
+
+  // ── Ella pulsa (ansiosa) ───────────────────────────────────
+  setTimeout(() => {
+    const g = $('ella-grupo');
+    g.style.transformOrigin = '640px 408px';
+    g.animate([
+      { transform: 'scale(1)',    opacity: 1 },
+      { transform: 'scale(0.88)', opacity: 0.55, offset: 0.5 },
+      { transform: 'scale(1)',    opacity: 1 },
+      { transform: 'scale(0.88)', opacity: 0.55, offset: 1.5 },
+      { transform: 'scale(1)',    opacity: 1 }
+    ], { duration: 1000, iterations: 3, easing: 'ease-in-out' });
+  }, INICIO_ROJA + 600);
+
+  // ── Ella y el círculo se encogen ───────────────────────────
+  setTimeout(() => {
+    // ella encoge
+    const g = $('ella-grupo');
+    g.animate([
+      { transform: 'scale(1)' },
+      { transform: 'scale(0.4)' }
+    ], { duration: 2500, fill: 'forwards', easing: 'cubic-bezier(.4,0,.6,1)' });
+
+    // rayos base se encogen también
+    ellaPartes.forEach(id => {
+      const el = $(id);
+      if (!el) return;
+      el.animate([{ opacity: 1 }, { opacity: 0.3 }],
+        { duration: 2500, fill: 'forwards', easing: 'ease-in' });
+    });
+
+    // círculo dorado encoge
+    const c1 = $('circulo-1');
+    const startR = 140;
+    const endR   = 55;
+    const startT = performance.now();
+    const dur    = 2500;
+    function animR(now) {
+      const p = Math.min((now - startT) / dur, 1);
+      const ease = p < 0.5 ? 2*p*p : -1+(4-2*p)*p;
+      c1.setAttribute('r', startR + (endR - startR) * ease);
+      if (p < 1) requestAnimationFrame(animR);
+    }
+    requestAnimationFrame(animR);
+
+  }, INICIO_ENCOGE);
+
+  // ── Fade out ───────────────────────────────────────────────
+  setTimeout(() => {
+    document.getElementById('scene').classList.add('out');
+  }, DURACION_MS);
+</script>
+</body>
+</html>

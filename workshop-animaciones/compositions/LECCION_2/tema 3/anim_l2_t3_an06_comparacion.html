@@ -1,0 +1,248 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<style>
+  body:not(.fonts-loaded) * { animation-play-state: paused !important; transition: none !important; }
+</style>
+<script>
+  document.fonts.ready.then(() => {
+    setTimeout(() => { document.body.classList.add("fonts-loaded"); }, 1500);
+  });
+</script>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=1280, height=720">
+<title>anim_l2_t3_an06 — Trampa vs Código Soberana</title>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,700;0,900;1,400&family=Cormorant+Garamond:ital,wght@1,300;1,400;1,600&display=swap" rel="stylesheet">
+<style>
+  * { margin:0; padding:0; box-sizing:border-box; }
+  body { width:1280px; height:720px; overflow:hidden; background:#0F0A0B; }
+
+  .scene {
+    width:1280px; height:720px; position:relative;
+    display:flex; flex-direction:column;
+    background:#0F0A0B;
+    opacity:0; animation:sceneIn .6s ease-out .1s forwards;
+  }
+  @keyframes sceneIn { to{opacity:1} }
+  .scene.out { animation:sceneOut .7s ease-in forwards; }
+  @keyframes sceneOut { to{opacity:0} }
+
+  /* HEADER */
+  .header {
+    display:flex; align-items:center; justify-content:space-between;
+    padding:28px 60px 20px 60px;
+    border-bottom:2px solid rgba(232,200,112,.2);
+    opacity:0; animation:fadeDown .55s ease-out .4s forwards;
+  }
+  @keyframes fadeDown { 0%{opacity:0;transform:translateY(-12px)} 100%{opacity:1;transform:translateY(0)} }
+
+  .col-header {
+    display:flex; flex-direction:column; align-items:center;
+    flex:1;
+  }
+  .col-icon { margin-bottom:6px; }
+  .col-title {
+    font-family:'Playfair Display',serif; font-weight:900; font-size:52px;
+    line-height:1.0; text-align:center;
+  }
+  .col-title.trampa { color:#C97080; }
+  .col-title.soberana { color:#E8C870; }
+
+  .divider-v {
+    width:3px; height:80px;
+    background:linear-gradient(180deg, transparent, rgba(232,200,112,.4), transparent);
+    flex-shrink:0; margin:0 40px;
+  }
+
+  /* TABLA BODY */
+  .tabla-body {
+    flex:1; display:flex; padding:12px 40px 24px 40px;
+    gap:0;
+  }
+
+  .col-trampa, .col-soberana {
+    flex:1; display:flex; flex-direction:column;
+    gap:8px;
+  }
+
+  .col-divider {
+    width:3px; background:linear-gradient(180deg, transparent, rgba(232,200,112,.25), transparent);
+    margin:0 28px; flex-shrink:0;
+  }
+
+  /* Items */
+  .item {
+    display:flex; align-items:center; gap:16px;
+    padding:10px 20px;
+    border-radius:10px;
+    opacity:0; transform:translateX(0);
+    transition:opacity .4s ease, transform .4s ease;
+  }
+  .item.visible { opacity:1; transform:translateX(0); }
+
+  .item.trampa-item {
+    background:rgba(61,12,17,.45);
+    border-left:4px solid rgba(201,112,128,.45);
+    transform:translateX(-20px);
+  }
+  .item.trampa-item.visible { transform:translateX(0); }
+
+  .item.sober-item {
+    background:rgba(232,200,112,.07);
+    border-left:4px solid rgba(232,200,112,.5);
+    transform:translateX(20px);
+  }
+  .item.sober-item.visible { transform:translateX(0); }
+
+  .item-icon { font-size:28px; flex-shrink:0; }
+
+  .item-text {
+    font-family:'Cormorant Garamond',serif; font-style:italic;
+    font-size:34px; line-height:1.2; color:#F9F3E8;
+  }
+  .item.trampa-item .item-text { color:rgba(249,243,232,.65); }
+  .item.sober-item .item-text  { color:rgba(249,243,232,.9); }
+
+  /* thumb y estrella SVG */
+  .thumb-svg { width:36px; height:36px; flex-shrink:0; }
+  .star-row { display:flex; gap:2px; flex-shrink:0; }
+  .star-svg { width:22px; height:22px; }
+
+  @keyframes fadeIn { to{opacity:1} }
+</style>
+</head>
+<body>
+<div class="scene" id="scene">
+
+  <!-- HEADER -->
+  <div class="header">
+    <!-- Columna trampa -->
+    <div class="col-header">
+      <div class="col-icon">
+        <!-- SVG trampa -->
+        <svg width="56" height="56" viewBox="0 0 56 56" fill="none">
+          <circle cx="28" cy="28" r="24" stroke="#C97080" stroke-width="2.5" opacity="0.8"/>
+          <!-- Barras de jaula -->
+          <line x1="28" y1="4" x2="28" y2="52" stroke="#C97080" stroke-width="2" stroke-dasharray="5,3" opacity="0.6"/>
+          <line x1="4" y1="28" x2="52" y2="28" stroke="#C97080" stroke-width="2" stroke-dasharray="5,3" opacity="0.6"/>
+          <!-- Puntito atrapado -->
+          <circle cx="28" cy="28" r="5" fill="#C97080" opacity="0.9"/>
+          <circle cx="28" cy="28" r="9" stroke="#C97080" stroke-width="1.5" opacity="0.45"/>
+        </svg>
+      </div>
+      <div class="col-title trampa">Dentro<br>de la Trampa</div>
+    </div>
+
+    <div class="divider-v"></div>
+
+    <!-- Columna Soberana -->
+    <div class="col-header">
+      <div class="col-icon">
+        <!-- SVG logo Código Soberana simplificado: corona + CS -->
+        <svg width="56" height="56" viewBox="0 0 56 56" fill="none">
+          <!-- Corona -->
+          <polyline points="8,42 14,22 22,34 28,16 34,34 42,22 48,42" stroke="#E8C870" stroke-width="2.5" stroke-linejoin="round" stroke-linecap="round" fill="none"/>
+          <line x1="8" y1="44" x2="48" y2="44" stroke="#E8C870" stroke-width="2.5" stroke-linecap="round"/>
+          <!-- Glow -->
+          <circle cx="28" cy="28" r="26" stroke="rgba(232,200,112,.15)" stroke-width="1.5"/>
+        </svg>
+      </div>
+      <div class="col-title soberana">Con el<br>Código Soberana</div>
+    </div>
+  </div>
+
+  <!-- TABLA BODY -->
+  <div class="tabla-body">
+
+    <!-- Columna trampa -->
+    <div class="col-trampa" id="colTrampa">
+      <!-- Items se inyectan por JS -->
+    </div>
+
+    <div class="col-divider"></div>
+
+    <!-- Columna soberana -->
+    <div class="col-soberana" id="colSoberana">
+      <!-- Items se inyectan por JS -->
+    </div>
+
+  </div>
+
+</div>
+
+<script>
+  const TRAMPA = [
+    "Su estado de ánimo calibra el tuyo",
+    "Busca aprobación sin darse cuenta",
+    "Habla desde la herida acumulada",
+    "Espera que él cambie para estar bien",
+    "Siente que pierde si él no responde",
+    "Confunde entrega con anulación",
+  ];
+  const SOBERANA = [
+    "Tu estado de ánimo viene de tu propio centro",
+    "Sus estándares son su propia brújula",
+    "Habla desde la claridad presente",
+    "Cambia el sistema y la dinámica se mueve",
+    "Gana siempre porque actúa en coherencia",
+    "Ama desde la elección, no desde la necesidad",
+  ];
+
+  // Thumb abajo SVG
+  function thumbDown() {
+    return `<svg class="thumb-svg" viewBox="0 0 36 36" fill="none">
+      <path d="M22 4H12C10.9 4 10 4.9 10 6v12l6 14h2c1.1 0 2-.9 2-2v-6h6c1.1 0 2-.9 2-2V10c0-1.7-1.3-3-3-3h-1V6c0-1.1-.9-2-2-2z" 
+        fill="rgba(201,112,128,.55)" stroke="none"/>
+      <rect x="4" y="20" width="6" height="12" rx="2" fill="rgba(201,112,128,.35)"/>
+    </svg>`;
+  }
+
+  // Estrellas SVG
+  function fiveStars() {
+    let stars = '<div class="star-row">';
+    for(let i=0;i<5;i++){
+      stars += `<svg class="star-svg" viewBox="0 0 22 22" fill="none">
+        <polygon points="11,2 13.5,8.5 20.5,9 15.5,13.5 17,20.5 11,17 5,20.5 6.5,13.5 1.5,9 8.5,8.5" 
+          fill="#E8C870" stroke="rgba(232,200,112,.5)" stroke-width="0.5"/>
+      </svg>`;
+    }
+    return stars + '</div>';
+  }
+
+  const cT = document.getElementById('colTrampa');
+  const cS = document.getElementById('colSoberana');
+
+  // Crear items
+  TRAMPA.forEach((txt, i) => {
+    const div = document.createElement('div');
+    div.className = 'item trampa-item';
+    div.innerHTML = `${thumbDown()}<span class="item-text">${txt}</span>`;
+    cT.appendChild(div);
+  });
+  SOBERANA.forEach((txt, i) => {
+    const div = document.createElement('div');
+    div.className = 'item sober-item';
+    div.innerHTML = `${fiveStars()}<span class="item-text">${txt}</span>`;
+    cS.appendChild(div);
+  });
+
+  // Animar de a pares: trampa[i] + soberana[i] con delay escalonado
+  const itemsT = cT.querySelectorAll('.item');
+  const itemsS = cS.querySelectorAll('.item');
+  const DELAY_BASE = 1000; // ms antes del primer item
+  const STEP = 950;        // ms entre cada par
+
+  for(let i = 0; i < itemsT.length; i++){
+    const d = DELAY_BASE + i * STEP;
+    setTimeout(() => {
+      itemsT[i].classList.add('visible');
+      itemsS[i].classList.add('visible');
+    }, d);
+  }
+
+  // Fade out al final
+  const TOTAL = DELAY_BASE + itemsT.length * STEP + 4000;
+  setTimeout(() => { document.getElementById('scene').classList.add('out'); }, TOTAL);
+</script>
+</body>
+</html>

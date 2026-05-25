@@ -1,0 +1,322 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<style>
+  body:not(.fonts-loaded) * { animation-play-state: paused !important; transition: none !important; }
+</style>
+<script>
+  document.fonts.ready.then(() => {
+    setTimeout(() => { document.body.classList.add("fonts-loaded"); }, 1500);
+  });
+</script>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=1280, height=720">
+<title>REACCIONARIA → ARQUITECTA</title>
+<link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;700&family=Playfair+Display:ital,wght@0,900;1,700&family=Cormorant+Garamond:ital,wght@1,400&display=swap" rel="stylesheet">
+<style>
+  * { margin:0; padding:0; box-sizing:border-box; }
+  body { width:1280px; height:720px; overflow:hidden; background:#0F0A0B; }
+
+  .scene {
+    width:1280px; height:720px; position:relative;
+    background:#0F0A0B;
+    display:flex; flex-direction:column;
+    align-items:center; justify-content:center;
+  }
+  .scene.out { animation:sceneOut 1s ease-in forwards; }
+  @keyframes sceneOut { to{opacity:0} }
+
+  /* Grid de fondo tipo terminal */
+  .grid-bg {
+    position:absolute; inset:0;
+    background-image:
+      linear-gradient(rgba(232,200,112,.03) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(232,200,112,.03) 1px, transparent 1px);
+    background-size:52px 52px;
+  }
+
+  /* Líneas de código de fondo que caen */
+  .code-rain {
+    position:absolute; inset:0; overflow:hidden; pointer-events:none; opacity:0.18;
+  }
+  .code-col {
+    position:absolute; top:-100%; font-family:'JetBrains Mono',monospace;
+    font-size:14px; color:#E8C870; line-height:1.6;
+    animation: rainFall linear infinite;
+    white-space:pre;
+  }
+  @keyframes rainFall { to { top:110%; } }
+
+  /* ── Etiqueta pequeña arriba ── */
+  .tag-top {
+    font-family:'JetBrains Mono',monospace;
+    font-size:18px; color:rgba(232,200,112,0.5);
+    letter-spacing:0.12em; margin-bottom:28px;
+    opacity:0; animation:tagIn .5s ease 0.3s forwards;
+  }
+  @keyframes tagIn { to{opacity:1} }
+
+  /* ── Palabra principal ── */
+  .palabra-wrap {
+    position:relative;
+    display:flex; align-items:center; justify-content:center;
+    gap:0;
+    height:160px;
+  }
+
+  /* Cada letra */
+  .letra {
+    font-family:'Playfair Display', Georgia, serif;
+    font-weight:900;
+    font-size:130px;
+    line-height:1;
+    display:inline-block;
+    position:relative;
+    transition:color 0.15s ease;
+  }
+
+  /* Estado inicial: REACCIONARIA — rojo apagado */
+  .letra.reac {
+    color:#E8D0D5;
+    text-shadow:
+      0 0 25px rgba(201,112,128,0.9),
+      0 0 55px rgba(139,45,63,0.5), 0 0 90px rgba(139,45,63,0.25);
+  }
+
+  /* Estado glitch: letras random — dorado parpadeante */
+  .letra.glitch {
+    color:#E8C870;
+    text-shadow:
+      0 0 10px rgba(232,200,112,1),
+      0 0 30px rgba(232,200,112,0.7),
+      0 0 60px rgba(232,200,112,0.4);
+    animation:glitchFlicker 0.08s steps(1) infinite;
+  }
+  @keyframes glitchFlicker {
+    0%  {opacity:1}
+    50% {opacity:0.7}
+    100%{opacity:1}
+  }
+
+  /* Estado final: ARQUITECTA — dorado pleno */
+  .letra.arq {
+    color:#E8C870;
+    text-shadow:
+      0 0 30px rgba(232,200,112,1),
+      0 0 70px rgba(220,180,60,0.8),
+      0 0 130px rgba(220,180,60,0.4);
+    animation:none;
+  }
+
+  /* Letras que desaparecen (las extras de REACCIONARIA) */
+  .letra.fade-out {
+    animation:letraOut 0.3s ease forwards;
+  }
+  @keyframes letraOut {
+    to { opacity:0; transform:scaleX(0); width:0; margin:0; padding:0; }
+  }
+
+  /* ── Subtexto debajo ── */
+  .sub-wrap {
+    margin-top:32px;
+    display:flex; align-items:center; gap:24px;
+    opacity:0;
+  }
+
+  .sub-label {
+    font-family:'Cormorant Garamond', Georgia, serif;
+    font-style:italic; font-size:36px;
+    letter-spacing:0.04em;
+  }
+  .sub-label.reac-sub { color:rgba(139,45,63,0.7); }
+  .sub-label.arq-sub  { color:rgba(232,200,112,0.85); }
+
+  .arrow-sub {
+    font-family:'JetBrains Mono', monospace;
+    font-size:32px; color:rgba(249,243,232,0.5);
+  }
+
+  /* ── Línea de código debajo ── */
+  .code-line {
+    margin-top:22px;
+    font-family:'JetBrains Mono', monospace;
+    font-size:20px;
+    color:rgba(232,200,112,0.45);
+    letter-spacing:0.05em;
+    opacity:0;
+    min-height:28px;
+  }
+  .code-line .kw  { color:rgba(201,112,128,0.8); }
+  .code-line .fn  { color:rgba(249,243,232,0.7); }
+  .code-line .str { color:rgba(100,200,120,0.75); }
+
+  /* Cursor parpadeante */
+  .cursor {
+    display:inline-block; width:3px; height:22px;
+    background:rgba(232,200,112,0.7);
+    vertical-align:middle; margin-left:2px;
+    animation:cursorBlink .55s step-end infinite;
+  }
+  @keyframes cursorBlink { 0%,100%{opacity:1} 50%{opacity:0} }
+
+  /* Borde decorativo izquierdo borgoña */
+  .borde-izq {
+    position:absolute; left:0; top:0; bottom:0; width:6px;
+    background:linear-gradient(180deg,#3D0C11,#6B1A2A,#3D0C11);
+  }
+  /* Borde superior dorado */
+  .borde-top {
+    position:absolute; top:0; left:0; right:0; height:4px;
+    background:linear-gradient(90deg,#6B1A2A,#E8C870,#E8C870,#6B1A2A);
+  }
+
+  @keyframes sceneIn { from{opacity:0} to{opacity:1} }
+</style>
+</head>
+<body>
+<div class="scene" id="scene" style="opacity:0; animation:sceneIn .6s ease .1s forwards;">
+  <div class="grid-bg"></div>
+  <div class="code-rain" id="code-rain"></div>
+  <div class="borde-izq"></div>
+  <div class="borde-top"></div>
+
+  <!-- Etiqueta tipo terminal arriba -->
+  <div class="tag-top" id="tag-top">// identity.rewrite()</div>
+
+  <!-- Palabra principal -->
+  <div class="palabra-wrap" id="palabra-wrap"></div>
+
+  <!-- Subtexto -->
+  <div class="sub-wrap" id="sub-wrap">
+    <span class="sub-label reac-sub" id="sub-reac">alguien que solo responde</span>
+    <span class="arrow-sub" id="sub-arrow">→</span>
+    <span class="sub-label arq-sub" id="sub-arq">alguien que diseña el entorno</span>
+  </div>
+
+  <!-- Línea de código tipo terminal -->
+  <div class="code-line" id="code-line">
+    <span class="cursor" id="cursor-blink"></span>
+  </div>
+</div>
+
+<script>
+  // ── Caracteres disponibles para el glitch ────────────────
+  const CHARS = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789#@$%&*+=<>';
+
+  const PALABRA_INICIO = 'REACCIONARIA';
+  const PALABRA_FIN    = 'ARQUITECTA';
+
+  // Las primeras N letras de ARQUITECTA que coinciden posicionalmente
+  // REACCIONARIA  → 12 letras
+  // ARQUITECTA    → 10 letras
+  // Secuencia de transformación: letra a letra de izquierda a derecha
+
+  const DURACION_MS       = 13000;
+  const DELAY_INICIO      = 800;
+  const GLITCH_DURACION   = 1800;  // cuánto tiempo dura el glitch total
+  const MS_POR_LETRA      = 160;   // cada cuánto se estabiliza una letra
+  const GLITCH_INTERVAL   = 60;    // cada cuánto cambia la letra random
+
+  // ── Construir letras iniciales ───────────────────────────
+  const wrap = document.getElementById('palabra-wrap');
+  const letras = [];
+
+  PALABRA_INICIO.split('').forEach((ch, i) => {
+    const span = document.createElement('span');
+    span.className = 'letra reac';
+    span.textContent = ch;
+    span.id = 'letra-' + i;
+    wrap.appendChild(span);
+    letras.push(span);
+  });
+
+  // ── Lluvia de código de fondo ────────────────────────────
+  const rain = document.getElementById('code-rain');
+  const snippets = [
+    'if(yo)cambio()','{reconfigura}','return poder;',
+    'self.update()','sistema++','new.role()',
+    '=> arquitecta','ctrl.shift()','true;false;',
+    'design(mundo)','build(vida)','you.lead()',
+  ];
+  for (let c = 0; c < 18; c++) {
+    const col = document.createElement('div');
+    col.className = 'code-col';
+    col.style.left = (c * 72 + Math.random()*30) + 'px';
+    col.style.animationDuration = (8 + Math.random()*10) + 's';
+    col.style.animationDelay = (-Math.random()*12) + 's';
+    col.style.fontSize = (11 + Math.random()*5) + 'px';
+    let txt = '';
+    for (let r = 0; r < 30; r++) txt += snippets[Math.floor(Math.random()*snippets.length)] + '\n';
+    col.textContent = txt;
+    rain.appendChild(col);
+  }
+
+  // ── Código que se escribe en la línea inferior ───────────
+  const codeLine = document.getElementById('code-line');
+  const codeTexts = [
+    { html: '<span class="kw">if</span> <span class="fn">(yo_cambio)</span> <span class="str">→</span> sistema.reconfigura()', delay: 400 },
+    { html: '<span class="kw">delete</span> reaccionaria; <span class="kw">new</span> <span class="fn">Arquitecta()</span>', delay: 3200 },
+    { html: '<span class="str">"El entorno debe adaptarse a ti."</span>', delay: 6500 },
+  ];
+
+  codeTexts.forEach(ct => {
+    setTimeout(() => {
+      codeLine.style.opacity = '0';
+      setTimeout(() => {
+        codeLine.innerHTML = ct.html + '<span class="cursor"></span>';
+        codeLine.animate([{opacity:0},{opacity:1}], {duration:400, fill:'forwards'});
+      }, 200);
+    }, ct.delay);
+  });
+
+  // ── FASE 1: Glitch general — todas las letras empiezan a cambiar ─
+  setTimeout(() => {
+    // Intervalos independientes por letra
+    const intervals = letras.map((span, i) => {
+      return setInterval(() => {
+        if (!span.classList.contains('arq') && !span.classList.contains('fade-out')) {
+          span.classList.add('glitch');
+          span.textContent = CHARS[Math.floor(Math.random() * CHARS.length)];
+        }
+      }, GLITCH_INTERVAL + i * 8);
+    });
+
+    // ── FASE 2: Letra a letra se estabiliza en ARQUITECTA ────────
+    // Las 10 letras de ARQUITECTA se fijan de izquierda a derecha
+    for (let i = 0; i < PALABRA_FIN.length; i++) {
+      setTimeout(() => {
+        clearInterval(intervals[i]);
+        const span = letras[i];
+        span.classList.remove('glitch','reac');
+        span.classList.add('arq');
+        span.textContent = PALABRA_FIN[i];
+      }, i * MS_POR_LETRA + 300);
+    }
+
+    // ── FASE 3: Las letras sobrantes de REACCIONARIA desaparecen ─
+    // REACCIONARIA=12, ARQUITECTA=10 → letras 10 y 11 se van
+    setTimeout(() => {
+      for (let i = PALABRA_FIN.length; i < PALABRA_INICIO.length; i++) {
+        clearInterval(intervals[i]);
+        setTimeout(() => {
+          letras[i].classList.add('fade-out');
+        }, (i - PALABRA_FIN.length) * 80);
+      }
+    }, PALABRA_FIN.length * MS_POR_LETRA + 400);
+
+    // ── FASE 4: Subtexto aparece ──────────────────────────────────
+    setTimeout(() => {
+      const sw = document.getElementById('sub-wrap');
+      sw.animate([{opacity:0,transform:'translateY(10px)'},{opacity:1,transform:'translateY(0)'}],
+        {duration:600, fill:'forwards', easing:'ease-out'});
+    }, PALABRA_FIN.length * MS_POR_LETRA + 800);
+
+  }, DELAY_INICIO);
+
+  // ── Fade out ────────────────────────────────────────────
+  setTimeout(() => {
+    document.getElementById('scene').classList.add('out');
+  }, DURACION_MS);
+</script>
+</body>
+</html>

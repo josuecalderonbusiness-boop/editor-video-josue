@@ -1,0 +1,361 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<style>
+  body:not(.fonts-loaded) * { animation-play-state: paused !important; transition: none !important; }
+</style>
+<script>
+  document.fonts.ready.then(() => {
+    setTimeout(() => { document.body.classList.add("fonts-loaded"); }, 1500);
+  });
+</script>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=1280, height=720">
+<title>anim_l1_an8 — Credenciales Josué</title>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,900;1,700&family=Cormorant+Garamond:ital,wght@1,400;1,600&display=swap" rel="stylesheet">
+<style>
+  * { margin:0; padding:0; box-sizing:border-box; }
+  body { width:1280px; height:720px; overflow:hidden; }
+
+  /* ── Pizarra base ── */
+  .pizarra {
+    position:absolute; inset:0;
+    background:#F0E8D5;
+    background-image:
+      linear-gradient(rgba(139,100,60,.13) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(139,100,60,.13) 1px, transparent 1px);
+    background-size:56px 56px;
+  }
+  .pizarra::before {
+    content:''; position:absolute; left:0; top:0; bottom:0;
+    width:8px;
+    background:linear-gradient(180deg, #3D0C11, #6B1A2A, #3D0C11);
+  }
+  .pizarra::after {
+    content:''; position:absolute; top:0; left:0; right:0;
+    height:4px;
+    background:linear-gradient(90deg, #6B1A2A, #E8C870, #E8C870, #6B1A2A);
+  }
+
+  /* ── Línea divisoria entre zona superior e inferior ── */
+  .divider {
+    position:absolute; top:300px; left:40px; right:40px;
+    height:2px;
+    background:linear-gradient(90deg, transparent, rgba(107,26,42,.25), rgba(232,200,112,.4), rgba(107,26,42,.25), transparent);
+    z-index:5;
+    opacity:0; animation:fadeIn .4s ease-out 1s forwards;
+  }
+  @keyframes fadeIn { to{opacity:1} }
+
+  /* Zona inferior — espacio para fotos */
+  .zona-fotos {
+    position:absolute; top:308px; left:0; right:0; bottom:0;
+    display:flex; align-items:center; justify-content:center;
+    z-index:2;
+    opacity:0; animation:fadeIn .5s ease-out 1.2s forwards;
+  }
+  .fotos-label {
+    font-family:'Cormorant Garamond',serif; font-style:italic;
+    font-size:28px; color:rgba(107,26,42,.3);
+    letter-spacing:.05em;
+  }
+
+  /* ── Zona superior — tarjetas ── */
+  .zona-cards {
+    position:absolute; top:0; left:0; right:0; height:300px;
+    z-index:10;
+    display:flex; align-items:center;
+    padding:0 40px 0 48px;
+  }
+
+  /* Slide container */
+  .slide {
+    position:absolute; inset:0;
+    display:flex; align-items:center;
+    padding:0 40px 0 48px;
+    opacity:0; pointer-events:none;
+  }
+
+  @keyframes cardIn {
+    0%   { opacity:0; transform:translateY(-40px) scale(.96); }
+    65%  { transform:translateY(6px) scale(1.01); }
+    100% { opacity:1; transform:translateY(0) scale(1); }
+  }
+  @keyframes cardOut {
+    0%   { opacity:1; transform:translateY(0); }
+    100% { opacity:0; transform:translateY(-30px); }
+  }
+  @keyframes lineGrow {
+    0%   { width:0; }
+    100% { width:100%; }
+  }
+  @keyframes tickIn {
+    to { stroke-dashoffset:0; }
+  }
+
+  /* Tarjeta */
+  .card {
+    border-radius:14px;
+    padding:28px 48px 28px 40px;
+    position:relative;
+    box-shadow: 5px 7px 0 rgba(61,12,17,.22), 0 16px 40px rgba(61,12,17,.12);
+    display:flex; align-items:center; gap:40px;
+    width:100%; opacity:0;
+  }
+  .card-vino   { background:linear-gradient(135deg, #3D0C11, #6B1A2A); }
+  .card-negro  { background:linear-gradient(135deg, #0F0A0B, #1C1114); }
+  .card-medio  { background:linear-gradient(135deg, #6B1A2A, #8B2D3F); }
+  .card-dorado { background:linear-gradient(135deg, #7A5C1E, #B8892A); }
+  .card-oscuro { background:linear-gradient(135deg, #1A0810, #3D0C11); }
+
+  /* Número grande decorativo */
+  .card-num {
+    font-family:'Playfair Display',serif; font-weight:900;
+    font-size:110px; color:rgba(255,255,255,.07);
+    line-height:1; flex-shrink:0; width:120px; text-align:center;
+    margin-left:-10px;
+  }
+
+  /* Texto de la tarjeta */
+  .card-body { flex:1; }
+  .card-titulo {
+    font-family:'Playfair Display',serif; font-weight:900;
+    font-size:68px; color:#F9F3E8; line-height:.95;
+    text-shadow:0 3px 20px rgba(0,0,0,.3);
+  }
+  .card-titulo .gold { color:#E8C870; }
+  .card-sub {
+    font-family:'Cormorant Garamond',serif; font-style:italic;
+    font-size:30px; color:rgba(249,243,232,.6);
+    margin-top:8px; line-height:1.2;
+  }
+
+  /* Línea inferior de la tarjeta */
+  .card-line {
+    position:absolute; bottom:0; left:40px; right:40px;
+    height:2px; background:rgba(232,200,112,.3); border-radius:1px;
+    width:0; animation:lineGrow .5s ease-out forwards;
+  }
+
+  /* Check esquina */
+  .card-check {
+    position:absolute; bottom:20px; right:28px;
+    flex-shrink:0;
+  }
+  .card-check svg { width:40px; height:40px; }
+  .c-circle {
+    fill:none; stroke:rgba(232,200,112,.6); stroke-width:2;
+    stroke-dasharray:110; stroke-dashoffset:110;
+    animation:tickIn .4s ease-out forwards;
+  }
+  .c-mark {
+    fill:none; stroke:#F9F3E8; stroke-width:2.5;
+    stroke-linecap:round; stroke-linejoin:round;
+    stroke-dasharray:30; stroke-dashoffset:30;
+    animation:tickIn .3s ease-out forwards;
+  }
+
+  /* Franja tipo noticias abajo del todo */
+  .news-bar {
+    position:absolute; bottom:0; left:0; right:0;
+    height:52px; z-index:20;
+    display:flex; align-items:center;
+    background:linear-gradient(90deg, #3D0C11, #6B1A2A, #3D0C11);
+    overflow:hidden;
+    opacity:0; animation:fadeIn .4s ease-out .8s forwards;
+  }
+  .news-tag {
+    font-family:'Playfair Display',serif; font-weight:900;
+    font-size:13px; color:#E8C870; letter-spacing:.2em; text-transform:uppercase;
+    padding:0 20px; flex-shrink:0; border-right:1px solid rgba(232,200,112,.3);
+    white-space:nowrap;
+  }
+  .news-dot {
+    width:8px; height:8px; border-radius:50%; background:#E8C870;
+    margin:0 14px; flex-shrink:0;
+    animation:pulse 1s ease-in-out infinite;
+  }
+  @keyframes pulse { 0%,100%{opacity:.5;transform:scale(1)} 50%{opacity:1;transform:scale(1.3)} }
+  .news-scroll-wrap {
+    flex:1; overflow:hidden; position:relative; height:100%;
+    display:flex; align-items:center;
+  }
+  .news-text {
+    font-family:'Cormorant Garamond',serif; font-style:italic;
+    font-size:24px; color:#F9F3E8; white-space:nowrap;
+    position:absolute;
+    animation:scrollNews 14s linear infinite;
+  }
+  @keyframes scrollNews {
+    0%   { transform:translateX(900px); }
+    100% { transform:translateX(-100%); }
+  }
+</style>
+</head>
+<body>
+
+<div class="pizarra"></div>
+<div class="divider"></div>
+
+<!-- Zona inferior para fotos -->
+<div class="zona-fotos">
+  <p class="fotos-label">↓ espacio para fotos / video</p>
+</div>
+
+<!-- Zona superior: slides de tarjetas -->
+<div class="zona-cards">
+
+  <!-- SLIDE 1: JOSUÉ CALDERÓN -->
+  <div class="slide" id="s1">
+    <div class="card card-vino" style="animation:cardIn .5s cubic-bezier(.2,0,.1,1) .3s forwards; opacity:0;">
+      <div class="card-num">J</div>
+      <div class="card-body">
+        <div class="card-titulo">JOSUÉ<br><span class="gold">CALDERÓN</span></div>
+      </div>
+      <div class="card-line" style="animation-delay:.7s;"></div>
+      <div class="card-check" style="opacity:0; animation:fadeIn .3s ease-out .9s forwards;">
+        <svg viewBox="0 0 40 40">
+          <circle class="c-circle" cx="20" cy="20" r="16" style="animation-delay:.9s;"/>
+          <polyline class="c-mark" points="11,20 17,27 29,13" style="animation-delay:1.3s;"/>
+        </svg>
+      </div>
+    </div>
+  </div>
+
+  <!-- SLIDE 2: 20 años + 2 hijos -->
+  <div class="slide" id="s2">
+    <div class="card card-negro" style="animation:cardIn .5s cubic-bezier(.2,0,.1,1) .2s forwards; opacity:0;">
+      <div class="card-num" style="font-size:90px; width:100px;">20</div>
+      <div class="card-body">
+        <div class="card-titulo"><span class="gold">20</span> AÑOS<br>EN PAREJA</div>
+        <div class="card-sub">+ 2 hijos</div>
+      </div>
+      <div class="card-line" style="animation-delay:.6s;"></div>
+      <div class="card-check" style="opacity:0; animation:fadeIn .3s ease-out .8s forwards;">
+        <svg viewBox="0 0 40 40">
+          <circle class="c-circle" cx="20" cy="20" r="16" style="animation-delay:.8s;"/>
+          <polyline class="c-mark" points="11,20 17,27 29,13" style="animation-delay:1.2s;"/>
+        </svg>
+      </div>
+    </div>
+  </div>
+
+  <!-- SLIDE 3: 10 años emprendiendo -->
+  <div class="slide" id="s3">
+    <div class="card card-medio" style="animation:cardIn .5s cubic-bezier(.2,0,.1,1) .2s forwards; opacity:0;">
+      <div class="card-num" style="font-size:90px; width:100px;">10</div>
+      <div class="card-body">
+        <div class="card-titulo">+10 AÑOS<br><span class="gold">EMPRENDIENDO</span></div>
+        <div class="card-sub">juntos como pareja</div>
+      </div>
+      <div class="card-line" style="animation-delay:.6s;"></div>
+      <div class="card-check" style="opacity:0; animation:fadeIn .3s ease-out .8s forwards;">
+        <svg viewBox="0 0 40 40">
+          <circle class="c-circle" cx="20" cy="20" r="16" style="animation-delay:.8s;"/>
+          <polyline class="c-mark" points="11,20 17,27 29,13" style="animation-delay:1.2s;"/>
+        </svg>
+      </div>
+    </div>
+  </div>
+
+  <!-- SLIDE 4: Pastor 10 años -->
+  <div class="slide" id="s4">
+    <div class="card card-oscuro" style="animation:cardIn .5s cubic-bezier(.2,0,.1,1) .2s forwards; opacity:0;">
+      <div class="card-num" style="font-size:90px; width:100px;">✝</div>
+      <div class="card-body">
+        <div class="card-titulo">PASTOR<br><span class="gold">CRISTIANO</span></div>
+        <div class="card-sub">10 años · estudio bíblico y teológico</div>
+      </div>
+      <div class="card-line" style="animation-delay:.6s;"></div>
+      <div class="card-check" style="opacity:0; animation:fadeIn .3s ease-out .8s forwards;">
+        <svg viewBox="0 0 40 40">
+          <circle class="c-circle" cx="20" cy="20" r="16" style="animation-delay:.8s;"/>
+          <polyline class="c-mark" points="11,20 17,27 29,13" style="animation-delay:1.2s;"/>
+        </svg>
+      </div>
+    </div>
+  </div>
+
+  <!-- SLIDE 5: Educación lógica -->
+  <div class="slide" id="s5">
+    <div class="card card-dorado" style="animation:cardIn .5s cubic-bezier(.2,0,.1,1) .2s forwards; opacity:0;">
+      <div class="card-num" style="font-size:60px; width:100px; color:rgba(0,0,0,.1);">∑</div>
+      <div class="card-body">
+        <div class="card-titulo" style="color:#0F0A0B;">LÓGICA<br><span style="color:#3D0C11;">TOTAL</span></div>
+        <div class="card-sub" style="color:rgba(15,10,11,.6);">formación en casa · mundo de resultados</div>
+      </div>
+      <div class="card-line" style="background:rgba(61,12,17,.3); animation-delay:.6s;"></div>
+      <div class="card-check" style="opacity:0; animation:fadeIn .3s ease-out .8s forwards;">
+        <svg viewBox="0 0 40 40">
+          <circle class="c-circle" cx="20" cy="20" r="16" style="stroke:rgba(61,12,17,.5); animation-delay:.8s;"/>
+          <polyline class="c-mark" points="11,20 17,27 29,13" style="stroke:#3D0C11; animation-delay:1.2s;"/>
+        </svg>
+      </div>
+    </div>
+  </div>
+
+</div>
+
+<!-- Franja noticias -->
+<div class="news-bar">
+  <div class="news-tag">Código Soberana</div>
+  <div class="news-dot"></div>
+  <div class="news-scroll-wrap">
+    <div class="news-text">
+      ¿Quién es Josué Calderón? &nbsp;&nbsp;·&nbsp;&nbsp; 20 años en pareja · 2 hijos · +10 años emprendiendo juntos · Pastor cristiano por 10 años · Formación en casa · &nbsp;&nbsp;¿Quién es Josué Calderón? &nbsp;&nbsp;·&nbsp;&nbsp; 20 años en pareja · 2 hijos · +10 años emprendiendo juntos · Pastor cristiano por 10 años · Formación en casa ·
+    </div>
+  </div>
+</div>
+
+<script>
+  // Timings basados en el SRT:
+  // s1: 2:29 (inicio) → dura 3s
+  // s2: 2:32 → dura 5s
+  // s3: 2:37 → dura 8s
+  // s4: 2:45 → dura 9s
+  // s5: 2:54 → dura 11s hasta ~3:05
+
+  const SLIDES = [
+    { id:'s1', dur:3000  },
+    { id:'s2', dur:5000  },
+    { id:'s3', dur:8000  },
+    { id:'s4', dur:9000  },
+    { id:'s5', dur:11000 },
+  ];
+  const TRANS = 350;
+  let current = 0;
+
+  function show(idx) {
+    const el = document.getElementById(SLIDES[idx].id);
+    el.style.opacity = '1';
+    el.style.pointerEvents = 'auto';
+  }
+
+  function hide(idx) {
+    const el = document.getElementById(SLIDES[idx].id);
+    el.style.animation = `cardOut ${TRANS}ms ease-in forwards`;
+    setTimeout(() => {
+      el.style.opacity = '0';
+      el.style.pointerEvents = 'none';
+      el.style.animation = '';
+    }, TRANS);
+  }
+
+  function next() {
+    hide(current);
+    current++;
+    if (current < SLIDES.length) {
+      setTimeout(() => {
+        show(current);
+        if (current < SLIDES.length - 1) {
+          setTimeout(next, SLIDES[current].dur);
+        }
+      }, TRANS);
+    }
+  }
+
+  show(0);
+  setTimeout(next, SLIDES[0].dur);
+</script>
+</body>
+</html>

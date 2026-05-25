@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<style>
+  body:not(.fonts-loaded) * { animation-play-state:paused !important; transition:none !important; }
+</style>
+<script>
+  document.fonts.ready.then(() => { setTimeout(() => { document.body.classList.add("fonts-loaded"); }, 1500); });
+</script>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=1280, height=720">
+<title>anim_l2_an9</title>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@1,600&family=Inter:wght@300&display=swap" rel="stylesheet">
+<style>
+* { margin:0; padding:0; box-sizing:border-box; }
+body { width:1280px; height:720px; overflow:hidden; background:#00FF00; }
+.scene {
+  width:1280px; height:720px; position:relative;
+  background:#00FF00; overflow:hidden;
+  opacity:0; animation:fadeIn 0.3s ease forwards 0.1s, fadeOut 0.4s ease forwards 3.6s;
+}
+@keyframes fadeIn { to{opacity:1} }
+@keyframes fadeOut { to{opacity:0} }
+.banda {
+  position:absolute; top:50%; left:0; transform:translateY(-50%);
+  width:0; height:160px;
+  background:rgba(28,8,14,0.92);
+  animation:bandaExpand 0.6s cubic-bezier(0.25,0.46,0.45,0.94) forwards 0.3s;
+  overflow:hidden; display:flex; align-items:center;
+}
+@keyframes bandaExpand { to{width:1280px} }
+.barra {
+  position:absolute; left:0; top:50%; transform:translateY(-50%);
+  width:6px; height:0;
+  background:linear-gradient(180deg,#E8C870,#B8892A);
+  box-shadow:0 0 20px rgba(232,200,112,0.7), 0 0 40px rgba(184,137,42,0.3);
+  animation:barraGrow 0.5s ease forwards 0.8s; z-index:20;
+}
+@keyframes barraGrow { to{height:160px} }
+.banda-content { padding-left:50px; position:relative; z-index:10; width:100%; }
+.titulo {
+  font-family:'Cormorant Garamond',serif; font-style:italic; font-weight:600;
+  font-size:62px; color:#F9F3E8;
+  white-space:nowrap; overflow:hidden; width:0;
+  animation:escribir 1.1s steps(24,end) forwards 1.0s;
+  border-right:3px solid #E8C870;
+  text-shadow:0 0 30px rgba(249,243,232,0.15);
+}
+@keyframes escribir {
+  from{width:0;border-right-color:#E8C870}
+  to{width:640px;border-right-color:transparent}
+}
+</style>
+</head>
+<body>
+<div class="scene">
+  <div class="barra"></div>
+  <div class="banda">
+    <div class="banda-content">
+      <div class="titulo">La Trampa de la Entrega</div>
+    </div>
+  </div>
+</div>
+</body>
+</html>

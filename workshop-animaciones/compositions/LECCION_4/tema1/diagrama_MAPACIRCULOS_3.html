@@ -1,0 +1,432 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<style>
+  body:not(.fonts-loaded) * { animation-play-state: paused !important; transition: none !important; }
+</style>
+<script>
+  document.fonts.ready.then(() => {
+    setTimeout(() => { document.body.classList.add("fonts-loaded"); }, 1500);
+  });
+</script>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=1280, height=720">
+<title>DIAGRAMA — Punto de Influencia fase 3</title>
+<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Cormorant+Garamond:ital,wght@1,400;1,600&display=swap" rel="stylesheet">
+<style>
+  * { margin:0; padding:0; box-sizing:border-box; }
+  body { width:1280px; height:720px; overflow:hidden; background:#0000FF; }
+  .scene { width:1280px; height:720px; position:relative; background:#0000FF; }
+  .scene.out { animation: sceneOut 1.2s ease-in forwards; }
+  @keyframes sceneOut { to { opacity:0; } }
+  svg { position:absolute; top:0; left:0; width:1280px; height:720px; }
+
+  /* chips zona de influencia — entre dorado y rojo */
+  .chip-inf {
+    display: inline-block;
+    background: rgba(30,8,12,0.88);
+    border: 2px solid #E8C870;
+    border-radius: 7px;
+    padding: 5px 14px;
+    font-family: 'Bebas Neue', Impact, sans-serif;
+    font-size: 22px;
+    letter-spacing: 0.07em;
+    color: #F9F3E8;
+    white-space: nowrap;
+    box-shadow: 0 0 10px rgba(232,200,112,0.35);
+  }
+
+  /* chips zona impotencia — fuera del rojo, pequeños y apagados */
+  .chip-imp {
+    display: inline-block;
+    background: rgba(60,10,15,0.55);
+    border: 1.5px solid rgba(201,112,128,0.45);
+    border-radius: 6px;
+    padding: 4px 11px;
+    font-family: 'Bebas Neue', Impact, sans-serif;
+    font-size: 16px;
+    letter-spacing: 0.06em;
+    color: rgba(201,112,128,0.65);
+    white-space: nowrap;
+  }
+
+  @keyframes drift-a { 0%,100%{transform:translateY(0)}   50%{transform:translateY(-5px)} }
+  @keyframes drift-b { 0%,100%{transform:translateY(0)}   50%{transform:translateY(5px)} }
+  @keyframes drift-c { 0%,100%{transform:translateY(-3px)} 50%{transform:translateY(3px)} }
+
+  @keyframes chipIn {
+    from { opacity:0; transform:scale(0.25); }
+    to   { opacity:1; transform:scale(1); }
+  }
+  @keyframes chipInSmall {
+    from { opacity:0; }
+    to   { opacity:1; }
+  }
+  @keyframes sceneIn { from{opacity:0} to{opacity:1} }
+</style>
+</head>
+<body>
+<div class="scene" id="scene">
+<svg id="svg-main" viewBox="0 0 1280 720" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <filter id="glow-cream" x="-80%" y="-80%" width="260%" height="260%">
+      <feGaussianBlur stdDeviation="12" result="blur"/>
+      <feMerge><feMergeNode in="blur"/><feMergeNode in="SourceGraphic"/></feMerge>
+    </filter>
+    <filter id="glow-gold" x="-50%" y="-50%" width="200%" height="200%">
+      <feGaussianBlur stdDeviation="9" result="blur"/>
+      <feMerge><feMergeNode in="blur"/><feMergeNode in="SourceGraphic"/></feMerge>
+    </filter>
+    <filter id="glow-gold-label" x="-60%" y="-60%" width="220%" height="220%">
+      <feGaussianBlur stdDeviation="14" result="blur"/>
+      <feMerge><feMergeNode in="blur"/><feMergeNode in="SourceGraphic"/></feMerge>
+    </filter>
+    <filter id="glow-wine" x="-30%" y="-30%" width="160%" height="160%">
+      <feGaussianBlur stdDeviation="8" result="blur"/>
+      <feMerge><feMergeNode in="blur"/><feMergeNode in="SourceGraphic"/></feMerge>
+    </filter>
+
+    <!-- Patrón rayas rojas diagonales para zona de impotencia -->
+    <pattern id="rayas-rojas" patternUnits="userSpaceOnUse" width="18" height="18" patternTransform="rotate(45)">
+      <line x1="0" y1="0" x2="0" y2="18" stroke="rgba(180,40,55,0.55)" stroke-width="5"/>
+    </pattern>
+
+    <!-- Máscara: solo fuera del círculo rojo -->
+    <mask id="mask-exterior">
+      <!-- todo blanco (visible) -->
+      <rect x="0" y="0" width="1280" height="720" fill="white"/>
+      <!-- circulo rojo negro (oculta dentro) -->
+      <circle cx="640" cy="395" r="275" fill="black"/>
+    </mask>
+
+    <marker id="arrowhead-gold" markerWidth="10" markerHeight="8" refX="9" refY="4" orient="auto">
+      <polygon points="0 0, 10 4, 0 8" fill="#E8C870"/>
+    </marker>
+  </defs>
+
+  <!-- ══════════════════════════════════════════ -->
+  <!-- RAYAS ROJAS — solo fuera del círculo rojo -->
+  <!-- ══════════════════════════════════════════ -->
+  <rect x="0" y="0" width="1280" height="720"
+    fill="url(#rayas-rojas)"
+    mask="url(#mask-exterior)"
+    opacity="0" id="rayas-overlay">
+    <animate attributeName="opacity" from="0" to="1" dur="0.8s" begin="0.3s" fill="freeze"/>
+  </rect>
+
+  <!-- ══ CÍRCULO EXTERIOR borgoña ══ -->
+  <circle cx="640" cy="395" r="275"
+    fill="none" stroke="#8B2D3F" stroke-width="13"
+    filter="url(#glow-wine)"/>
+
+  <!-- ══ CÍRCULO INTERIOR dorado — empieza pequeño, crece ══ -->
+  <circle id="circulo-1" cx="640" cy="395" r="55"
+    fill="none" stroke="#E8C870" stroke-width="10"
+    filter="url(#glow-gold)"/>
+
+  <!-- ══ ELLA — empieza encogida ══ -->
+  <g id="ella-grupo" style="transform-origin:640px 408px; transform:scale(0.4);">
+    <polygon id="star-core"
+      points="640,336 648,356 670,356 654,368 660,388 640,376 620,388 626,368 610,356 632,356"
+      fill="#F9F3E8" filter="url(#glow-cream)"/>
+    <circle cx="640" cy="408" r="11" fill="#F9F3E8"/>
+    <line x1="640" y1="419" x2="640" y2="442" stroke="#F9F3E8" stroke-width="5" stroke-linecap="round"/>
+    <line x1="624" y1="428" x2="656" y2="428" stroke="#F9F3E8" stroke-width="4" stroke-linecap="round"/>
+    <line x1="640" y1="442" x2="630" y2="458" stroke="#F9F3E8" stroke-width="4" stroke-linecap="round"/>
+    <line x1="640" y1="442" x2="650" y2="458" stroke="#F9F3E8" stroke-width="4" stroke-linecap="round"/>
+    <circle cx="640" cy="408" r="48" fill="none" stroke="rgba(249,243,232,0.25)" stroke-width="3"/>
+    <line x1="640" y1="325" x2="640" y2="300" stroke="#F9F3E8" stroke-width="4" stroke-linecap="round"/>
+    <line x1="640" y1="465" x2="640" y2="490" stroke="#F9F3E8" stroke-width="4" stroke-linecap="round"/>
+    <line x1="600" y1="395" x2="575" y2="395" stroke="#F9F3E8" stroke-width="4" stroke-linecap="round"/>
+    <line x1="680" y1="395" x2="705" y2="395" stroke="#F9F3E8" stroke-width="4" stroke-linecap="round"/>
+    <line x1="618" y1="348" x2="600" y2="330" stroke="#F9F3E8" stroke-width="4" stroke-linecap="round"/>
+    <line x1="662" y1="348" x2="680" y2="330" stroke="#F9F3E8" stroke-width="4" stroke-linecap="round"/>
+    <line x1="618" y1="442" x2="600" y2="460" stroke="#F9F3E8" stroke-width="4" stroke-linecap="round"/>
+    <line x1="662" y1="442" x2="680" y2="460" stroke="#F9F3E8" stroke-width="4" stroke-linecap="round"/>
+  </g>
+
+  <!-- ══════════════════════════════════════════════════════ -->
+  <!-- CHIPS ZONA INFLUENCIA — entre dorado y rojo           -->
+  <!-- Radio dorado=140, rojo=275. Zona: r≈175-250           -->
+  <!-- Centro: 640,395. Los chips aparecen con rayo dorado   -->
+  <!-- ══════════════════════════════════════════════════════ -->
+
+  <!-- Arriba centro θ=-90 r=195: y=395-195=200, x=640-93=547 -->
+  <g id="cg-a" style="opacity:0; animation: drift-a 5s ease-in-out infinite;">
+    <foreignObject x="543" y="192" width="196" height="44">
+      <div xmlns="http://www.w3.org/1999/xhtml" class="chip-inf" id="chip-a">Tus pensamientos.</div>
+    </foreignObject>
+  </g>
+
+  <!-- Arriba derecha θ=-50 r=210 -->
+  <g id="cg-b" style="opacity:0; animation: drift-b 6s ease-in-out infinite;">
+    <foreignObject x="730" y="218" width="188" height="44">
+      <div xmlns="http://www.w3.org/1999/xhtml" class="chip-inf" id="chip-b">Tus emociones.</div>
+    </foreignObject>
+  </g>
+
+  <!-- Derecha θ=0 r=205: x=640+205=845, y=395-22=373 -->
+  <g id="cg-c" style="opacity:0; animation: drift-c 4.5s ease-in-out infinite;">
+    <foreignObject x="842" y="373" width="196" height="44">
+      <div xmlns="http://www.w3.org/1999/xhtml" class="chip-inf" id="chip-c">Tu comunicación.</div>
+    </foreignObject>
+  </g>
+
+  <!-- Abajo derecha θ=50 r=210 -->
+  <g id="cg-d" style="opacity:0; animation: drift-a 5.5s ease-in-out 1s infinite;">
+    <foreignObject x="730" y="528" width="188" height="44">
+      <div xmlns="http://www.w3.org/1999/xhtml" class="chip-inf" id="chip-d">Tus decisiones.</div>
+    </foreignObject>
+  </g>
+
+  <!-- Abajo centro θ=90 r=195: y=395+195=590, x=547 -->
+  <g id="cg-e" style="opacity:0; animation: drift-b 7s ease-in-out 0.5s infinite;">
+    <foreignObject x="543" y="568" width="196" height="44">
+      <div xmlns="http://www.w3.org/1999/xhtml" class="chip-inf" id="chip-e">Tu respuesta.</div>
+    </foreignObject>
+  </g>
+
+  <!-- Abajo izquierda θ=130 r=210 -->
+  <g id="cg-f" style="opacity:0; animation: drift-c 4.8s ease-in-out 1.2s infinite;">
+    <foreignObject x="358" y="528" width="218" height="44">
+      <div xmlns="http://www.w3.org/1999/xhtml" class="chip-inf" id="chip-f">Desde donde hablas.</div>
+    </foreignObject>
+  </g>
+
+  <!-- Izquierda θ=180 r=205: x=640-205=435, y=373 -->
+  <g id="cg-g" style="opacity:0; animation: drift-a 6.2s ease-in-out 0.8s infinite;">
+    <foreignObject x="238" y="373" width="196" height="44">
+      <div xmlns="http://www.w3.org/1999/xhtml" class="chip-inf" id="chip-g">La persona que serás.</div>
+    </foreignObject>
+  </g>
+
+  <!-- Arriba izquierda θ=-130 r=210 -->
+  <g id="cg-h" style="opacity:0; animation: drift-b 5.2s ease-in-out 0.3s infinite;">
+    <foreignObject x="358" y="218" width="218" height="44">
+      <div xmlns="http://www.w3.org/1999/xhtml" class="chip-inf" id="chip-h">Tus metas y sueños.</div>
+    </foreignObject>
+  </g>
+
+  <!-- ══════════════════════════════════════════════════ -->
+  <!-- LABEL "EL PUNTO DE INFLUENCIA" + flecha           -->
+  <!-- Dentro de la zona anular (entre dorado y rojo)    -->
+  <!-- Arriba — entre r=140 y r=275 → y≈180             -->
+  <!-- ══════════════════════════════════════════════════ -->
+  <g id="label-influencia" style="opacity:0;">
+    <!-- flecha desde el label hacia el anillo -->
+    <path id="arrow-inf"
+      d="M 640 158 C 640 170 640 175 640 185"
+      stroke="#E8C870" stroke-width="3" fill="none"
+      stroke-linecap="round"
+      marker-end="url(#arrowhead-gold)"
+      stroke-dasharray="30" stroke-dashoffset="30">
+      <animate attributeName="stroke-dashoffset" from="30" to="0" dur="0.5s" begin="2.5s" fill="freeze"/>
+    </path>
+    <text x="640" y="148"
+      font-family="'Bebas Neue', Impact, sans-serif"
+      font-size="44" fill="#E8C870"
+      letter-spacing="0.14em"
+      text-anchor="middle"
+      filter="url(#glow-gold-label)">EL PUNTO DE INFLUENCIA</text>
+    <text x="640" y="172"
+      font-family="'Cormorant Garamond', Georgia, serif"
+      font-style="italic" font-size="22"
+      fill="rgba(232,200,112,0.72)"
+      text-anchor="middle">todo lo que sí depende de ti</text>
+  </g>
+
+  <!-- ══════════════════════════════════════════════════ -->
+  <!-- CHIPS ZONA IMPOTENCIA — fuera del círculo rojo    -->
+  <!-- pequeños, apagados, con rayas encima              -->
+  <!-- ══════════════════════════════════════════════════ -->
+
+  <!-- Arriba izq exterior -->
+  <g style="animation: drift-a 5s ease-in-out infinite;">
+    <foreignObject x="10" y="148" width="200" height="36">
+      <div xmlns="http://www.w3.org/1999/xhtml" class="chip-imp">El carácter de él.</div>
+    </foreignObject>
+  </g>
+
+  <!-- Arriba der exterior -->
+  <g style="animation: drift-b 6s ease-in-out infinite;">
+    <foreignObject x="1000" y="118" width="260" height="36">
+      <div xmlns="http://www.w3.org/1999/xhtml" class="chip-imp">Su historia de vida.</div>
+    </foreignObject>
+  </g>
+
+  <!-- Izquierda exterior -->
+  <g style="animation: drift-c 4.5s ease-in-out infinite;">
+    <foreignObject x="10" y="315" width="168" height="36">
+      <div xmlns="http://www.w3.org/1999/xhtml" class="chip-imp">Sus silencios.</div>
+    </foreignObject>
+  </g>
+
+  <!-- Derecha exterior -->
+  <g style="animation: drift-a 5.5s ease-in-out 1s infinite;">
+    <foreignObject x="1060" y="288" width="188" height="36">
+      <div xmlns="http://www.w3.org/1999/xhtml" class="chip-imp">Sus decisiones.</div>
+    </foreignObject>
+  </g>
+
+  <!-- Abajo izq exterior -->
+  <g style="animation: drift-b 7s ease-in-out 0.5s infinite;">
+    <foreignObject x="10" y="495" width="280" height="36">
+      <div xmlns="http://www.w3.org/1999/xhtml" class="chip-imp">Sus reacciones automáticas.</div>
+    </foreignObject>
+  </g>
+
+  <!-- Derecha baja exterior -->
+  <g style="animation: drift-c 4.8s ease-in-out 1.2s infinite;">
+    <foreignObject x="1060" y="468" width="188" height="36">
+      <div xmlns="http://www.w3.org/1999/xhtml" class="chip-imp">Sus prioridades.</div>
+    </foreignObject>
+  </g>
+
+  <!-- Abajo centro exterior -->
+  <g style="animation: drift-a 6.2s ease-in-out 0.8s infinite;">
+    <foreignObject x="200" y="640" width="288" height="36">
+      <div xmlns="http://www.w3.org/1999/xhtml" class="chip-imp">Lo que la crianza le instaló.</div>
+    </foreignObject>
+  </g>
+
+  <!-- Abajo der exterior -->
+  <g style="animation: drift-b 5.2s ease-in-out 0.3s infinite;">
+    <foreignObject x="720" y="610" width="252" height="36">
+      <div xmlns="http://www.w3.org/1999/xhtml" class="chip-imp">La forma en que lo criaron.</div>
+    </foreignObject>
+  </g>
+
+  <!-- ══ RAYOS AMOROSOS se crean con JS ══ -->
+
+</svg>
+</div>
+
+<script>
+  // Chips de influencia: origen del rayo (cerca de ella), destino (chip)
+  // Los chips están en el anillo entre r=140 y r=275
+  const chipsInf = [
+    { id:'a', x1:640, y1:345, tx:641, ty:214 }, // arriba
+    { id:'b', x1:655, y1:352, tx:824, ty:240 }, // arriba derecha
+    { id:'c', x1:668, y1:390, tx:845, ty:395 }, // derecha
+    { id:'d', x1:655, y1:432, tx:824, ty:550 }, // abajo derecha
+    { id:'e', x1:640, y1:445, tx:641, ty:590 }, // abajo
+    { id:'f', x1:622, y1:432, tx:467, ty:550 }, // abajo izquierda
+    { id:'g', x1:608, y1:390, tx:434, ty:395 }, // izquierda
+    { id:'h', x1:622, y1:352, tx:467, ty:240 }, // arriba izquierda
+  ];
+
+  const INICIO_ELLA     = 400;
+  const INICIO_LABEL    = 1800;
+  const INICIO_CHIPS    = 2800;
+  const PRIMER_RAYO     = 3600;
+  const INTERVALO_RAYO  = 850;
+  const DURACION_MS     = 13000;
+
+  const svg = document.getElementById('svg-main');
+
+  // ── 1. Ella y círculo crecen ───────────────────────────────
+  setTimeout(() => {
+    const g = document.getElementById('ella-grupo');
+    g.animate(
+      [{ transform: 'scale(0.4)' }, { transform: 'scale(1)' }],
+      { duration: 1800, fill: 'forwards', easing: 'cubic-bezier(.2,0,.1,1)' }
+    );
+    const partes = g.querySelectorAll('polygon,circle,line');
+    partes.forEach(el => {
+      const attr = el.tagName === 'line' ? 'stroke' : 'fill';
+      el.animate(
+        [{ [attr]: '#FF3B3B' }, { [attr]: '#F9F3E8' }],
+        { duration: 1200, fill: 'forwards', delay: 300 }
+      );
+    });
+    const c1 = document.getElementById('circulo-1');
+    const startT = performance.now();
+    const dur = 1800, startR = 55, endR = 140;
+    function animR(now) {
+      const p = Math.min((now - startT) / dur, 1);
+      const ease = 1 - Math.pow(1 - p, 3);
+      c1.setAttribute('r', startR + (endR - startR) * ease);
+      if (p < 1) requestAnimationFrame(animR);
+    }
+    requestAnimationFrame(animR);
+  }, INICIO_ELLA);
+
+  // ── 2. Label EL PUNTO DE INFLUENCIA ───────────────────────
+  setTimeout(() => {
+    const lbl = document.getElementById('label-influencia');
+    lbl.animate([{ opacity:0 }, { opacity:1 }],
+      { duration: 700, fill: 'forwards', easing: 'ease-out' });
+  }, INICIO_LABEL);
+
+  // ── 3. Chips de influencia aparecen tiny ─────────────────
+  chipsInf.forEach((c, i) => {
+    setTimeout(() => {
+      const g = document.getElementById('cg-' + c.id);
+      const chip = document.getElementById('chip-' + c.id);
+      // aparecen muy pequeños
+      chip.style.fontSize = '6px';
+      chip.style.transform = 'scale(0.18)';
+      chip.style.transformOrigin = 'left center';
+      chip.style.transition = 'none';
+      g.animate([{ opacity:0 }, { opacity:0.6 }],
+        { duration: 300, fill: 'forwards' });
+    }, INICIO_CHIPS + i * 100);
+  });
+
+  // ── 4. Rayos amorosos dorados + chip crece ────────────────
+  chipsInf.forEach((c, i) => {
+    const delay = PRIMER_RAYO + i * INTERVALO_RAYO;
+    setTimeout(() => {
+
+      // Crear rayo curvo dorado
+      const rayo = document.createElementNS('http://www.w3.org/2000/svg', 'path');
+      const mx = (c.x1 + c.tx) / 2 + (Math.random() * 40 - 20);
+      const my = (c.y1 + c.ty) / 2 + (Math.random() * 30 - 15);
+      rayo.setAttribute('d', `M ${c.x1} ${c.y1} Q ${mx} ${my} ${c.tx} ${c.ty}`);
+      rayo.setAttribute('fill', 'none');
+      rayo.setAttribute('stroke', '#E8C870');
+      rayo.setAttribute('stroke-width', '4');
+      rayo.setAttribute('stroke-linecap', 'round');
+      rayo.setAttribute('filter', 'url(#glow-gold)');
+      rayo.setAttribute('opacity', '0');
+      svg.appendChild(rayo);
+
+      const len = rayo.getTotalLength() || 180;
+      rayo.setAttribute('stroke-dasharray', len);
+      rayo.setAttribute('stroke-dashoffset', len);
+
+      rayo.animate([
+        { strokeDashoffset: len, opacity: 0   },
+        { strokeDashoffset: len*0.4, opacity: 1, offset: 0.1 },
+        { strokeDashoffset: 0,   opacity: 1,  offset: 0.65 },
+        { strokeDashoffset: 0,   opacity: 0   }
+      ], { duration: 1800, fill: 'forwards', easing: 'ease-in-out' });
+
+      // Chip crece al llegar el rayo
+      setTimeout(() => {
+        const chip = document.getElementById('chip-' + c.id);
+        const cg   = document.getElementById('cg-' + c.id);
+        if (!chip) return;
+
+        // glow dorado en chip
+        cg.animate([{ opacity: 0.6 }, { opacity: 1 }],
+          { duration: 400, fill: 'forwards' });
+
+        chip.animate([
+          { fontSize: '6px',  transform: 'scale(0.18)' },
+          { fontSize: '24px', transform: 'scale(1.06)', offset: 0.75 },
+          { fontSize: '22px', transform: 'scale(1)' }
+        ], { duration: 650, fill: 'forwards', easing: 'cubic-bezier(.2,0,.1,1)' });
+
+      }, 1150);
+
+    }, delay);
+  });
+
+  // ── 5. Fade out ──────────────────────────────────────────
+  setTimeout(() => {
+    document.getElementById('scene').classList.add('out');
+  }, DURACION_MS);
+</script>
+</body>
+</html>

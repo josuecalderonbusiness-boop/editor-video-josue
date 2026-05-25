@@ -1,0 +1,290 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<style>
+  body:not(.fonts-loaded) * { animation-play-state:paused !important; transition:none !important; }
+</style>
+<script>
+  document.fonts.ready.then(() => { setTimeout(() => { document.body.classList.add("fonts-loaded"); }, 1500); });
+</script>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=1280, height=720">
+<title>anim_l2_an14</title>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,900;1,700&family=Cormorant+Garamond:ital,wght@1,600&display=swap" rel="stylesheet">
+<style>
+* { margin:0; padding:0; box-sizing:border-box; }
+body { width:1280px; height:720px; overflow:hidden; background:#0A0306; }
+
+.scene {
+  width:1280px; height:720px; position:relative;
+  display:flex; overflow:hidden;
+  opacity:0; transition:opacity 0.6s ease;
+}
+.scene.visible { opacity:1; }
+
+/* Glows */
+.glow-left {
+  position:absolute; left:-80px; top:50%; transform:translateY(-50%);
+  width:680px; height:680px;
+  background:radial-gradient(circle, rgba(90,18,32,0.38) 0%, transparent 65%);
+  pointer-events:none; z-index:0;
+}
+.glow-right {
+  position:absolute; right:-80px; top:50%; transform:translateY(-50%);
+  width:680px; height:680px;
+  background:radial-gradient(circle, rgba(184,137,42,0.24) 0%, transparent 65%);
+  pointer-events:none; z-index:0;
+}
+
+/* Línea divisora */
+.divisor {
+  position:absolute; left:50%; top:6%; bottom:6%;
+  width:1px;
+  background:linear-gradient(180deg, transparent, rgba(255,255,255,0.1) 25%, rgba(255,255,255,0.1) 75%, transparent);
+  z-index:10;
+}
+
+/* Mitades */
+.mitad {
+  width:50%; height:100%;
+  display:flex; flex-direction:column;
+  align-items:center; justify-content:flex-start;
+  position:relative; z-index:2;
+  padding:36px 56px 36px 56px;
+  gap:0;
+}
+
+/* ── TÍTULO GRANDE DE CADA CAJA ── */
+.caja-titulo {
+  display:flex; align-items:center; gap:16px;
+  margin-bottom:28px; width:100%;
+  justify-content:center;
+}
+
+.caja-titulo-texto {
+  font-family:'Playfair Display',serif;
+  font-weight:900; font-size:34px;
+  line-height:1.1; text-align:center;
+}
+.mitad-trampa  .caja-titulo-texto { color:#C97080; }
+.mitad-soberana .caja-titulo-texto { color:#E8C870; }
+
+/* Línea divisora bajo título */
+.titulo-line {
+  width:100%; height:1px; margin-bottom:0;
+}
+.mitad-trampa  .titulo-line { background:linear-gradient(90deg, transparent, rgba(201,112,128,0.3), transparent); }
+.mitad-soberana .titulo-line { background:linear-gradient(90deg, transparent, rgba(232,200,112,0.3), transparent); }
+
+/* ── TEXTO ITEM — grande, ocupa el espacio central ── */
+.item-wrap {
+  flex:1; width:100%;
+  display:flex; flex-direction:column;
+  align-items:center; justify-content:center;
+  gap:28px;
+}
+
+.item-texto {
+  font-family:'Cormorant Garamond',serif;
+  font-style:italic; font-weight:600;
+  font-size:50px; line-height:1.28;
+  text-align:center; color:#F9F3E8;
+  opacity:0; transform:translateY(18px);
+  transition:opacity 0.45s ease, transform 0.45s ease;
+}
+.item-texto.visible { opacity:1; transform:translateY(0); }
+
+/* ── SELLO ── */
+.sello-zona {
+  height:100px;
+  display:flex; align-items:center; justify-content:center;
+  opacity:0; transform:scale(0);
+  transition:opacity 0.35s ease, transform 0.4s cubic-bezier(0.2,0,0.1,1.5);
+}
+.sello-zona.visible { opacity:1; transform:scale(1); }
+
+.sello-x-inner    { transform:rotate(-10deg); }
+.estrellas-row    { display:flex; gap:10px; align-items:center; }
+</style>
+</head>
+<body>
+<div class="scene" id="scene">
+
+  <div class="glow-left"></div>
+  <div class="glow-right"></div>
+  <div class="divisor"></div>
+
+  <!-- IZQUIERDA — TRAMPA -->
+  <div class="mitad mitad-trampa">
+
+    <!-- TÍTULO GRANDE -->
+    <div class="caja-titulo">
+      <!-- Logo: punto orbitando círculo -->
+      <svg width="34" height="34" viewBox="0 0 34 34" fill="none" xmlns="http://www.w3.org/2000/svg" style="flex-shrink:0;">
+        <circle cx="17" cy="17" r="14" stroke="#C97080" stroke-width="1.8" opacity="0.7"/>
+        <circle cx="17" cy="17" r="9" stroke="#C97080" stroke-width="1" opacity="0.35"/>
+        <circle cx="17" cy="4" r="3.5" fill="#C97080">
+          <animateTransform attributeName="transform" type="rotate" from="0 17 17" to="360 17 17" dur="3s" repeatCount="indefinite"/>
+        </circle>
+      </svg>
+      <div class="caja-titulo-texto">Dentro de<br>la Trampa</div>
+    </div>
+    <div class="titulo-line"></div>
+
+    <div class="item-wrap">
+      <div class="item-texto" id="textoTrampa"></div>
+      <!-- Sello X -->
+      <div class="sello-zona" id="selloTrampa">
+        <div class="sello-x-inner">
+          <svg width="110" height="110" viewBox="0 0 110 110" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <circle cx="55" cy="55" r="50" fill="rgba(90,18,32,0.8)" stroke="#C97080" stroke-width="2.5"/>
+            <circle cx="55" cy="55" r="44" fill="none" stroke="#C97080" stroke-width="1" stroke-dasharray="5 6" opacity="0.35"/>
+            <line x1="35" y1="35" x2="75" y2="75" stroke="#C97080" stroke-width="5" stroke-linecap="round"/>
+            <line x1="75" y1="35" x2="35" y2="75" stroke="#C97080" stroke-width="5" stroke-linecap="round"/>
+          </svg>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- DERECHA — SOBERANA -->
+  <div class="mitad mitad-soberana">
+
+    <!-- TÍTULO GRANDE -->
+    <div class="caja-titulo">
+      <!-- Logo: diamante -->
+      <svg width="34" height="34" viewBox="0 0 34 34" fill="none" xmlns="http://www.w3.org/2000/svg" style="flex-shrink:0;">
+        <polygon points="17,2 32,14 17,32 2,14" fill="rgba(232,200,112,0.12)" stroke="#E8C870" stroke-width="1.8" opacity="0.8"/>
+        <polygon points="17,8 26,15 17,26 8,15" fill="none" stroke="#E8C870" stroke-width="1" opacity="0.4"/>
+        <circle cx="17" cy="17" r="2.5" fill="#E8C870"/>
+      </svg>
+      <div class="caja-titulo-texto">Con el Código<br>Soberana</div>
+    </div>
+    <div class="titulo-line"></div>
+
+    <div class="item-wrap">
+      <div class="item-texto" id="textoSoberana"></div>
+      <!-- Sello CHECK + estrellas -->
+      <div class="sello-zona" id="selloSoberana">
+        <div class="estrellas-row" id="estrellasRow"></div>
+      </div>
+    </div>
+  </div>
+
+</div>
+
+<script>
+const PARES = [
+  ["Su estado de ánimo calibra el tuyo",        "Tu estado de ánimo viene de tu propio centro"],
+  ["Busca aprobación sin darse cuenta",          "Sus estándares son su propia brújula"],
+  ["Habla desde la herida acumulada",            "Habla desde la claridad presente"],
+  ["Espera que él cambie para estar bien",       "Cambia el sistema y la dinámica se mueve"],
+  ["Su paz depende de una respuesta de él",      "Su paz es territorio propio"],
+  ["Confunde entrega con anulación",             "Ama desde la elección, no desde la necesidad"],
+  ["Siente que pierde si él no responde",        "Gana siempre porque actúa en coherencia"],
+];
+
+const T_IN    = 450;
+const T_SELLO = 600;
+const T_HOLD  = 2000;
+const T_OUT   = 380;
+const T_PAUSA = 180;
+
+document.fonts.ready.then(() => {
+  setTimeout(() => {
+
+    const scene  = document.getElementById('scene');
+    const textoT = document.getElementById('textoTrampa');
+    const textoS = document.getElementById('textoSoberana');
+    const selloT = document.getElementById('selloTrampa');
+    const selloS = document.getElementById('selloSoberana');
+    const eRow   = document.getElementById('estrellasRow');
+
+    scene.classList.add('visible');
+
+    function makeEstrella(i) {
+      const svg = document.createElementNS('http://www.w3.org/2000/svg','svg');
+      svg.setAttribute('width','36'); svg.setAttribute('height','36'); svg.setAttribute('viewBox','0 0 36 36');
+      svg.style.cssText = 'opacity:0;transform:scale(0) rotate(-20deg);transition:opacity 0.22s ease,transform 0.28s cubic-bezier(0.2,0,0.1,1.6);';
+      const defs = document.createElementNS('http://www.w3.org/2000/svg','defs');
+      const f    = document.createElementNS('http://www.w3.org/2000/svg','filter');
+      f.setAttribute('id','gs'+i);
+      const fe   = document.createElementNS('http://www.w3.org/2000/svg','feDropShadow');
+      fe.setAttribute('dx','0'); fe.setAttribute('dy','0'); fe.setAttribute('stdDeviation','4');
+      fe.setAttribute('flood-color','#E8C870'); fe.setAttribute('flood-opacity','0.85');
+      f.appendChild(fe); defs.appendChild(f); svg.appendChild(defs);
+      const p = document.createElementNS('http://www.w3.org/2000/svg','polygon');
+      p.setAttribute('points','18,2 22,13 34,13 24.5,20 28,31 18,24 8,31 11.5,20 2,13 14,13');
+      p.setAttribute('fill','rgba(232,200,112,0.22)');
+      p.setAttribute('stroke','#E8C870'); p.setAttribute('stroke-width','2');
+      p.setAttribute('stroke-linejoin','round'); p.setAttribute('filter','url(#gs'+i+')');
+      svg.appendChild(p);
+      eRow.appendChild(svg);
+      setTimeout(() => { svg.style.opacity='1'; svg.style.transform='scale(1) rotate(0deg)'; }, 40);
+    }
+
+    function resetTodo() {
+      // Textos
+      textoT.style.transition='none'; textoS.style.transition='none';
+      textoT.style.opacity='0'; textoT.style.transform='translateY(18px)';
+      textoS.style.opacity='0'; textoS.style.transform='translateY(18px)';
+      // Sellos
+      selloT.style.transition='none'; selloS.style.transition='none';
+      selloT.style.opacity='0'; selloT.style.transform='scale(0) rotate(-10deg)';
+      selloS.style.opacity='0'; selloS.style.transform='scale(0)';
+      eRow.innerHTML='';
+    }
+
+    function runPar(idx, onDone) {
+      if (idx >= PARES.length) { onDone && onDone(); return; }
+      const [trampa, soberana] = PARES[idx];
+      resetTodo();
+
+      // Textos entran
+      setTimeout(() => {
+        textoT.textContent = trampa;
+        textoS.textContent = soberana;
+        textoT.style.transition=`opacity ${T_IN}ms ease,transform ${T_IN}ms ease`;
+        textoS.style.transition=`opacity ${T_IN}ms ease,transform ${T_IN}ms ease`;
+        textoT.style.opacity='1'; textoT.style.transform='translateY(0)';
+        textoS.style.opacity='1'; textoS.style.transform='translateY(0)';
+      }, 80);
+
+      // Sellos entran
+      setTimeout(() => {
+        selloT.style.transition=`opacity 0.35s ease,transform 0.42s cubic-bezier(0.2,0,0.1,1.5)`;
+        selloT.style.opacity='1'; selloT.style.transform='scale(1) rotate(-10deg)';
+        selloS.style.transition=`opacity 0.35s ease,transform 0.42s cubic-bezier(0.2,0,0.1,1.5)`;
+        selloS.style.opacity='1'; selloS.style.transform='scale(1)';
+        for(let i=0;i<5;i++) setTimeout(()=>makeEstrella(i), i*130);
+      }, T_IN + T_SELLO);
+
+      // Fade out
+      const t_out = T_IN + T_SELLO + T_HOLD;
+      setTimeout(() => {
+        const d=T_OUT+'ms';
+        textoT.style.transition=`opacity ${d} ease,transform ${d} ease`;
+        textoS.style.transition=`opacity ${d} ease,transform ${d} ease`;
+        textoT.style.opacity='0'; textoT.style.transform='translateY(-12px)';
+        textoS.style.opacity='0'; textoS.style.transform='translateY(-12px)';
+        selloT.style.transition=`opacity ${d} ease,transform ${d} ease`;
+        selloS.style.transition=`opacity ${d} ease,transform ${d} ease`;
+        selloT.style.opacity='0'; selloT.style.transform='scale(0.7) rotate(-10deg)';
+        selloS.style.opacity='0'; selloS.style.transform='scale(0.7)';
+      }, t_out);
+
+      setTimeout(() => runPar(idx+1, onDone), t_out + T_OUT + T_PAUSA);
+    }
+
+    runPar(0, () => {
+      setTimeout(() => {
+        scene.style.transition='opacity 0.8s ease';
+        scene.style.opacity='0';
+      }, 400);
+    });
+
+  }, 1500);
+});
+</script>
+</body>
+</html>

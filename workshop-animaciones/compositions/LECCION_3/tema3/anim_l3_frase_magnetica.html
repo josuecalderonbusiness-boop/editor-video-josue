@@ -1,0 +1,206 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<style>body:not(.fonts-loaded) * { animation-play-state: paused !important; transition: none !important; }</style>
+<script>document.fonts.ready.then(() => { setTimeout(() => { document.body.classList.add("fonts-loaded"); }, 1500); });</script>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=1280, height=720">
+<title>Frase — Mujer magnética</title>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,700;0,900;1,400;1,900&family=Cormorant+Garamond:ital,wght@1,300;1,400&display=swap" rel="stylesheet">
+<style>
+  * { margin:0; padding:0; box-sizing:border-box; }
+  body { width:1280px; height:720px; overflow:hidden; background:#0F0A0B; }
+
+  .scene {
+    width:1280px; height:720px; background:#0F0A0B;
+    position:relative; display:flex; flex-direction:column;
+    align-items:center; justify-content:center;
+    padding:0 100px;
+    opacity:0; animation:sceneIn .8s ease-out .1s forwards;
+  }
+  @keyframes sceneIn { to{opacity:1} }
+  .scene.out { animation:fadeOut .9s ease-in forwards; }
+  @keyframes fadeOut { to{opacity:0} }
+
+  /* Glow borgoña centrado */
+  .bg-glow {
+    position:absolute; inset:0; pointer-events:none;
+    background:radial-gradient(ellipse at 50% 52%, rgba(107,26,42,.5) 0%, rgba(61,12,17,.25) 38%, transparent 68%);
+    animation:pulseGlow 3.5s ease-in-out infinite;
+  }
+  @keyframes pulseGlow { 0%,100%{opacity:.7;transform:scale(1)} 50%{opacity:1;transform:scale(1.04)} }
+
+  .comillas {
+    font-family:'Playfair Display',serif; font-size:110px; font-weight:900;
+    color:#E8C870; line-height:.75; letter-spacing:-0.05em;
+    display:block; text-align:center; margin-bottom:14px;
+    opacity:0; transform:translateY(-10px);
+    animation:marksIn .55s ease-out .4s forwards, marksGlow 2.8s ease-in-out 1.2s infinite;
+  }
+  @keyframes marksIn { to{opacity:1;transform:translateY(0)} }
+  @keyframes marksGlow {
+    0%,100%{text-shadow:0 0 15px rgba(232,200,112,1),0 0 40px rgba(220,180,60,.8)}
+    50%{text-shadow:0 0 35px rgba(255,248,180,1),0 0 80px rgba(232,200,112,1)}
+  }
+
+  .text-block { position:relative; z-index:2; max-width:1080px; text-align:center; }
+
+  /* L1 — "La mujer emocionalmente independiente" */
+  .l1 {
+    font-family:'Cormorant Garamond',serif; font-style:italic;
+    font-size:54px; font-weight:400; color:rgba(249,243,232,.75);
+    line-height:1.15; letter-spacing:.01em;
+  }
+  /* L2 — "no es una mujer fría." — tachado visual */
+  .l2 {
+    font-family:'Playfair Display',serif; font-weight:900;
+    font-size:74px; color:rgba(201,112,128,.7); line-height:1.05;
+    position:relative; display:inline-block; margin-top:4px;
+  }
+  .tacho {
+    position:absolute; top:50%; left:-6px; right:-6px; height:5px;
+    background:#C97080; border-radius:3px; transform:translateY(-50%);
+    width:0; box-shadow:0 0 10px rgba(201,112,128,.7);
+  }
+  /* L3 — "Es la mujer más" */
+  .l3 {
+    font-family:'Cormorant Garamond',serif; font-style:italic;
+    font-size:56px; color:rgba(249,243,232,.8);
+    line-height:1.1; margin-top:8px;
+  }
+  /* L4 — "MAGNÉTICA" — explosión */
+  .l4 {
+    font-family:'Playfair Display',serif; font-weight:900; font-style:italic;
+    font-size:148px; color:#E8C870; line-height:.88;
+    opacity:0; transform:scale(.82);
+  }
+  /* L5 — "que existe. Porque elige, no necesita." */
+  .l5 {
+    font-family:'Playfair Display',serif; font-weight:900;
+    font-size:58px; color:#F9F3E8; line-height:1.1; margin-top:6px;
+  }
+  .l5 em { color:#E8C870; font-style:italic; }
+
+  .word { display:inline-block; opacity:0; filter:blur(8px); transform:translateY(14px); white-space:pre; }
+  .word.v {
+    transition:opacity .38s ease, filter .38s ease, transform .38s ease;
+    opacity:1; filter:blur(0); transform:translateY(0);
+  }
+  .l1 .word.v { text-shadow:0 0 15px rgba(249,243,232,.3); }
+  .l3 .word.v { text-shadow:0 0 15px rgba(249,243,232,.35); }
+  .l5 .word.v { text-shadow:0 0 20px rgba(255,255,255,.5); }
+
+  /* Línea dorada */
+  .gold-line-wrap { margin-top:22px; position:relative; height:10px; width:520px; display:none; }
+  .gold-line { position:absolute; bottom:0; left:0; height:3px; width:0; border-radius:2px; background:linear-gradient(90deg,transparent,#B8892A,#E8C870,#FFF5B0,#E8C870,#D4A843,transparent); animation:growLine .9s cubic-bezier(.15,0,.1,1) forwards; }
+  .gold-spark { position:absolute; bottom:-4px; left:-30px; width:55px; height:11px; background:radial-gradient(ellipse,rgba(255,245,190,1) 0%,rgba(245,228,176,.55) 45%,transparent 75%); border-radius:50%; animation:sparkSweep 1s ease-in-out .8s forwards; opacity:0; }
+  @keyframes growLine { to{width:520px} }
+  @keyframes sparkSweep { 0%{left:-55px;opacity:0}12%{opacity:1}88%{opacity:.9}100%{left:530px;opacity:0} }
+  @keyframes goldPulse { 0%,100%{text-shadow:0 0 30px rgba(232,200,112,.6),0 0 70px rgba(232,200,112,.3)} 50%{text-shadow:0 0 60px rgba(255,245,180,1),0 0 120px rgba(232,200,112,.8),0 0 180px rgba(220,180,60,.4)} }
+</style>
+</head>
+<body>
+<div class="scene" id="scene">
+  <div class="bg-glow"></div>
+  <span class="comillas">&#8220;</span>
+  <div class="text-block">
+    <p class="l1" id="l1"></p>
+    <p><span class="l2" id="l2wrap"><span id="l2"></span><span class="tacho" id="tacho"></span></span></p>
+    <p class="l3" id="l3"></p>
+    <p class="l4" id="l4">MAGNÉTICA</p>
+    <p class="l5" id="l5"></p>
+  </div>
+  <div class="gold-line-wrap" id="lineaWrap">
+    <div class="gold-line"></div><div class="gold-spark"></div>
+  </div>
+</div>
+
+<script>
+  const DURACION_MS = 13000;
+  const MS = 190;
+
+  function buildWords(txt, id) {
+    const el = document.getElementById(id);
+    txt.split(" ").forEach((w,i,a) => {
+      const s = document.createElement("span");
+      s.className = "word";
+      s.textContent = w+(i<a.length-1?" ":"");
+      el.appendChild(s);
+    });
+    return el.querySelectorAll(".word");
+  }
+
+  // L1
+  const w1 = buildWords("La mujer emocionalmente independiente", "l1");
+  // L2 tachada
+  const w2 = buildWords("no es una mujer fría.", "l2");
+  // L3
+  const w3 = buildWords("Es la mujer más", "l3");
+  // L5
+  const l5raw = "que existe. Porque elige, no necesita.";
+  const l5el = document.getElementById("l5");
+  l5raw.split(" ").forEach((w,i,a) => {
+    const s = document.createElement("span");
+    s.className = "word";
+    // destacar "elige" y "necesita"
+    if(w.startsWith("elige") || w.startsWith("necesita")) {
+      const em = document.createElement("em");
+      em.textContent = w;
+      s.appendChild(em);
+    } else {
+      s.textContent = w;
+    }
+    if(i < a.length-1) s.appendChild(document.createTextNode(" "));
+    l5el.appendChild(s);
+  });
+  const w5 = l5el.querySelectorAll(".word");
+
+  let t = 700;
+
+  // L1 aparece
+  w1.forEach(w => { setTimeout(()=>w.classList.add("v"),t); t+=MS; });
+  t += 200;
+
+  // L2 aparece (tachado viene después)
+  w2.forEach(w => { setTimeout(()=>w.classList.add("v"),t); t+=MS; });
+
+  // Tachado se dibuja
+  setTimeout(() => {
+    const tacho = document.getElementById("tacho");
+    tacho.style.transition = "width .5s ease-out";
+    tacho.style.width = "100%";
+  }, t + 150);
+  t += 700;
+
+  // L3 aparece
+  w3.forEach(w => { setTimeout(()=>w.classList.add("v"),t); t+=MS; });
+  t += 200;
+
+  // L4 — MAGNÉTICA explota
+  setTimeout(() => {
+    const l4 = document.getElementById("l4");
+    l4.style.transition = "opacity .5s cubic-bezier(.2,0,.1,1), transform .5s cubic-bezier(.2,0,.1,1.4)";
+    l4.style.opacity = "1";
+    l4.style.transform = "scale(1)";
+    setTimeout(() => {
+      l4.style.animation = "goldPulse 2.4s ease-in-out infinite";
+    }, 600);
+  }, t);
+  t += 900;
+
+  // L5 aparece
+  w5.forEach(w => { setTimeout(()=>w.classList.add("v"),t); t+=MS; });
+  t += 300;
+
+  // Línea dorada
+  setTimeout(() => {
+    document.getElementById("lineaWrap").style.display = "block";
+  }, t);
+
+  // Fade out
+  setTimeout(() => {
+    document.getElementById("scene").classList.add("out");
+  }, DURACION_MS);
+</script>
+</body>
+</html>

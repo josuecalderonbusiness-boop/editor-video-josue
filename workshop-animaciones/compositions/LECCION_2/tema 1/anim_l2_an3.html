@@ -1,0 +1,385 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<style>
+  body:not(.fonts-loaded) * { animation-play-state: paused !important; transition: none !important; }
+</style>
+<script>
+  document.fonts.ready.then(() => {
+    setTimeout(() => { document.body.classList.add("fonts-loaded"); }, 1500);
+  });
+</script>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=1280, height=720">
+<title>anim_l2_an3 — Pregunta 02</title>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,900;1,400&family=Cormorant+Garamond:ital,wght@1,300;1,600&family=Inter:wght@300&display=swap" rel="stylesheet">
+<style>
+* { margin:0; padding:0; box-sizing:border-box; }
+body { width:1280px; height:720px; overflow:hidden; }
+
+.pizarra {
+  width:1280px; height:720px; position:relative; overflow:hidden;
+  background-color: #EDE3CE;
+  background-image:
+    linear-gradient(rgba(90,18,32,0.06) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(90,18,32,0.06) 1px, transparent 1px);
+  background-size: 52px 52px;
+}
+
+.borde-izq {
+  position:absolute; left:0; top:0; bottom:0; width:8px;
+  background: linear-gradient(180deg, #5A1220, #8B2D3F, #5A1220);
+  z-index:10;
+}
+.borde-sup {
+  position:absolute; top:0; left:0; right:0; height:5px;
+  background: linear-gradient(90deg, #D4A843, #B8892A, #E8C870, transparent);
+  width:0; animation: lineaGrow 0.8s ease forwards 0.3s;
+  z-index:10;
+}
+.linea-dec {
+  position:absolute; bottom:0; left:0; right:0; height:4px;
+  background: linear-gradient(90deg, #5A1220, #D4A843, transparent);
+  width:0; animation: lineaGrow 1s ease forwards 0.5s;
+  z-index:10;
+}
+@keyframes lineaGrow { to { width:100%; } }
+
+/* Signos flotantes */
+.qs { position:absolute; inset:0; pointer-events:none; overflow:hidden; z-index:1; }
+.q {
+  position:absolute;
+  font-family:'Playfair Display',serif; font-weight:900;
+  color:#5A1220; opacity:0;
+  animation: qFloat var(--dur) ease-in-out infinite var(--delay);
+  text-shadow: 0 0 30px rgba(90,18,32,0.4), 0 0 60px rgba(90,18,32,0.2);
+}
+@keyframes qFloat {
+  0%   { opacity:0; transform:translateY(20px) scale(0.85); }
+  15%  { opacity:var(--op); }
+  70%  { opacity:var(--op); transform:translateY(-40px) scale(1.05); }
+  100% { opacity:0; transform:translateY(-80px) scale(0.9); }
+}
+
+/* Sistema de slides con push */
+.stage {
+  position:absolute; inset:0;
+  overflow:hidden; z-index:5;
+}
+
+/* Cada concepto-slide */
+.cslide {
+  position:absolute; inset:0;
+  display:flex; flex-direction:column;
+  align-items:center; justify-content:center;
+  transform:translateX(100%);
+  transition: none;
+}
+
+/* Colores de fondo por slide (sobre la pizarra) */
+/* Slide 0 (intro) — transparente */
+/* Slides conceptos — tarjeta de color */
+.card-concepto {
+  display:flex; flex-direction:column; align-items:center; justify-content:center;
+  border-radius:20px; padding:48px 80px;
+  min-width:900px; min-height:400px;
+  position:relative;
+  box-shadow: 6px 8px 0 rgba(61,12,17,0.25), 0 20px 50px rgba(61,12,17,0.15);
+  opacity:0;
+}
+.card-concepto.visible { opacity:1; }
+
+.cv { background: linear-gradient(135deg, #3D0C11, #6B1A2A); }
+.cn { background: linear-gradient(135deg, #0F0A0B, #1C1114); }
+.cb { background: linear-gradient(135deg, #6B1A2A, #8B2D3F); }
+.cd { background: linear-gradient(135deg, #7A5C1E, #B8892A); }
+.co { background: linear-gradient(135deg, #1A0810, #3D0C11); }
+
+.card-icono {
+  margin-bottom:20px;
+  opacity:0;
+}
+.card-icono svg {
+  filter: drop-shadow(0 0 12px currentColor) drop-shadow(0 0 24px currentColor);
+}
+
+.card-titulo {
+  font-family:'Playfair Display',serif; font-weight:900;
+  font-size:120px; color:#F9F3E8; line-height:0.9;
+  text-align:center; letter-spacing:-2px;
+  text-shadow: 2px 3px 0 rgba(0,0,0,0.3);
+  opacity:0;
+}
+.card-titulo.dorado { color:#E8C870; }
+
+.card-sub {
+  font-family:'Cormorant Garamond',serif; font-style:italic; font-weight:300;
+  font-size:46px; color:rgba(249,243,232,0.6);
+  margin-top:12px; text-align:center;
+  opacity:0;
+}
+
+/* Slide intro especial */
+#si {
+  flex-direction:column; gap:8px;
+}
+.intro-grande {
+  font-family:'Playfair Display',serif; font-weight:900;
+  font-size:180px; color:#3D0C11; line-height:0.85;
+  text-align:center; letter-spacing:-4px;
+  text-shadow: 3px 4px 0 rgba(61,12,17,0.15);
+  opacity:0;
+}
+.intro-pequeño {
+  font-family:'Cormorant Garamond',serif; font-style:italic; font-weight:300;
+  font-size:52px; color:#8B2D3F; letter-spacing:0.05em;
+  opacity:0;
+}
+
+/* Slide final — OCUPAS EL ESPACIO */
+#sf .card-titulo { font-size:110px; }
+
+/* Animaciones de entrada */
+@keyframes fadeUp {
+  from { opacity:0; transform:translateY(20px); }
+  to   { opacity:1; transform:translateY(0); }
+}
+@keyframes pushFromRight {
+  from { transform:translateX(110%); }
+  to   { transform:translateX(0%); }
+}
+@keyframes pushToLeft {
+  from { transform:translateX(0%); }
+  to   { transform:translateX(-110%); }
+}
+@keyframes iconGlow {
+  from { opacity:0; transform:scale(0.7); }
+  to   { opacity:1; transform:scale(1); }
+}
+</style>
+</head>
+<body>
+<div class="pizarra">
+  <div class="borde-izq"></div>
+  <div class="borde-sup"></div>
+  <div class="linea-dec"></div>
+
+  <div class="qs">
+    <span class="q" style="left:5%;top:8%;font-size:90px;--dur:5s;--delay:0.5s;--op:0.10">?</span>
+    <span class="q" style="left:82%;top:5%;font-size:60px;--dur:4.5s;--delay:1.3s;--op:0.09">?</span>
+    <span class="q" style="left:93%;top:45%;font-size:105px;--dur:6s;--delay:0.4s;--op:0.07">?</span>
+    <span class="q" style="left:70%;top:80%;font-size:70px;--dur:5.5s;--delay:1.9s;--op:0.10">?</span>
+    <span class="q" style="left:2%;top:72%;font-size:90px;--dur:4.8s;--delay:2.3s;--op:0.08">?</span>
+    <span class="q" style="left:50%;top:2%;font-size:50px;--dur:5.2s;--delay:3.1s;--op:0.09">?</span>
+    <span class="q" style="left:87%;top:88%;font-size:75px;--dur:4.2s;--delay:0.8s;--op:0.07">?</span>
+    <span class="q" style="left:30%;top:88%;font-size:48px;--dur:5.8s;--delay:2.8s;--op:0.08">?</span>
+  </div>
+
+  <div class="stage">
+
+    <!-- SLIDE INTRO: HAS CAMBIADO / algo de ti misma -->
+    <div class="cslide" id="si">
+      <div class="intro-grande" id="ig">HAS<br>CAMBIADO</div>
+      <div class="intro-pequeño" id="ip">algo de ti misma...</div>
+    </div>
+
+    <!-- SLIDE 1: CÓMO HABLAS -->
+    <div class="cslide" id="s1">
+      <div class="card-concepto cv" id="c1">
+        <div class="card-icono" id="i1">
+          <svg width="80" height="80" viewBox="0 0 80 80" fill="none" stroke="#E8C870" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M12 20 Q12 10 22 10 L58 10 Q68 10 68 20 L68 42 Q68 52 58 52 L44 52 L30 68 L30 52 L22 52 Q12 52 12 42 Z"/>
+            <path d="M25 31 Q32 24 40 31 Q48 38 55 31"/>
+            <circle cx="30" cy="31" r="2" fill="#E8C870"/>
+            <circle cx="40" cy="31" r="2" fill="#E8C870"/>
+            <circle cx="50" cy="31" r="2" fill="#E8C870"/>
+          </svg>
+        </div>
+        <div class="card-titulo" id="t1">CÓMO<br>HABLAS</div>
+        <div class="card-sub" id="sub1">la forma en que te expresas</div>
+      </div>
+    </div>
+
+    <!-- SLIDE 2: CÓMO PIDES -->
+    <div class="cslide" id="s2">
+      <div class="card-concepto cn" id="c2">
+        <div class="card-icono" id="i2">
+          <svg width="80" height="80" viewBox="0 0 80 80" fill="none" stroke="#E8C870" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M20 55 L20 35 Q20 28 28 28 L35 28 L35 20 Q35 12 43 12 Q51 12 51 20 L51 28 L58 28 Q66 28 66 36 L66 55 Q66 68 53 68 L33 68 Q20 68 20 55 Z"/>
+            <path d="M35 28 L35 50"/>
+            <path d="M51 28 L51 50"/>
+            <path d="M20 42 L66 42"/>
+          </svg>
+        </div>
+        <div class="card-titulo" id="t2">CÓMO<br>PIDES</div>
+        <div class="card-sub" id="sub2">lo que necesitas</div>
+      </div>
+    </div>
+
+    <!-- SLIDE 3: TUS EXPECTATIVAS -->
+    <div class="cslide" id="s3">
+      <div class="card-concepto cb" id="c3">
+        <div class="card-icono" id="i3">
+          <svg width="80" height="80" viewBox="0 0 80 80" fill="none" stroke="#E8C870" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+            <circle cx="40" cy="40" r="30"/>
+            <circle cx="40" cy="40" r="18"/>
+            <circle cx="40" cy="40" r="6"/>
+            <line x1="40" y1="10" x2="40" y2="4"/>
+            <line x1="40" y1="70" x2="40" y2="76"/>
+            <line x1="10" y1="40" x2="4" y2="40"/>
+            <line x1="70" y1="40" x2="76" y2="40"/>
+            <line x1="40" y1="22" x2="40" y2="18" stroke-width="4"/>
+          </svg>
+        </div>
+        <div class="card-titulo" id="t3">TUS<br>EXPECTATIVAS</div>
+        <div class="card-sub" id="sub3">lo que esperabas de él</div>
+      </div>
+    </div>
+
+    <!-- SLIDE 4: TUS AMISTADES -->
+    <div class="cslide" id="s4">
+      <div class="card-concepto cd" id="c4">
+        <div class="card-icono" id="i4">
+          <svg width="80" height="80" viewBox="0 0 80 80" fill="none" stroke="#F9F3E8" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+            <circle cx="28" cy="24" r="10"/>
+            <circle cx="52" cy="24" r="10"/>
+            <path d="M8 68 Q8 50 28 50"/>
+            <path d="M72 68 Q72 50 52 50"/>
+            <path d="M28 50 Q40 44 52 50"/>
+            <path d="M28 50 L28 68"/>
+            <path d="M52 50 L52 68"/>
+          </svg>
+        </div>
+        <div class="card-titulo dorado" id="t4">TUS<br>AMISTADES</div>
+        <div class="card-sub" id="sub4">la forma en que te relacionas</div>
+      </div>
+    </div>
+
+    <!-- SLIDE 5: CÓMO TE VISTES -->
+    <div class="cslide" id="s5">
+      <div class="card-concepto co" id="c5">
+        <div class="card-icono" id="i5">
+          <svg width="80" height="80" viewBox="0 0 80 80" fill="none" stroke="#E8C870" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M30 12 Q40 8 50 12 L62 20 L54 30 L54 70 L26 70 L26 30 L18 20 Z"/>
+            <path d="M30 12 Q30 24 40 24 Q50 24 50 12"/>
+            <line x1="34" y1="44" x2="46" y2="44"/>
+            <line x1="34" y1="52" x2="46" y2="52"/>
+          </svg>
+        </div>
+        <div class="card-titulo" id="t5">CÓMO<br>TE VISTES</div>
+        <div class="card-sub" id="sub5">hasta tu imagen</div>
+      </div>
+    </div>
+
+    <!-- SLIDE FINAL: CÓMO OCUPAS EL ESPACIO -->
+    <div class="cslide" id="sf">
+      <div class="card-concepto cv" id="cf" style="min-width:1100px; min-height:480px;">
+        <div class="card-icono" id="if">
+          <svg width="80" height="80" viewBox="0 0 80 80" fill="none" stroke="#E8C870" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+            <rect x="8" y="8" width="64" height="64" rx="4"/>
+            <circle cx="40" cy="36" r="12"/>
+            <path d="M20 68 Q20 54 40 54 Q60 54 60 68"/>
+            <line x1="8" y1="8" x2="20" y2="20" stroke-width="1.5" stroke-dasharray="3,3"/>
+            <line x1="72" y1="8" x2="60" y2="20" stroke-width="1.5" stroke-dasharray="3,3"/>
+          </svg>
+        </div>
+        <div class="card-titulo" id="tf" style="font-size:100px;">CÓMO OCUPAS<br>EL ESPACIO</div>
+        <div class="card-sub" id="subf">...esperando que la relación mejorara</div>
+      </div>
+    </div>
+
+  </div><!-- /stage -->
+</div>
+
+<script>
+document.fonts.ready.then(() => {
+  setTimeout(() => {
+    document.body.classList.add("fonts-loaded");
+    runSequence();
+  }, 1500);
+});
+
+function runSequence() {
+  // Cada item: [slideId, cardId, iconId, titleId, subId, duracion_ms]
+  const pasos = [
+    { id:'si',  card:null, icon:'ig', title:'ig', sub:'ip',   dur:3000  },
+    { id:'s1',  card:'c1', icon:'i1', title:'t1', sub:'sub1', dur:2500  },
+    { id:'s2',  card:'c2', icon:'i2', title:'t2', sub:'sub2', dur:2500  },
+    { id:'s3',  card:'c3', icon:'i3', title:'t3', sub:'sub3', dur:2500  },
+    { id:'s4',  card:'c4', icon:'i4', title:'t4', sub:'sub4', dur:2500  },
+    { id:'s5',  card:'c5', icon:'i5', title:'t5', sub:'sub5', dur:2500  },
+    { id:'sf',  card:'cf', icon:'if', title:'tf', sub:'subf', dur:4000  },
+  ];
+
+  let t = 0;
+  pasos.forEach((paso, idx) => {
+    const slide = document.getElementById(paso.id);
+
+    // Entrada
+    setTimeout(() => {
+      // Si hay slide anterior, empujarlo a la izquierda
+      if (idx > 0) {
+        const prev = document.getElementById(pasos[idx-1].id);
+        prev.style.animation = 'pushToLeft 0.5s cubic-bezier(.4,0,.2,1) forwards';
+      }
+      slide.style.transform = 'translateX(100%)';
+      slide.style.animation = 'pushFromRight 0.5s cubic-bezier(.2,0,.1,1) forwards';
+
+      // Animar contenido interno
+      setTimeout(() => {
+        if (paso.id === 'si') {
+          // Intro especial
+          const ig = document.getElementById('ig');
+          const ip = document.getElementById('ip');
+          ig.style.animation = 'fadeUp 0.5s ease forwards';
+          setTimeout(() => {
+            ip.style.animation = 'fadeUp 0.5s ease forwards';
+          }, 600);
+        } else {
+          const card = document.getElementById(paso.card);
+          const icon = document.getElementById(paso.icon);
+          const title = document.getElementById(paso.title);
+          const sub = document.getElementById(paso.sub);
+          if (card) card.style.animation = 'fadeUp 0.4s ease forwards';
+          setTimeout(() => {
+            if (icon) icon.style.animation = 'iconGlow 0.4s ease forwards';
+          }, 200);
+          setTimeout(() => {
+            if (title) title.style.animation = 'fadeUp 0.4s ease forwards';
+          }, 400);
+          setTimeout(() => {
+            if (sub) sub.style.animation = 'fadeUp 0.4s ease forwards';
+          }, 650);
+        }
+      }, 300);
+
+    }, t);
+
+    t += paso.dur;
+  });
+}
+
+// Keyframes para JS
+const style = document.createElement('style');
+style.textContent = `
+  @keyframes fadeUp {
+    from { opacity:0; transform:translateY(18px); }
+    to   { opacity:1; transform:translateY(0); }
+  }
+  @keyframes iconGlow {
+    from { opacity:0; transform:scale(0.6); }
+    to   { opacity:1; transform:scale(1); }
+  }
+  @keyframes pushFromRight {
+    from { transform:translateX(110%); }
+    to   { transform:translateX(0); }
+  }
+  @keyframes pushToLeft {
+    from { transform:translateX(0); }
+    to   { transform:translateX(-110%); }
+  }
+`;
+document.head.appendChild(style);
+</script>
+</body>
+</html>

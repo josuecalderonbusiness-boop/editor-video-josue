@@ -1,0 +1,115 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<style>body:not(.fonts-loaded) * { animation-play-state: paused !important; transition: none !important; }</style>
+<script>document.fonts.ready.then(() => { setTimeout(() => { document.body.classList.add("fonts-loaded"); }, 1500); });</script>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=1280, height=720">
+<title>Franja noticias — El amor que dura</title>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700;900&family=Cormorant+Garamond:ital,wght@1,400;1,600&display=swap" rel="stylesheet">
+<style>
+  * { margin:0; padding:0; box-sizing:border-box; }
+  body { width:1280px; height:720px; overflow:hidden; background:#00FF00; }
+
+  /* Franja inferior */
+  .franja-wrap {
+    position:absolute; bottom:0; left:0; right:0; height:116px;
+    opacity:0; animation:franjaIn .5s ease-out .3s forwards;
+  }
+  @keyframes franjaIn { to{opacity:1} }
+
+  /* Banda superior de la franja — label */
+  .franja-top {
+    height:36px; background:linear-gradient(90deg, #3D0C11, #6B1A2A);
+    display:flex; align-items:center; padding:0 18px; gap:14px;
+  }
+  .punto-pulso {
+    width:10px; height:10px; border-radius:50%; background:#E8C870;
+    animation:pulseDot 1.2s ease-in-out infinite;
+    flex-shrink:0;
+  }
+  @keyframes pulseDot { 0%,100%{opacity:1;transform:scale(1)} 50%{opacity:.5;transform:scale(.7)} }
+  .franja-label {
+    font-family:'Cormorant Garamond',serif; font-style:italic; font-weight:600;
+    font-size:22px; color:#E8C870; letter-spacing:.12em; text-transform:uppercase;
+    white-space:nowrap;
+  }
+
+  /* Banda principal — texto que se mueve */
+  .franja-main {
+    height:80px; background:rgba(15,10,11,.92);
+    display:flex; align-items:center;
+    overflow:hidden; position:relative;
+  }
+  /* Línea dorada borde superior */
+  .franja-main::before {
+    content:''; position:absolute; top:0; left:0; right:0; height:2px;
+    background:linear-gradient(90deg, #6B1A2A, #E8C870, #D4A843, #E8C870, #6B1A2A);
+  }
+
+  /* Tag fijo izquierdo */
+  .tag-fijo {
+    flex-shrink:0; height:100%;
+    background:linear-gradient(90deg, #6B1A2A, #8B2D3F);
+    display:flex; align-items:center; padding:0 28px;
+    z-index:2; position:relative;
+  }
+  .tag-fijo::after {
+    content:''; position:absolute; right:-14px; top:0; bottom:0;
+    width:28px;
+    background:linear-gradient(90deg, #8B2D3F, transparent);
+  }
+  .tag-texto {
+    font-family:'Playfair Display',serif; font-weight:900;
+    font-size:28px; color:#F9F3E8; letter-spacing:.05em;
+    white-space:nowrap;
+  }
+
+  /* Texto que viaja */
+  .ticker-track {
+    display:flex; align-items:center; height:100%;
+    animation:tickerMove 12s linear 0.8s infinite;
+    white-space:nowrap; padding-left:48px;
+  }
+  @keyframes tickerMove {
+    0%   { transform: translateX(0); }
+    100% { transform: translateX(-50%); }
+  }
+  .ticker-text {
+    font-family:'Cormorant Garamond',serif; font-style:italic; font-weight:600;
+    font-size:52px; color:#F9F3E8; white-space:nowrap;
+    padding-right:120px;
+    text-shadow:0 0 20px rgba(249,243,232,.15);
+  }
+  .ticker-text em {
+    color:#E8C870;
+    animation:goldFlash 3s ease-in-out infinite;
+  }
+  @keyframes goldFlash { 0%,100%{text-shadow:none} 50%{text-shadow:0 0 30px rgba(232,200,112,.8)} }
+  .ticker-sep {
+    color:#E8C870; font-size:40px; padding-right:120px; opacity:.6;
+  }
+</style>
+</head>
+<body>
+
+<div class="franja-wrap">
+  <div class="franja-top">
+    <div class="punto-pulso"></div>
+    <span class="franja-label">Código Soberana · Josué Calderón</span>
+  </div>
+  <div class="franja-main">
+    <div class="tag-fijo">
+      <span class="tag-texto">El Amor</span>
+    </div>
+    <div class="ticker-track">
+      <span class="ticker-text">Y ese es el amor que dura. El que nace de la <em>elección,</em> no del miedo.</span>
+      <span class="ticker-sep">✦</span>
+      <span class="ticker-text">Y ese es el amor que dura. El que nace de la <em>elección,</em> no del miedo.</span>
+      <span class="ticker-sep">✦</span>
+    </div>
+  </div>
+</div>
+
+</body>
+</html>

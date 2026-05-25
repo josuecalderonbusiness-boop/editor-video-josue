@@ -1,0 +1,239 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<style>
+  body:not(.fonts-loaded) * { animation-play-state: paused !important; transition: none !important; }
+</style>
+<script>
+  document.fonts.ready.then(() => {
+    setTimeout(() => { document.body.classList.add("fonts-loaded"); }, 1500);
+  });
+</script>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=1280, height=720">
+<title>anim_l1_an12 — Camino 1-2-3 Logo</title>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,700;0,900;1,500&family=Cormorant+Garamond:ital,wght@1,300;1,400&family=Inter:wght@300;400;500&display=swap" rel="stylesheet">
+<style>
+  * { margin:0; padding:0; box-sizing:border-box; }
+  body { width:1280px; height:720px; overflow:hidden; background:#0F0A0B; }
+
+  .scene {
+    width:1280px; height:720px; position:relative;
+    background:linear-gradient(135deg,#0F0A0B 0%,#1C1114 100%);
+    display:flex; flex-direction:column;
+    align-items:center; justify-content:center;
+    opacity:0; animation:fadeIn .6s ease-out .1s forwards;
+  }
+  @keyframes fadeIn { to{opacity:1} }
+  .scene.out { animation:fadeOut .7s ease-in forwards; }
+  @keyframes fadeOut { to{opacity:0} }
+
+  /* Título */
+  .titulo {
+    font-family:'Cormorant Garamond',Georgia,serif;
+    font-style:italic; font-size:26px; font-weight:300;
+    color:#C97080; letter-spacing:.1em; margin-bottom:48px;
+    opacity:0; animation:fadeIn .5s ease-out .4s forwards;
+  }
+
+  /* Contenedor del camino */
+  .path-container {
+    width:1000px; position:relative;
+    display:flex; align-items:center; justify-content:space-between;
+  }
+
+  /* Línea del camino — se dibuja progresivamente */
+  .path-line {
+    position:absolute; top:50%; left:80px; right:80px;
+    height:6px; transform:translateY(-50%);
+    background:linear-gradient(90deg, #3D0C11, #6B1A2A, #B8892A, #E8C870);
+    border-radius:3px;
+    transform-origin:left center;
+    transform:translateY(-50%) scaleX(0);
+    animation:growPath 1.5s ease-out 1.0s forwards;
+    box-shadow:0 0 15px rgba(232,200,112,.3);
+  }
+  @keyframes growPath { to{transform:translateY(-50%) scaleX(1)} }
+
+  /* Nodos del camino */
+  .node {
+    position:relative; z-index:2;
+    display:flex; flex-direction:column; align-items:center; gap:16px;
+    opacity:0; transform:translateY(20px);
+  }
+  .node:nth-child(2){ animation:riseIn .5s ease-out 1.5s forwards; }
+  .node:nth-child(3){ animation:riseIn .5s ease-out 2.5s forwards; }
+  .node:nth-child(4){ animation:riseIn .5s ease-out 3.5s forwards; }
+
+  @keyframes riseIn { to{opacity:1;transform:translateY(0)} }
+
+  /* Círculo del nodo */
+  .node-circle {
+    width:72px; height:72px; border-radius:50%;
+    background:linear-gradient(135deg,#3D0C11,#6B1A2A);
+    border:2px solid #E8C870;
+    display:flex; align-items:center; justify-content:center;
+    box-shadow:0 0 20px rgba(232,200,112,.4), 0 0 40px rgba(232,200,112,.15);
+  }
+
+  .node-num {
+    font-family:'Playfair Display',Georgia,serif;
+    font-size:30px; font-weight:900; color:#E8C870;
+    text-shadow:0 0 15px rgba(232,200,112,.8);
+  }
+
+  /* Texto del nodo */
+  .node-text {
+    text-align:center; max-width:220px;
+  }
+  .node-title {
+    font-family:'Cormorant Garamond',Georgia,serif;
+    font-style:italic; font-size:20px; font-weight:400;
+    color:#F9F3E8; line-height:1.3; margin-bottom:4px;
+  }
+  .node-sub {
+    font-family:'Inter',sans-serif; font-size:12px; font-weight:300;
+    color:#C97080; letter-spacing:.1em; text-transform:uppercase;
+  }
+
+  /* Gema que estalla */
+  .gem-container {
+    position:absolute; right:-40px; top:50%;
+    transform:translate(0,-50%);
+    z-index:3;
+    opacity:0;
+    animation:gemAppear .3s ease-out 4.5s forwards;
+  }
+
+  @keyframes gemAppear { to{opacity:1} }
+
+  .gem {
+    width:60px; height:60px; position:relative;
+    animation:gemSpin .6s ease-out 4.5s, gemGlow 2s ease-in-out 5.2s infinite;
+  }
+
+  @keyframes gemSpin {
+    0%  { transform:scale(0) rotate(-180deg); }
+    70% { transform:scale(1.3) rotate(10deg); }
+    100%{ transform:scale(1) rotate(0deg); }
+  }
+  @keyframes gemGlow {
+    0%,100%{ filter:drop-shadow(0 0 8px rgba(232,200,112,.8)) drop-shadow(0 0 20px rgba(232,200,112,.4)); }
+    50%    { filter:drop-shadow(0 0 16px rgba(255,248,180,1)) drop-shadow(0 0 40px rgba(232,200,112,.8)); }
+  }
+
+  /* Logo Código Soberana — aparece después de la gema */
+  .logo-reveal {
+    position:absolute; inset:0;
+    display:flex; flex-direction:column;
+    align-items:center; justify-content:center;
+    background:linear-gradient(135deg,#0F0A0B 0%,#1C1114 100%);
+    opacity:0; pointer-events:none;
+    animation:logoReveal .8s ease-out 5.5s forwards;
+    z-index:10;
+  }
+
+  @keyframes logoReveal { to{opacity:1} }
+
+  .logo-codigo {
+    font-family:'Playfair Display',Georgia,serif;
+    font-size:88px; font-weight:900; color:#F9F3E8;
+    line-height:1; letter-spacing:-.01em;
+    text-shadow:0 0 30px rgba(255,255,255,.2);
+  }
+  .logo-soberana {
+    font-family:'Playfair Display',Georgia,serif;
+    font-style:italic; font-size:100px; font-weight:700;
+    color:#E8C870; line-height:.95;
+    text-shadow:
+      0 0 40px rgba(232,200,112,1),
+      0 0 80px rgba(220,180,60,.7),
+      0 0 140px rgba(220,180,60,.35);
+    animation:goldPulse 2.5s ease-in-out 6.3s infinite;
+  }
+  @keyframes goldPulse {
+    0%,100%{text-shadow:0 0 40px rgba(232,200,112,1),0 0 80px rgba(220,180,60,.7),0 0 140px rgba(220,180,60,.35)}
+    50%{text-shadow:0 0 60px rgba(255,248,180,1),0 0 110px rgba(232,200,112,1),0 0 180px rgba(220,180,60,.6)}
+  }
+  .logo-line {
+    width:0; height:2px; margin:16px auto;
+    background:linear-gradient(90deg,transparent,#E8C870,#D4A843,#E8C870,transparent);
+    animation:lineGrow .6s ease-out 6.3s forwards;
+  }
+  @keyframes lineGrow { to{width:260px} }
+  .logo-tag {
+    font-family:'Inter',sans-serif; font-size:16px; font-weight:300;
+    color:#C97080; letter-spacing:.25em; text-transform:uppercase;
+    opacity:0; animation:fadeIn .5s ease-out 6.8s forwards;
+  }
+  @keyframes fadeIn { to{opacity:1} }
+</style>
+</head>
+<body>
+<div class="scene" id="scene">
+
+  <p class="titulo">Por eso esto no es una teoría más.</p>
+
+  <div class="path-container">
+
+    <!-- Línea del camino -->
+    <div class="path-line"></div>
+
+    <!-- Nodo 1 -->
+    <div class="node">
+      <div class="node-circle"><span class="node-num">1</span></div>
+      <div class="node-text">
+        <p class="node-title">Consejería de parejas</p>
+        <p class="node-sub">Mi experiencia directa</p>
+      </div>
+    </div>
+
+    <!-- Nodo 2 -->
+    <div class="node">
+      <div class="node-circle"><span class="node-num">2</span></div>
+      <div class="node-text">
+        <p class="node-title">Desarrollo de mi esposa</p>
+        <p class="node-sub">Lo que transformó todo</p>
+      </div>
+    </div>
+
+    <!-- Nodo 3 -->
+    <div class="node">
+      <div class="node-circle"><span class="node-num">3</span></div>
+      <div class="node-text">
+        <p class="node-title">Mi desarrollo personal</p>
+        <p class="node-sub">Familia inquebrantable</p>
+      </div>
+    </div>
+
+    <!-- Gema que estalla -->
+    <div class="gem-container">
+      <svg class="gem" viewBox="0 0 60 60" xmlns="http://www.w3.org/2000/svg">
+        <polygon points="30,5 55,20 55,40 30,55 5,40 5,20" fill="none" stroke="#E8C870" stroke-width="1.5"
+          style="filter:drop-shadow(0 0 6px rgba(232,200,112,.8))"/>
+        <polygon points="30,12 48,22 48,38 30,48 12,38 12,22" fill="rgba(232,200,112,.15)" stroke="#D4A843" stroke-width="1"/>
+        <line x1="30" y1="5" x2="30" y2="55" stroke="#E8C870" stroke-width=".8" opacity=".4"/>
+        <line x1="5" y1="20" x2="55" y2="40" stroke="#E8C870" stroke-width=".8" opacity=".4"/>
+        <line x1="5" y1="40" x2="55" y2="20" stroke="#E8C870" stroke-width=".8" opacity=".4"/>
+        <circle cx="30" cy="30" r="4" fill="#E8C870" opacity=".8"
+          style="filter:drop-shadow(0 0 4px rgba(232,200,112,1))"/>
+      </svg>
+    </div>
+
+  </div>
+
+  <!-- Logo reveal -->
+  <div class="logo-reveal">
+    <div class="logo-codigo">Código</div>
+    <div class="logo-soberana">Soberana</div>
+    <div class="logo-line"></div>
+    <p class="logo-tag">Un sistema. Desde adentro.</p>
+  </div>
+
+</div>
+<script>
+  const DURACION_MS = 18000;
+  setTimeout(() => { document.getElementById('scene').classList.add('out'); }, DURACION_MS);
+</script>
+</body>
+</html>

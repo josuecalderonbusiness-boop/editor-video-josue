@@ -1,0 +1,351 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=1280, height=720">
+<title>La historia que tu mente escribió en tres segundos</title>
+<link href="https://fonts.googleapis.com/css2?family=Dancing+Script:wght@400;700&family=Playfair+Display:ital,wght@1,400;1,700&family=Inter:wght@300;400&display=swap" rel="stylesheet">
+<style>
+* { margin: 0; padding: 0; box-sizing: border-box; }
+
+body {
+  width: 1280px;
+  height: 720px;
+  overflow: hidden;
+  background: #F5EDD8;
+  position: relative;
+  font-family: 'Inter', sans-serif;
+}
+
+/* Textura de papel */
+body::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background-image:
+    repeating-linear-gradient(
+      transparent,
+      transparent 47px,
+      rgba(160,130,80,.18) 47px,
+      rgba(160,130,80,.18) 49px
+    );
+  background-size: 100% 48px;
+  pointer-events: none;
+  z-index: 0;
+}
+
+/* Margen izquierdo tipo hoja de cuaderno */
+body::after {
+  content: '';
+  position: absolute;
+  left: 110px;
+  top: 0; bottom: 0;
+  width: 2px;
+  background: rgba(210,100,100,.25);
+  z-index: 1;
+}
+
+/* Borde superior dorado */
+.borde-sup {
+  position: absolute; top: 0; left: 0; right: 0; height: 5px;
+  background: linear-gradient(90deg, #E8C870, #D4A843 50%, #E8C870);
+  z-index: 10;
+}
+.borde-izq {
+  position: absolute; left: 0; top: 0; bottom: 0; width: 7px;
+  background: linear-gradient(180deg, #6B1A2A, #3D0C11 50%, #8B2D3F);
+  z-index: 10;
+}
+
+/* ══════════════════════════════
+   RELOJ ANALÓGICO
+   ══════════════════════════════ */
+#reloj-wrap {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  transform: translate(-50%, -50%);
+  z-index: 5;
+  opacity: 0;
+  animation: relojIn .8s ease forwards .3s, relojOut .6s ease forwards 4.5s;
+}
+@keyframes relojIn  { to { opacity: 1; } }
+@keyframes relojOut { to { opacity: 0; transform: translate(-50%, -50%) scale(.92); } }
+
+#reloj-wrap svg {
+  filter: drop-shadow(0 4px 18px rgba(61,12,17,.12));
+}
+
+/* Manecilla de segundos: gira 3 segundos = 18deg/s × 3 = 54deg
+   pero en cámara lenta visual: animamos 3 vueltas en 4s para que parezca que corre */
+#segundero {
+  transform-origin: 150px 150px;
+  animation: giraSegundero 2s linear forwards .4s;
+}
+@keyframes giraSegundero {
+  from { transform: rotate(0deg); }
+  to   { transform: rotate(1080deg); } /* 3 vueltas = 3 segundos acelerado */
+}
+
+/* Manecilla de minutos: movimiento muy sutil */
+#minutero {
+  transform-origin: 150px 150px;
+  animation: giraMinutero 4s linear forwards .5s;
+}
+@keyframes giraMinutero {
+  from { transform: rotate(0deg); }
+  to   { transform: rotate(18deg); }
+}
+
+/* ══════════════════════════════
+   HOJA / PAPEL
+   ══════════════════════════════ */
+#hoja-wrap {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 6;
+  opacity: 0;
+  animation: hojaIn .7s ease forwards 5.2s;
+}
+@keyframes hojaIn {
+  from { opacity: 0; transform: translateY(20px) rotate(-1deg); }
+  to   { opacity: 1; transform: translateY(0) rotate(-1deg); }
+}
+
+.hoja {
+  width: 820px;
+  background: #FFFEF8;
+  border-radius: 4px;
+  padding: 60px 80px 70px 90px;
+  position: relative;
+  box-shadow: 3px 4px 28px rgba(61,12,17,.13), 0 1px 4px rgba(61,12,17,.07);
+}
+
+/* Líneas de la hoja */
+.hoja::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  border-radius: 4px;
+  background-image:
+    repeating-linear-gradient(
+      transparent,
+      transparent 47px,
+      rgba(160,130,80,.2) 47px,
+      rgba(160,130,80,.2) 49px
+    );
+  background-size: 100% 48px;
+  pointer-events: none;
+}
+
+/* Margen rojo de la hoja */
+.hoja::after {
+  content: '';
+  position: absolute;
+  left: 72px; top: 0; bottom: 0;
+  width: 1.5px;
+  background: rgba(210,80,80,.2);
+}
+
+/* Espiral de la hoja */
+.espiral {
+  position: absolute;
+  left: -18px;
+  top: 0; bottom: 0;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-evenly;
+  padding: 20px 0;
+  z-index: 2;
+}
+.espiral-anillo {
+  width: 22px;
+  height: 22px;
+  border: 2.5px solid rgba(140,100,40,.4);
+  border-radius: 50%;
+  background: transparent;
+  flex-shrink: 0;
+}
+
+/* ══════════════════════════════
+   TEXTO CURSIVO — SVG path drawing
+   ══════════════════════════════ */
+.texto-wrap {
+  position: relative;
+  z-index: 3;
+}
+
+/* Líneas de texto cursivo */
+.linea-txt {
+  font-family: 'Dancing Script', cursive;
+  font-size: 62px;
+  line-height: 1.35;
+  color: #1a0a05;
+  display: block;
+  white-space: normal;
+  opacity: 0;
+  position: relative;
+}
+
+.linea-txt:nth-child(1) { animation: escritura .8s ease forwards 5.8s; font-size: 64px; }
+.linea-txt:nth-child(2) { animation: escritura .8s ease forwards 6.6s; font-size: 64px; }
+.linea-txt:nth-child(3) { animation: escritura .8s ease forwards 7.4s; font-size: 64px; }
+.linea-txt:nth-child(4) { animation: escritura .8s ease forwards 8.2s; font-size: 64px; color: #6B1A2A; font-weight: 700; }
+.linea-txt:nth-child(5) { animation: escritura .8s ease forwards 9.0s; font-size: 44px; }
+
+@keyframes escritura {
+  from { opacity: 0; clip-path: inset(0 100% 0 0); }
+  to   { opacity: 1; clip-path: inset(0 0% 0 0); }
+}
+
+/* Underline decorativo en la línea 4 */
+.linea-txt:nth-child(4)::after {
+  content: '';
+  position: absolute;
+  bottom: 2px; left: 0;
+  width: 0;
+  height: 3px;
+  background: #D4A843;
+  border-radius: 2px;
+  animation: underlineCrece .5s ease forwards 9.6s;
+}
+@keyframes underlineCrece { to { width: 100%; } }
+
+/* ══════════════════════════════
+   TAG "3 segundos" — reloj pequeño
+   ══════════════════════════════ */
+.tag-tiempo {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  font-family: 'Inter', sans-serif;
+  font-size: 11px;
+  letter-spacing: 4px;
+  text-transform: uppercase;
+  color: rgba(107,26,42,.5);
+  margin-bottom: 18px;
+  opacity: 0;
+  animation: fadeIn .5s ease forwards 5.6s;
+}
+@keyframes fadeIn { to { opacity: 1; } }
+
+.tag-tiempo svg {
+  opacity: .5;
+}
+</style>
+</head>
+<body>
+
+<div class="borde-sup"></div>
+<div class="borde-izq"></div>
+
+<!-- ══════════════════════════════
+     RELOJ ANALÓGICO
+     ══════════════════════════════ -->
+<div id="reloj-wrap">
+  <svg width="300" height="300" viewBox="0 0 300 300" xmlns="http://www.w3.org/2000/svg">
+    <!-- Sombra/fondo del reloj -->
+    <circle cx="150" cy="150" r="138" fill="#FFFEF8" stroke="#C8A96E" stroke-width="3"/>
+    <!-- Borde exterior -->
+    <circle cx="150" cy="150" r="142" fill="none" stroke="#8B6520" stroke-width="2.5" opacity=".3"/>
+
+    <!-- Marcas de horas -->
+    <g stroke="#3D0C11" stroke-linecap="round">
+      <!-- 12 -->  <line x1="150" y1="22"  x2="150" y2="40"  stroke-width="3.5"/>
+      <!-- 3  -->  <line x1="278" y1="150" x2="260" y2="150" stroke-width="3.5"/>
+      <!-- 6  -->  <line x1="150" y1="278" x2="150" y2="260" stroke-width="3.5"/>
+      <!-- 9  -->  <line x1="22"  y1="150" x2="40"  y2="150" stroke-width="3.5"/>
+      <!-- resto minutos -->
+      <line x1="222" y1="31"  x2="215" y2="43"  stroke-width="1.5" opacity=".4"/>
+      <line x1="269" y1="78"  x2="257" y2="85"  stroke-width="1.5" opacity=".4"/>
+      <line x1="269" y1="222" x2="257" y2="215" stroke-width="1.5" opacity=".4"/>
+      <line x1="222" y1="269" x2="215" y2="257" stroke-width="1.5" opacity=".4"/>
+      <line x1="78"  y1="269" x2="85"  y2="257" stroke-width="1.5" opacity=".4"/>
+      <line x1="31"  y1="222" x2="43"  y2="215" stroke-width="1.5" opacity=".4"/>
+      <line x1="31"  y1="78"  x2="43"  y2="85"  stroke-width="1.5" opacity=".4"/>
+      <line x1="78"  y1="31"  x2="85"  y2="43"  stroke-width="1.5" opacity=".4"/>
+    </g>
+
+    <!-- Números del reloj -->
+    <g font-family="'Playfair Display', serif" font-size="22" fill="#3D0C11" text-anchor="middle" dominant-baseline="central">
+      <text x="150" y="58">12</text>
+      <text x="242" y="150">3</text>
+      <text x="150" y="242">6</text>
+      <text x="58"  y="150">9</text>
+    </g>
+
+    <!-- Manecilla de horas (apuntando ~10) -->
+    <line x1="150" y1="150" x2="110" y2="90"
+          stroke="#3D0C11" stroke-width="5" stroke-linecap="round"/>
+
+    <!-- Manecilla de minutos -->
+    <g id="minutero">
+      <line x1="150" y1="150" x2="150" y2="55"
+            stroke="#3D0C11" stroke-width="3.5" stroke-linecap="round"/>
+    </g>
+
+    <!-- Segundero (rojo, gira 3 vueltas) -->
+    <g id="segundero">
+      <line x1="150" y1="150" x2="150" y2="38"
+            stroke="#8B2D3F" stroke-width="2" stroke-linecap="round"/>
+      <line x1="150" y1="150" x2="150" y2="178"
+            stroke="#8B2D3F" stroke-width="2" stroke-linecap="round" opacity=".5"/>
+    </g>
+
+    <!-- Centro del reloj -->
+    <circle cx="150" cy="150" r="7" fill="#3D0C11"/>
+    <circle cx="150" cy="150" r="3" fill="#8B2D3F"/>
+
+    <!-- Texto "× 3 seg" bajo el centro -->
+    <text x="150" y="200" font-family="'Inter', sans-serif" font-size="13"
+          fill="rgba(107,26,42,.45)" text-anchor="middle" letter-spacing="3">EN 3 SEGUNDOS</text>
+  </svg>
+</div>
+
+<!-- ══════════════════════════════
+     HOJA CON TEXTO
+     ══════════════════════════════ -->
+<div id="hoja-wrap">
+  <div class="hoja">
+
+    <!-- Espiral -->
+    <div class="espiral">
+      <div class="espiral-anillo"></div>
+      <div class="espiral-anillo"></div>
+      <div class="espiral-anillo"></div>
+      <div class="espiral-anillo"></div>
+      <div class="espiral-anillo"></div>
+      <div class="espiral-anillo"></div>
+      <div class="espiral-anillo"></div>
+      <div class="espiral-anillo"></div>
+    </div>
+
+    <div class="texto-wrap">
+      <!-- Tag superior -->
+      <div class="tag-tiempo">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#6B1A2A" stroke-width="2">
+          <circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/>
+        </svg>
+        en tan solo 3 segundos
+      </div>
+
+      <!-- Líneas de texto cursivo -->
+      <span class="linea-txt">La historia que tu mente</span>
+      <span class="linea-txt">escribió sobre lo que</span>
+      <span class="linea-txt">eso significa para</span>
+      <span class="linea-txt">tu lugar en su vida.</span>
+      <span class="linea-txt" style="font-size:44px; color:rgba(61,12,17,.42); margin-top:6px;">— sin que nadie se la pidiera.</span>
+    </div>
+
+  </div>
+</div>
+
+<script>
+  document.body.addEventListener('click', () => location.reload());
+</script>
+
+</body>
+</html>

@@ -1,0 +1,681 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<style>
+  body:not(.fonts-loaded) * { animation-play-state: paused !important; transition: none !important; }
+</style>
+<script>
+  document.fonts.ready.then(() => {
+    setTimeout(() => { document.body.classList.add("fonts-loaded"); }, 1500);
+  });
+</script>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=1280, height=720">
+<title>El Patrón — Pizarra Conceptual</title>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,900;1,900;1,400&family=Cormorant+Garamond:ital,wght@1,400;1,600&display=swap" rel="stylesheet">
+<style>
+* { margin:0; padding:0; box-sizing:border-box; }
+body { width:1280px; height:720px; overflow:hidden; background:#F0E8D5; }
+
+/* ── PIZARRA BASE ── */
+.pizarra {
+  position:absolute; inset:0;
+  background:#F0E8D5;
+  background-image:
+    linear-gradient(rgba(139,100,60,.11) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(139,100,60,.11) 1px, transparent 1px);
+  background-size:56px 56px;
+}
+.pizarra::before {
+  content:''; position:absolute; left:0; top:0; bottom:0; width:8px;
+  background:linear-gradient(180deg, #3D0C11, #6B1A2A, #3D0C11);
+}
+.pizarra::after {
+  content:''; position:absolute; top:0; left:0; right:0; height:4px;
+  background:linear-gradient(90deg, #6B1A2A, #E8C870, #E8C870, #6B1A2A);
+}
+.papel {
+  position:absolute; inset:0; pointer-events:none;
+  background:
+    radial-gradient(ellipse at 20% 50%, rgba(255,245,220,.5) 0%, transparent 55%),
+    radial-gradient(ellipse at 80% 50%, rgba(220,200,160,.25) 0%, transparent 55%);
+}
+.barra-izq { position:absolute; left:0; top:0; bottom:0; width:8px; overflow:hidden; }
+.barra-fill {
+  position:absolute; left:0; right:0; bottom:0; height:0;
+  background:linear-gradient(0deg, #3D0C11, #6B1A2A, #3D0C11);
+  animation: barraCrece 1.2s ease-out .1s forwards;
+}
+
+/* ── KEYFRAMES ── */
+@keyframes barraCrece   { to { height:100%; opacity:1; } }
+@keyframes cardIn {
+  0%   { opacity:0; transform:translateY(65px) rotate(-1.5deg) scale(.93); }
+  65%  { transform:translateY(-9px) rotate(.4deg) scale(1.015); }
+  100% { opacity:1; transform:translateY(0) rotate(0deg) scale(1); }
+}
+@keyframes cardOut {
+  0%   { opacity:1; transform:translateY(0) scale(1); }
+  100% { opacity:0; transform:translateY(-65px) scale(.94); }
+}
+@keyframes fadeIn   { to { opacity:1; } }
+@keyframes fadeBlur { 0%{opacity:0;filter:blur(8px);} 100%{opacity:1;filter:blur(0);} }
+@keyframes lineGrow { 0%{width:0;opacity:0;} 100%{width:100%;opacity:1;} }
+@keyframes drawSVG  { to { stroke-dashoffset:0; } }
+@keyframes checkDraw{ to { stroke-dashoffset:0; } }
+@keyframes pulseGold {
+  0%,100% { filter:drop-shadow(0 0 12px rgba(232,200,112,.5)); }
+  50%      { filter:drop-shadow(0 0 28px rgba(232,200,112,1)); }
+}
+@keyframes spark {
+  0%   { opacity:0; transform:scale(0) rotate(0deg); }
+  40%  { opacity:1; transform:scale(1.3) rotate(180deg); }
+  70%  { opacity:1; transform:scale(1) rotate(300deg); }
+  100% { opacity:0; transform:scale(.4) rotate(420deg); }
+}
+@keyframes loopSpin {
+  from { transform:rotate(0deg); }
+  to   { transform:rotate(360deg); }
+}
+@keyframes blink {
+  0%,100% { opacity:1; } 50% { opacity:.2; }
+}
+@keyframes strokePulse {
+  0%,100% { stroke-opacity:.3; } 50% { stroke-opacity:.9; }
+}
+
+/* ── SLIDES ── */
+.slide {
+  position:absolute; inset:0;
+  display:flex; align-items:center; justify-content:center;
+  z-index:2;
+}
+
+/* ── TARJETA ── */
+.card {
+  border-radius:18px;
+  box-shadow: 7px 9px 0px rgba(61,12,17,.28), 0 24px 55px rgba(61,12,17,.18);
+  display:flex; flex-direction:row; align-items:center;
+  position:relative; overflow:visible;
+  opacity:0;
+  animation: cardIn .6s cubic-bezier(.2,0,.1,1) .3s forwards;
+}
+.card::after {
+  content:''; position:absolute; inset:-1px; border-radius:19px;
+  box-shadow:inset 0 0 0 1px rgba(255,255,255,.1); pointer-events:none;
+}
+.card-vino  { background:linear-gradient(135deg, #3D0C11, #6B1A2A); }
+.card-negro { background:linear-gradient(135deg, #0F0A0B, #1C1114); }
+.card-medio { background:linear-gradient(135deg, #1A0810, #3D0C11); }
+
+/* ── LADO TEXTO ── */
+.txt-lado {
+  padding:48px 56px 48px 64px;
+  display:flex; flex-direction:column; justify-content:center;
+  min-width:520px;
+}
+.tag {
+  font-family:'Playfair Display',serif; font-weight:900;
+  font-size:16px; letter-spacing:.3em; color:rgba(255,255,255,.2);
+  margin-bottom:16px;
+  opacity:0; animation:fadeIn .3s ease-out .65s forwards;
+}
+.palabra {
+  font-family:'Playfair Display',serif; font-weight:900;
+  font-size:148px; color:#F9F3E8; line-height:.82;
+  text-shadow:0 4px 28px rgba(0,0,0,.3);
+}
+.contexto {
+  font-family:'Cormorant Garamond',serif; font-style:italic;
+  font-size:48px; color:rgba(249,243,232,.65);
+  margin-top:14px; line-height:1.18;
+  opacity:0; animation:fadeIn .4s ease-out .8s forwards;
+}
+.linea-card {
+  height:3px; background:rgba(232,200,112,.5);
+  border-radius:2px; margin:22px 0 0;
+  width:0; animation:lineGrow .5s ease-out .95s forwards;
+}
+
+/* ── LADO SVG ── */
+.svg-lado {
+  width:420px; flex-shrink:0;
+  display:flex; align-items:center; justify-content:center;
+  padding:40px 48px 40px 24px;
+  position:relative;
+}
+
+/* ── CHECK ESQUINA ── */
+.check-wrap {
+  position:absolute; bottom:28px; right:36px;
+  opacity:0; animation:fadeIn .3s ease-out 1.5s forwards;
+}
+.check-circle {
+  fill:none; stroke:rgba(232,200,112,.6); stroke-width:1.8;
+  stroke-dasharray:110; stroke-dashoffset:110;
+  animation:checkDraw .5s ease-out 1.5s forwards;
+}
+.check-mark {
+  fill:none; stroke:#F9F3E8; stroke-width:2.5;
+  stroke-linecap:round; stroke-linejoin:round;
+  stroke-dasharray:30; stroke-dashoffset:30;
+  animation:checkDraw .35s ease-out 1.9s forwards;
+}
+
+/* ══════════════════════════════════
+   SLIDE 0: TÍTULO sobre pizarra
+══════════════════════════════════ */
+#s0 { opacity:0; animation:fadeIn .5s ease-out .2s forwards; }
+#s0 .titulo-intro {
+  font-family:'Playfair Display',serif; font-weight:900; font-style:italic;
+  font-size:108px; color:#3D0C11; text-align:center; line-height:.95;
+  opacity:0; animation:cardIn .65s cubic-bezier(.2,0,.1,1) .35s forwards;
+  text-shadow: 3px 4px 0 rgba(61,12,17,.1);
+}
+#s0 .linea-s0 {
+  height:5px; width:0;
+  background:linear-gradient(90deg, #6B1A2A, #E8C870, #6B1A2A);
+  border-radius:3px; margin:24px auto 0;
+  animation: lineGrow .6s ease-out 1s forwards;
+}
+
+/* ══════════════════════════════════
+   SLIDE 1: EL PATRÓN — bucle que se repite
+   SVG: loop con flechas girando en círculo
+══════════════════════════════════ */
+#s1 .palabra { font-size:130px; }
+
+/* el arco del loop */
+.arc-path {
+  fill:none; stroke:#E8C870; stroke-width:3;
+  stroke-dasharray:320; stroke-dashoffset:320;
+  animation: drawSVG 1.1s cubic-bezier(.4,0,.2,1) .5s forwards;
+}
+.arc-arrow1, .arc-arrow2 {
+  fill:none; stroke:#E8C870; stroke-width:2.5;
+  stroke-linecap:round; stroke-linejoin:round;
+  stroke-dasharray:24; stroke-dashoffset:24;
+  animation: drawSVG .3s ease-out 1.4s forwards;
+}
+.arc-arrow2 { animation-delay:1.5s; }
+
+/* nodo central — la persona */
+.nodo-persona {
+  fill:none; stroke:rgba(249,243,232,.25); stroke-width:1.5;
+  stroke-dasharray:200; stroke-dashoffset:200;
+  animation: drawSVG .8s ease-out .6s forwards;
+}
+.nodo-fill {
+  fill:rgba(61,12,17,.6);
+}
+
+/* etiquetas en el loop */
+.loop-tag {
+  font-family:'Cormorant Garamond',serif; font-style:italic;
+  fill:rgba(249,243,232,.5); font-size:22px;
+  opacity:0;
+}
+.loop-tag-1 { animation: fadeIn .3s ease-out 1.2s forwards; }
+.loop-tag-2 { animation: fadeIn .3s ease-out 1.35s forwards; }
+.loop-tag-3 { animation: fadeIn .3s ease-out 1.5s forwards; }
+
+/* chispa que dispara el loop */
+.chispa-star {
+  fill:none; stroke:#E8C870; stroke-width:2;
+  stroke-linecap:round;
+  stroke-dasharray:80; stroke-dashoffset:80;
+  animation: drawSVG .4s ease-out 1.1s forwards;
+}
+.chispa-glow {
+  fill:#E8C870; opacity:0;
+  animation: spark 0.6s ease-out 1.3s forwards;
+}
+
+/* ══════════════════════════════════
+   SLIDE 2: EL GATILLO — lo que antes la disparaba
+   SVG: chispa/trigger que llega a un punto
+══════════════════════════════════ */
+#s2 .palabra { font-size:130px; }
+
+.trigger-cable {
+  fill:none; stroke:rgba(201,112,128,.7); stroke-width:2.5;
+  stroke-linecap:round;
+  stroke-dasharray:180; stroke-dashoffset:180;
+  animation: drawSVG .7s ease-out .5s forwards;
+}
+.trigger-cable2 {
+  fill:none; stroke:rgba(201,112,128,.4); stroke-width:1.5;
+  stroke-linecap:round; stroke-dasharray:90; stroke-dashoffset:90;
+  animation: drawSVG .5s ease-out .7s forwards;
+}
+
+.trigger-bolt {
+  fill:none; stroke:#E8C870; stroke-width:2.8;
+  stroke-linecap:round; stroke-linejoin:round;
+  stroke-dasharray:120; stroke-dashoffset:120;
+  animation: drawSVG .5s ease-out .9s forwards;
+}
+.trigger-bolt-glow {
+  fill:#E8C870; opacity:0;
+  animation: spark .7s ease-out 1.3s forwards;
+  transform-origin:50% 50%;
+}
+
+.bolt-label {
+  font-family:'Cormorant Garamond',serif; font-style:italic;
+  fill:rgba(249,243,232,.55); font-size:20px;
+  opacity:0; animation:fadeIn .3s ease-out 1.0s forwards;
+}
+
+/* receptor — la reacción vieja */
+.receptor-ring {
+  fill:none; stroke:rgba(139,45,63,.6); stroke-width:2;
+  stroke-dasharray:160; stroke-dashoffset:160;
+  animation: drawSVG .6s ease-out 1.1s forwards;
+}
+.receptor-fill { fill:rgba(61,12,17,.5); }
+.receptor-signal {
+  fill:none; stroke:#C97080; stroke-width:1.8;
+  stroke-dasharray:50; stroke-dashoffset:50;
+  animation: drawSVG .4s ease-out 1.5s forwards;
+}
+
+/* ══════════════════════════════════
+   SLIDE 3: APAGADO — el gatillo llega pero no prende
+   SVG: misma chispa, pero el receptor tiene un corte — circuito abierto
+══════════════════════════════════ */
+#s3 .palabra { font-size:130px; color:#E8C870; }
+
+/* cable cortado */
+.cable-vivo {
+  fill:none; stroke:rgba(232,200,112,.7); stroke-width:2.5;
+  stroke-linecap:round;
+  stroke-dasharray:100; stroke-dashoffset:100;
+  animation: drawSVG .5s ease-out .5s forwards;
+}
+.cable-muerto {
+  fill:none; stroke:rgba(249,243,232,.18); stroke-width:2.5;
+  stroke-linecap:round; stroke-dasharray:80; stroke-dashoffset:80;
+  animation: drawSVG .4s ease-out .9s forwards;
+}
+/* gap visible — el corte */
+.gap-line {
+  stroke:rgba(232,200,112,.9); stroke-width:3;
+  stroke-linecap:round;
+  stroke-dasharray:20; stroke-dashoffset:20;
+  animation: drawSVG .3s ease-out 1.1s forwards;
+}
+
+/* chispa que NO llega */
+.chispa-muerta {
+  fill:rgba(232,200,112,.5); opacity:0;
+  animation: spark .5s ease-out 1.2s forwards;
+}
+
+/* receptor apagado */
+.receptor-off {
+  fill:none; stroke:rgba(249,243,232,.12); stroke-width:2;
+  stroke-dasharray:160; stroke-dashoffset:160;
+  animation: drawSVG .6s ease-out .7s forwards;
+}
+.receptor-off-fill { fill:rgba(0,0,0,.4); }
+
+/* X en el receptor */
+.x-off {
+  stroke:rgba(201,112,128,.7); stroke-width:2.5;
+  stroke-linecap:round;
+  stroke-dasharray:30; stroke-dashoffset:30;
+}
+.x1 { animation: drawSVG .25s ease-out 1.35s forwards; }
+.x2 { animation: drawSVG .25s ease-out 1.5s forwards; }
+
+/* ELLA — texto en SVG */
+.ella-txt {
+  font-family:'Playfair Display',serif; font-weight:900; font-style:italic;
+  fill:rgba(249,243,232,.8); font-size:26px;
+  opacity:0; animation:fadeIn .4s ease-out .8s forwards;
+}
+.ella-ring {
+  fill:none; stroke:rgba(249,243,232,.2); stroke-width:1.5;
+  stroke-dasharray:200; stroke-dashoffset:200;
+  animation: drawSVG .8s ease-out .6s forwards;
+}
+
+/* ══════════════════════════════════
+   SLIDE FINAL
+══════════════════════════════════ */
+#sfinal .card {
+  flex-direction:column; align-items:center; text-align:center;
+  min-width:1060px; padding:56px 88px;
+  animation: cardIn .7s ease-out .3s forwards;
+}
+#sfinal .label-final {
+  font-family:'Cormorant Garamond',serif; font-style:italic;
+  font-size:30px; color:rgba(232,200,112,.6);
+  letter-spacing:.12em; margin-bottom:20px;
+  opacity:0; animation:fadeIn .4s ease-out .7s forwards;
+}
+#sfinal .frase-final {
+  font-family:'Playfair Display',serif; font-weight:900;
+  font-size:72px; color:#F9F3E8; line-height:1.08;
+}
+#sfinal .frase-final em { color:#E8C870; font-style:italic; }
+#sfinal .linea-final {
+  height:3px; width:0; margin:26px auto 0;
+  background:linear-gradient(90deg, transparent, #E8C870, transparent);
+  border-radius:2px;
+  animation:lineGrow .6s ease-out 1.05s forwards;
+}
+#sfinal .firma {
+  font-family:'Cormorant Garamond',serif; font-style:italic;
+  font-size:32px; color:rgba(232,200,112,.65);
+  margin-top:22px;
+  opacity:0; animation:fadeIn .4s ease-out 1.3s forwards;
+}
+</style>
+</head>
+<body>
+
+<div class="pizarra"></div>
+<div class="papel"></div>
+<div class="barra-izq"><div class="barra-fill"></div></div>
+
+<!-- ══════════════════════════
+     SLIDE 0: TÍTULO
+══════════════════════════ -->
+<div class="slide" id="s0">
+  <div style="text-align:center;">
+    <p class="titulo-intro">el patrón<br>que activaba<br>los conflictos</p>
+    <div class="linea-s0" style="max-width:640px;"></div>
+  </div>
+</div>
+
+<!-- ══════════════════════════
+     SLIDE 1: EL PATRÓN — loop que se repite
+     SVG: círculo de flechas que forma un bucle infinito, etiquetas trigger→reacción→conflicto
+══════════════════════════ -->
+<div class="slide" id="s1">
+  <div class="card card-vino" style="min-width:1100px;">
+    <div class="txt-lado">
+      <div class="tag">01 — LO QUE EXISTÍA</div>
+      <div class="palabra">EL<br>BUCLE</div>
+      <div class="contexto">el mismo ciclo.<br>siempre.</div>
+      <div class="linea-card"></div>
+    </div>
+
+    <div class="svg-lado">
+      <!-- Bucle de 3 nodos: GATILLO → REACCIÓN → CONFLICTO → (vuelta) -->
+      <svg width="360" height="330" viewBox="0 0 360 330" fill="none">
+
+        <!-- ARCO superior: GATILLO → REACCIÓN -->
+        <path class="arc-path" d="M 70 165 A 120 120 0 0 1 290 165" />
+        <!-- ARCO inferior: REACCIÓN → CONFLICTO → GATILLO -->
+        <path class="arc-path" d="M 290 165 A 120 120 0 0 1 70 165"
+              style="animation-delay:.7s;" />
+
+        <!-- Flecha en arco superior (en 290,165 apuntando a abajo-izq) -->
+        <polyline class="arc-arrow1"
+          points="280,152 292,166 276,172" />
+        <!-- Flecha en arco inferior (en 70,165 apuntando a arriba-der) -->
+        <polyline class="arc-arrow2"
+          points="82,178 70,164 86,158" />
+
+        <!-- NODO 1: GATILLO — izquierda -->
+        <circle class="nodo-persona" cx="70" cy="165" r="44"/>
+        <circle class="nodo-fill" cx="70" cy="165" r="43"/>
+        <text class="loop-tag loop-tag-1" x="70" y="160" text-anchor="middle">gatillo</text>
+        <text class="loop-tag loop-tag-1" x="70" y="183" text-anchor="middle"
+              style="font-size:17px;fill:rgba(249,243,232,.3);">estímulo</text>
+
+        <!-- NODO 2: REACCIÓN — derecha -->
+        <circle class="nodo-persona" cx="290" cy="165" r="44"
+                style="animation-delay:.65s;"/>
+        <circle class="nodo-fill" cx="290" cy="165" r="43"/>
+        <text class="loop-tag loop-tag-2" x="290" y="160" text-anchor="middle">reacción</text>
+        <text class="loop-tag loop-tag-2" x="290" y="183" text-anchor="middle"
+              style="font-size:17px;fill:rgba(249,243,232,.3);">automática</text>
+
+        <!-- Rayo/chispa que conecta los nodos — símbolo de activación -->
+        <polyline class="chispa-star"
+          points="148,155 162,170 150,170 168,188 156,188 180,215"
+          stroke="#E8C870" stroke-width="2.5" stroke-linejoin="round"/>
+
+        <!-- Destellos de luz en el rayo -->
+        <circle class="chispa-glow" cx="162" cy="170" r="6"
+                style="animation-delay:1.4s;"/>
+        <circle class="chispa-glow" cx="168" cy="188" r="5"
+                style="animation-delay:1.55s;"/>
+
+        <!-- Label "CONFLICTO" arriba -->
+        <text class="loop-tag loop-tag-3" x="180" y="62" text-anchor="middle"
+              style="font-size:19px;fill:rgba(201,112,128,.7);letter-spacing:.15em;">
+          CONFLICTO
+        </text>
+        <!-- Líneas decorativas arriba indicando la cima del loop -->
+        <line x1="130" y1="70" x2="230" y2="70"
+              stroke="rgba(201,112,128,.3)" stroke-width="1.2"
+              stroke-dasharray="120" stroke-dashoffset="120"
+              style="animation:drawSVG .5s ease-out 1.45s forwards;"/>
+      </svg>
+
+      <!-- Check -->
+      <div class="check-wrap">
+        <svg width="48" height="48" viewBox="0 0 48 48">
+          <circle class="check-circle" cx="24" cy="24" r="20"/>
+          <polyline class="check-mark" points="14,24 21,32 34,16"/>
+        </svg>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ══════════════════════════
+     SLIDE 2: EL GATILLO — lo que disparaba todo
+     SVG: un rayo de energía que llega a un receptor y lo activa (ondas de impacto)
+══════════════════════════ -->
+<div class="slide" id="s2">
+  <div class="card card-negro" style="min-width:1100px;">
+    <div class="txt-lado">
+      <div class="tag">02 — LO QUE LO DISPARABA</div>
+      <div class="palabra">EL<br>GATILLO</div>
+      <div class="contexto">una palabra, un tono.<br>y todo explotaba.</div>
+      <div class="linea-card" style="animation-delay:1.0s;"></div>
+    </div>
+
+    <div class="svg-lado">
+      <svg width="360" height="310" viewBox="0 0 360 310" fill="none">
+
+        <!-- Cable de energía entrando desde la izquierda -->
+        <path class="trigger-cable"
+          d="M 20 155 C 60 155 80 130 110 130"/>
+        <path class="trigger-cable2"
+          d="M 20 170 C 60 170 80 145 110 145"/>
+
+        <!-- Rayo / BOLT central -->
+        <polyline class="trigger-bolt"
+          points="110,95 145,155 128,155 165,220 148,220 185,285"
+          stroke="#E8C870" stroke-width="3" stroke-linejoin="round"/>
+
+        <!-- Destello de impacto -->
+        <circle class="trigger-bolt-glow" cx="145" cy="155" r="10"
+                style="animation-delay:1.3s;"/>
+        <circle class="trigger-bolt-glow" cx="165" cy="220" r="8"
+                style="animation-delay:1.45s;"/>
+
+        <!-- Label "el estímulo" -->
+        <text class="bolt-label" x="30" y="210" style="animation-delay:1.0s;">
+          el estímulo
+        </text>
+
+        <!-- Receptor — círculo que vibra cuando recibe el impacto -->
+        <circle class="receptor-ring" cx="270" cy="155" r="70"/>
+        <circle class="receptor-fill" cx="270" cy="155" r="69"/>
+
+        <!-- Ondas de impacto dentro del receptor -->
+        <circle class="receptor-signal" cx="270" cy="155" r="35"
+                style="animation-delay:1.5s;"/>
+        <circle class="receptor-signal" cx="270" cy="155" r="20"
+                style="animation-delay:1.65s; stroke-dasharray:30; stroke-dashoffset:30;"/>
+
+        <!-- Label dentro receptor -->
+        <text class="loop-tag" x="270" y="148" text-anchor="middle"
+              style="opacity:0;animation:fadeIn .3s ease-out 1.2s forwards;font-size:20px;">
+          reacción
+        </text>
+        <text class="loop-tag" x="270" y="172" text-anchor="middle"
+              style="opacity:0;animation:fadeIn .3s ease-out 1.35s forwards;font-size:17px;fill:rgba(249,243,232,.3);">
+          automática
+        </text>
+
+        <!-- Línea que conecta bolt con receptor -->
+        <line x1="185" y1="155" x2="200" y2="155"
+              stroke="rgba(232,200,112,.5)" stroke-width="2"
+              stroke-dasharray="18" stroke-dashoffset="18"
+              style="animation:drawSVG .3s ease-out 1.0s forwards;"/>
+      </svg>
+
+      <div class="check-wrap">
+        <svg width="48" height="48" viewBox="0 0 48 48">
+          <circle class="check-circle" cx="24" cy="24" r="20"/>
+          <polyline class="check-mark" points="14,24 21,32 34,16"/>
+        </svg>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ══════════════════════════
+     SLIDE 3: APAGADO — el gatillo llega, el receptor ya no responde
+     SVG: el rayo llega, encuentra el cable cortado antes del receptor,
+     la chispa muere en el aire, el receptor queda oscuro con una X
+══════════════════════════ -->
+<div class="slide" id="s3">
+  <div class="card card-medio" style="min-width:1100px;">
+    <div class="txt-lado">
+      <div class="tag">03 — LO QUE CAMBIÓ EN ELLA</div>
+      <div class="palabra" style="color:#E8C870; font-size:128px;">APAGADO</div>
+      <div class="contexto" style="animation-delay:.85s;">
+        el gatillo llega.<br>ella ya no responde.
+      </div>
+      <div class="linea-card" style="animation-delay:1.05s;"></div>
+    </div>
+
+    <div class="svg-lado">
+      <svg width="380" height="310" viewBox="0 0 380 310" fill="none">
+
+        <!-- Cable vivo — llega hasta la mitad -->
+        <path class="cable-vivo"
+          d="M 10 155 C 50 155 70 130 100 130 L 155 155"/>
+
+        <!-- GAP — el corte visible -->
+        <!-- Dos líneas diagonales indicando el corte -->
+        <line class="gap-line" x1="158" y1="140" x2="172" y2="170"/>
+        <line class="gap-line" x1="168" y1="140" x2="182" y2="170"
+              style="animation-delay:1.2s;"/>
+
+        <!-- Chispa que muere en el gap -->
+        <circle class="chispa-muerta" cx="165" cy="155" r="7"
+                style="animation-delay:1.25s;"/>
+
+        <!-- Cable muerto — del gap al receptor (apagado) -->
+        <path class="cable-muerto"
+          d="M 182 155 L 220 155"/>
+
+        <!-- Receptor APAGADO -->
+        <circle class="receptor-off" cx="295" cy="155" r="70"/>
+        <circle class="receptor-off-fill" cx="295" cy="155" r="69"/>
+
+        <!-- ELLA — label dentro del receptor (la persona que cambió) -->
+        <circle class="ella-ring" cx="295" cy="130" r="28"/>
+        <text class="ella-txt" x="295" y="136" text-anchor="middle">ella</text>
+
+        <!-- X grande dentro del receptor -->
+        <line class="x-off x1" x1="268" y1="175" x2="322" y2="208"/>
+        <line class="x-off x2" x1="322" y1="175" x2="268" y2="208"/>
+
+        <!-- Label "sin respuesta" -->
+        <text style="font-family:'Cormorant Garamond',serif;font-style:italic;
+                     fill:rgba(249,243,232,.25);font-size:18px;
+                     opacity:0;animation:fadeIn .3s ease-out 1.6s forwards;"
+              x="295" y="240" text-anchor="middle">
+          sin respuesta
+        </text>
+
+        <!-- Label "el gatillo" entrando desde la izquierda -->
+        <text style="font-family:'Cormorant Garamond',serif;font-style:italic;
+                     fill:rgba(232,200,112,.4);font-size:18px;
+                     opacity:0;animation:fadeIn .3s ease-out .6s forwards;"
+              x="55" y="220">el gatillo</text>
+
+        <!-- Flecha indicativa del cable vivo -->
+        <polyline points="142,148 155,155 142,162"
+                  stroke="rgba(232,200,112,.6)" stroke-width="1.8"
+                  stroke-linecap="round" stroke-linejoin="round"
+                  stroke-dasharray="25" stroke-dashoffset="25"
+                  style="animation:drawSVG .3s ease-out .8s forwards;"/>
+      </svg>
+
+      <div class="check-wrap">
+        <svg width="48" height="48" viewBox="0 0 48 48">
+          <circle class="check-circle" cx="24" cy="24" r="20"/>
+          <polyline class="check-mark" points="14,24 21,32 34,16"/>
+        </svg>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ══════════════════════════
+     SLIDE FINAL
+══════════════════════════ -->
+<div class="slide" id="sfinal">
+  <div class="card card-medio">
+    <div class="label-final">— Código Soberana —</div>
+    <div class="frase-final">
+      el <em>patrón</em> que iniciaba<br>
+      los conflictos<br>
+      ya no se activa en <em>ella.</em>
+    </div>
+    <div class="linea-final" style="max-width:700px;"></div>
+    <div class="firma">Josué Calderón</div>
+  </div>
+</div>
+
+<script>
+  const SLIDES    = ['s0','s1','s2','s3','sfinal'];
+  const DURATIONS = [7500, 10000, 10000, 10500, 13000];
+  const TRANS     = 450;
+
+  function resetAnimations(el) {
+    const clone = el.cloneNode(true);
+    el.parentNode.replaceChild(clone, el);
+    return clone;
+  }
+
+  function transition(fromId, toId) {
+    const from = document.getElementById(fromId);
+    from.style.animation = 'cardOut ' + TRANS + 'ms ease-in forwards';
+    setTimeout(() => {
+      from.style.display = 'none';
+      let to = document.getElementById(toId);
+      to = resetAnimations(to);
+      to.style.display = 'flex';
+      void to.offsetWidth;
+    }, TRANS - 30);
+  }
+
+  document.addEventListener('DOMContentLoaded', () => {
+    SLIDES.forEach((id, i) => {
+      document.getElementById(id).style.display = (i === 0) ? 'flex' : 'none';
+    });
+    let t = 0;
+    for (let i = 0; i < SLIDES.length - 1; i++) {
+      t += DURATIONS[i];
+      (function(fi, ti) {
+        setTimeout(() => transition(SLIDES[fi], SLIDES[ti]), t);
+      })(i, i + 1);
+    }
+  });
+</script>
+</body>
+</html>

@@ -1,0 +1,174 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<style>
+  body:not(.fonts-loaded) * { animation-play-state: paused !important; transition: none !important; }
+</style>
+<script>
+  document.fonts.ready.then(() => {
+    setTimeout(() => { document.body.classList.add("fonts-loaded"); }, 1500);
+  });
+</script>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=1280, height=720">
+<title>anim_l1_an19 — FRASE MEMORABLE final</title>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,700;0,900;1,400&family=Cormorant+Garamond:ital,wght@1,300;1,400&display=swap" rel="stylesheet">
+<style>
+  * { margin:0; padding:0; box-sizing:border-box; }
+  body { width:1280px; height:720px; overflow:hidden; background:#000; }
+  .scene {
+    width:1280px; height:720px; background:#000;
+    position:relative; display:flex; flex-direction:column;
+    align-items:flex-start; justify-content:center;
+    padding:0 130px 0 110px;
+    opacity:0; animation:sceneIn .8s ease-out .1s forwards;
+  }
+  @keyframes sceneIn { to{opacity:1} }
+  .bg-glow {
+    position:absolute; left:-150px; top:50%; transform:translateY(-50%);
+    width:850px; height:680px;
+    background:radial-gradient(ellipse at 38% 50%, rgba(107,26,42,.50) 0%, rgba(61,12,17,.28) 38%, transparent 68%);
+    animation:pulseGlow 3.5s ease-in-out infinite; pointer-events:none;
+  }
+  @keyframes pulseGlow {
+    0%,100%{opacity:.75;transform:translateY(-50%) scale(1)}
+    50%{opacity:1;transform:translateY(-50%) scale(1.07)}
+  }
+  .quote-marks {
+    font-family:'Playfair Display',Georgia,serif;
+    font-size:140px; font-weight:900; color:#E8C870;
+    line-height:.75; margin-bottom:10px; letter-spacing:-0.05em;
+    opacity:0; transform:translateY(-10px);
+    animation:marksIn .55s ease-out .4s forwards, marksGlow 2.8s ease-in-out 1s infinite;
+    display:block;
+  }
+  @keyframes marksIn { to{opacity:1;transform:translateY(0)} }
+  @keyframes marksGlow {
+    0%,100%{text-shadow:0 0 15px rgba(232,200,112,1),0 0 40px rgba(220,180,60,.8),0 0 80px rgba(220,180,60,.4)}
+    50%{text-shadow:0 0 30px rgba(255,248,180,1),0 0 70px rgba(232,200,112,1),0 0 130px rgba(220,180,60,.6)}
+  }
+  .text-block { position:relative; max-width:1020px; }
+  .frase-main {
+    font-family:'Playfair Display',Georgia,serif;
+    font-size:66px; font-weight:900; color:#FFF; line-height:1.1; letter-spacing:-0.01em;
+  }
+  .frase-italic {
+    font-family:'Playfair Display',Georgia,serif;
+    font-size:56px; font-weight:400; font-style:italic;
+    color:#F9F3E8; line-height:1.18; margin-top:4px;
+  }
+  /* Última línea en dorado — la más poderosa */
+  .frase-gold {
+    font-family:'Playfair Display',Georgia,serif;
+    font-size:58px; font-weight:700; font-style:italic;
+    color:#E8C870; line-height:1.15; margin-top:4px;
+    text-shadow:
+      0 0 30px rgba(232,200,112,.9),
+      0 0 60px rgba(220,180,60,.5),
+      0 0 100px rgba(220,180,60,.25);
+  }
+  .word {
+    display:inline-block; opacity:0; filter:blur(10px);
+    transform:translateY(16px) scale(.96); white-space:pre;
+  }
+  .word.visible {
+    transition:opacity .42s ease,filter .42s ease,transform .42s ease;
+    opacity:1; filter:blur(0); transform:translateY(0) scale(1);
+  }
+  .frase-main .word.visible {
+    text-shadow:0 0 20px rgba(255,255,255,1),0 0 50px rgba(255,255,255,.7),0 0 90px rgba(255,255,255,.4);
+  }
+  .frase-italic .word.visible {
+    text-shadow:0 0 22px rgba(249,243,232,.50),0 0 55px rgba(249,243,232,.22);
+  }
+  .frase-gold .word.visible {
+    text-shadow:0 0 30px rgba(232,200,112,.9),0 0 60px rgba(220,180,60,.5),0 0 100px rgba(220,180,60,.25);
+  }
+  .gold-line-wrap { margin-top:24px; position:relative; height:14px; width:320px; display:none; }
+  .gold-line {
+    position:absolute; bottom:0; left:0; height:3px; width:0; border-radius:2px;
+    background:linear-gradient(90deg,transparent 0%,#B8892A 8%,#E8C870 35%,#FFF5B0 52%,#E8C870 68%,#D4A843 88%,transparent 100%);
+    animation:growLine .85s cubic-bezier(.15,0,.1,1) forwards;
+  }
+  .gold-glow {
+    position:absolute; bottom:-3px; left:0; height:9px; width:0; border-radius:10px;
+    background:linear-gradient(90deg,transparent,rgba(232,200,112,.4),transparent);
+    animation:growLine .85s cubic-bezier(.15,0,.1,1) .05s forwards, glowPulse 2.5s ease-in-out 1s infinite;
+  }
+  .gold-spark {
+    position:absolute; bottom:-4px; left:-30px; width:55px; height:11px;
+    background:radial-gradient(ellipse,rgba(255,245,190,1) 0%,rgba(245,228,176,.55) 45%,transparent 75%);
+    border-radius:50%; animation:sparkSweep 1s ease-in-out .75s forwards; opacity:0;
+  }
+  @keyframes growLine { to{width:320px} }
+  @keyframes glowPulse { 0%,100%{opacity:.55}50%{opacity:1} }
+  @keyframes sparkSweep {
+    0%{left:-55px;opacity:0}12%{opacity:1}88%{opacity:.9}100%{left:330px;opacity:0}
+  }
+  .author {
+    margin-top:14px; font-family:'Cormorant Garamond',Georgia,serif;
+    font-style:italic; font-size:34px; font-weight:300;
+    color:#E8C870; letter-spacing:.05em; opacity:0; transform:translateY(8px);
+    text-shadow:0 0 18px rgba(232,200,112,.65),0 0 45px rgba(220,180,60,.30);
+  }
+  .scene.out { animation:fadeOut .9s ease-in forwards; }
+  @keyframes fadeOut { to{opacity:0} }
+</style>
+</head>
+<body>
+<div class="scene" id="scene">
+  <div class="bg-glow"></div>
+  <span class="quote-marks">&#8220;</span>
+  <div class="text-block">
+    <p class="frase-main"  id="linea1"></p>
+    <p class="frase-italic" id="linea2"></p>
+    <p class="frase-gold"  id="linea3"></p>
+  </div>
+  <div class="gold-line-wrap" id="lineaWrap">
+    <div class="gold-glow"></div>
+    <div class="gold-line"></div>
+    <div class="gold-spark"></div>
+  </div>
+  <p class="author" id="author">— Josué Calderón</p>
+</div>
+<script>
+  const LINEA1 = "No siempre es culpa de tu pareja.";
+  const LINEA2 = "Pero la solución casi siempre empieza contigo.";
+  const LINEA3 = "Eso no es injusto. Es poder.";
+  const DURACION_MS = 10000;
+  const DELAY_INICIO = 800;
+  const MS_POR_PALABRA = 260;
+
+  function buildWords(texto, id) {
+    const el = document.getElementById(id);
+    texto.split(' ').forEach((w,i,arr) => {
+      const span = document.createElement('span');
+      span.className = 'word';
+      span.textContent = w + (i < arr.length-1 ? ' ' : '');
+      el.appendChild(span);
+    });
+    return el.querySelectorAll('.word');
+  }
+
+  const w1 = buildWords(LINEA1, 'linea1');
+  const w2 = buildWords(LINEA2, 'linea2');
+  const w3 = buildWords(LINEA3, 'linea3');
+
+  let t = DELAY_INICIO;
+  w1.forEach(w => { setTimeout(() => w.classList.add('visible'), t); t += MS_POR_PALABRA; });
+  t += 200;
+  w2.forEach(w => { setTimeout(() => w.classList.add('visible'), t); t += MS_POR_PALABRA; });
+  t += 200;
+  w3.forEach(w => { setTimeout(() => w.classList.add('visible'), t); t += MS_POR_PALABRA; });
+
+  const fin = t + 300;
+  setTimeout(() => { document.getElementById('lineaWrap').style.display = 'block'; }, fin);
+  setTimeout(() => {
+    const a = document.getElementById('author');
+    a.style.transition = 'opacity .6s ease,transform .6s ease';
+    a.style.opacity='1'; a.style.transform='translateY(0)';
+  }, fin + 520);
+  setTimeout(() => { document.getElementById('scene').classList.add('out'); }, DURACION_MS);
+</script>
+</body>
+</html>

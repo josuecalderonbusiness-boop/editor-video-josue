@@ -1,0 +1,236 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<style>
+  body:not(.fonts-loaded) * { animation-play-state: paused !important; transition: none !important; }
+</style>
+<script>
+  document.fonts.ready.then(() => {
+    setTimeout(() => { document.body.classList.add("fonts-loaded"); }, 1500);
+  });
+</script>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=1280, height=720">
+<title>anim_l2_an2 — Pregunta 01</title>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,900;1,400;1,700&family=Cormorant+Garamond:ital,wght@1,300;1,600&family=Inter:wght@300&display=swap" rel="stylesheet">
+<style>
+* { margin:0; padding:0; box-sizing:border-box; }
+body { width:1280px; height:720px; overflow:hidden; background:#EDE3CE; }
+
+.pizarra {
+  width:1280px; height:720px; position:relative; overflow:hidden;
+  background-color: #EDE3CE;
+  background-image:
+    linear-gradient(rgba(90,18,32,0.06) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(90,18,32,0.06) 1px, transparent 1px);
+  background-size: 52px 52px;
+}
+
+/* Bordes */
+.borde-izq {
+  position:absolute; left:0; top:0; bottom:0; width:8px;
+  background: linear-gradient(180deg, #5A1220, #8B2D3F, #5A1220);
+  z-index:10;
+}
+.borde-sup {
+  position:absolute; top:0; left:0; right:0; height:5px;
+  background: linear-gradient(90deg, #D4A843, #B8892A, #E8C870, transparent);
+  width:0; animation: lineaGrow 0.8s ease forwards 0.3s;
+  z-index:10;
+}
+@keyframes lineaGrow { to { width:100%; } }
+
+/* Signos de pregunta flotantes */
+.qs { position:absolute; inset:0; pointer-events:none; overflow:hidden; z-index:1; }
+.q {
+  position:absolute;
+  font-family:'Playfair Display',serif; font-weight:900;
+  color:#5A1220;
+  opacity:0;
+  animation: qFloat var(--dur) ease-in-out infinite var(--delay);
+  text-shadow: 0 0 30px rgba(90,18,32,0.4), 0 0 60px rgba(90,18,32,0.2);
+}
+@keyframes qFloat {
+  0%   { opacity:0; transform:translateY(20px) scale(0.85); }
+  15%  { opacity:var(--op); }
+  70%  { opacity:var(--op); transform:translateY(-40px) scale(1.05); }
+  100% { opacity:0; transform:translateY(-80px) scale(0.9); }
+}
+
+/* Slides */
+.slide {
+  position:absolute; inset:0;
+  display:flex; flex-direction:column;
+  align-items:center; justify-content:center;
+  opacity:0; pointer-events:none;
+  z-index:5;
+}
+
+/* SLIDE 1 — ÚLTIMA VEZ */
+#s1 { animation: slideIn 0.6s ease forwards 0.2s, slideOut 0.5s ease forwards 4.8s; }
+@keyframes slideIn { to { opacity:1; } }
+@keyframes slideOut { to { opacity:0; } }
+
+.s1-grande {
+  font-family:'Playfair Display',serif; font-weight:900;
+  font-size:200px; line-height:0.85;
+  color:#3D0C11;
+  text-align:center;
+  letter-spacing:-4px;
+  opacity:0; animation: wordIn 0.5s ease forwards 0.5s;
+  text-shadow: 3px 4px 0 rgba(61,12,17,0.15);
+}
+.s1-pequeño {
+  font-family:'Cormorant Garamond',serif; font-style:italic; font-weight:300;
+  font-size:52px; color:#8B2D3F;
+  margin-top:12px;
+  opacity:0; animation: wordIn 0.5s ease forwards 1.2s;
+  letter-spacing:0.05em;
+}
+@keyframes wordIn {
+  from { opacity:0; transform:translateY(20px) blur(8px); }
+  to   { opacity:1; transform:translateY(0) blur(0); }
+}
+
+/* SLIDE 2 — TUS NECESIDADES IMPORTABAN */
+#s2 { animation: slideIn 0.6s ease forwards 5.2s, slideOut 0.5s ease forwards 12.3s; }
+
+.s2-wrap {
+  display:flex; flex-direction:column; align-items:center;
+  gap:8px;
+}
+.s2-linea1 {
+  font-family:'Cormorant Garamond',serif; font-style:italic; font-weight:300;
+  font-size:46px; color:#8B2D3F; letter-spacing:0.08em;
+  opacity:0; animation: wordIn 0.5s ease forwards 5.6s;
+}
+.s2-grande {
+  font-family:'Playfair Display',serif; font-weight:900;
+  font-size:0px; /* crece letra a letra */
+  color:#3D0C11; line-height:0.9;
+  text-align:center; letter-spacing:-2px;
+  text-shadow: 3px 4px 0 rgba(61,12,17,0.12);
+}
+/* Letras individuales de "TUS NECESIDADES" */
+.letra {
+  display:inline-block;
+  font-family:'Playfair Display',serif; font-weight:900;
+  font-size:118px; color:#3D0C11;
+  opacity:0; transform:translateY(30px);
+  text-shadow: 2px 3px 0 rgba(61,12,17,0.12);
+}
+.importaban {
+  font-family:'Playfair Display',serif; font-weight:900;
+  font-size:148px; color:#5A1220; line-height:0.9;
+  letter-spacing:-3px;
+  opacity:0; animation: wordIn 0.7s ease forwards 9.2s;
+  text-shadow: 3px 4px 0 rgba(61,12,17,0.18);
+  display:block; text-align:center;
+}
+
+/* SLIDE 3 — TANTO / COMO LAS DE ÉL */
+#s3 { animation: slideIn 0.6s ease forwards 12.7s; }
+
+.s3-tanto {
+  font-family:'Cormorant Garamond',serif; font-style:italic; font-weight:300;
+  font-size:58px; color:#8B2D3F; letter-spacing:0.1em;
+  opacity:0; animation: wordIn 0.5s ease forwards 13.0s;
+  margin-bottom:10px;
+}
+.s3-grande {
+  font-family:'Playfair Display',serif; font-weight:900;
+  font-size:148px; line-height:0.88; color:#3D0C11;
+  text-align:center; letter-spacing:-3px;
+  text-shadow: 3px 4px 0 rgba(61,12,17,0.15);
+  opacity:0; animation: wordIn 0.7s ease forwards 13.6s;
+}
+.s3-grande em {
+  font-style:italic; color:#5A1220;
+  font-size:108px;
+}
+.s3-signo {
+  font-family:'Playfair Display',serif; font-weight:900;
+  font-size:200px; color:#E8C870; line-height:1;
+  text-shadow: 0 0 40px rgba(232,200,112,0.5), 0 0 80px rgba(232,200,112,0.25);
+  opacity:0; animation: wordIn 0.6s ease forwards 14.8s;
+  display:block; text-align:center;
+}
+
+/* Línea decorativa bottom */
+.linea-dec {
+  position:absolute; bottom:0; left:0; right:0; height:4px;
+  background: linear-gradient(90deg, #5A1220, #D4A843, transparent);
+  width:0; animation: lineaGrow 1s ease forwards 1s;
+  z-index:10;
+}
+</style>
+</head>
+<body>
+<div class="pizarra">
+  <div class="borde-izq"></div>
+  <div class="borde-sup"></div>
+  <div class="linea-dec"></div>
+
+  <!-- Signos flotantes -->
+  <div class="qs">
+    <span class="q" style="left:5%;top:8%;font-size:90px;--dur:5s;--delay:0.5s;--op:0.12">?</span>
+    <span class="q" style="left:80%;top:6%;font-size:60px;--dur:4.5s;--delay:1.2s;--op:0.10">?</span>
+    <span class="q" style="left:92%;top:42%;font-size:110px;--dur:6s;--delay:0.3s;--op:0.08">?</span>
+    <span class="q" style="left:72%;top:78%;font-size:75px;--dur:5.5s;--delay:1.8s;--op:0.11">?</span>
+    <span class="q" style="left:3%;top:70%;font-size:95px;--dur:4.8s;--delay:2.2s;--op:0.09">?</span>
+    <span class="q" style="left:55%;top:3%;font-size:55px;--dur:5.2s;--delay:3s;--op:0.10">?</span>
+    <span class="q" style="left:88%;top:85%;font-size:80px;--dur:4.2s;--delay:0.9s;--op:0.08">?</span>
+    <span class="q" style="left:28%;top:86%;font-size:50px;--dur:5.8s;--delay:2.7s;--op:0.09">?</span>
+    <span class="q" style="left:15%;top:2%;font-size:65px;--dur:4s;--delay:1.6s;--op:0.10">?</span>
+    <span class="q" style="left:42%;top:88%;font-size:45px;--dur:6.2s;--delay:0.4s;--op:0.07">?</span>
+    <span class="q" style="left:60%;top:92%;font-size:70px;--dur:5.1s;--delay:2s;--op:0.08">?</span>
+    <span class="q" style="left:20%;top:50%;font-size:40px;--dur:4.6s;--delay:3.5s;--op:0.07">?</span>
+  </div>
+
+  <!-- SLIDE 1 -->
+  <div class="slide" id="s1">
+    <div class="s1-grande">ÚLTIMA<br>VEZ</div>
+    <div class="s1-pequeño">¿cuándo fue la última vez que...</div>
+  </div>
+
+  <!-- SLIDE 2 -->
+  <div class="slide" id="s2">
+    <div class="s2-wrap">
+      <div class="s2-linea1">en tu relación...</div>
+      <div class="s2-grande">
+        <span id="letras-wrap"></span>
+        <span class="importaban">IMPORTABAN</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- SLIDE 3 -->
+  <div class="slide" id="s3">
+    <div class="s3-tanto">tanto...</div>
+    <div class="s3-grande">¿COMO LAS<br><em>DE ÉL</em></div>
+    <span class="s3-signo">?</span>
+  </div>
+</div>
+
+<script>
+document.fonts.ready.then(() => {
+  setTimeout(() => {
+    document.body.classList.add("fonts-loaded");
+
+    // Animar letras de "TUS NECESIDADES" una a una
+    const texto = "TUS NECESIDADES";
+    const wrap = document.getElementById("letras-wrap");
+    texto.split("").forEach((c, i) => {
+      const span = document.createElement("span");
+      span.className = "letra";
+      span.textContent = c === " " ? "\u00A0" : c;
+      // cada letra aparece escalonada, arranca en s=6.2s
+      const delay = 6.2 + i * 0.08;
+      span.style.animation = `wordIn 0.35s ease forwards ${delay}s`;
+      wrap.appendChild(span);
+    });
+  }, 1500);
+});
+</script>
+</body>
+</html>

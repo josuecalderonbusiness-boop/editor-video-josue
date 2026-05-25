@@ -1,0 +1,323 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<style>
+  body:not(.fonts-loaded) * { animation-play-state: paused !important; transition: none !important; }
+</style>
+<script>
+  document.fonts.ready.then(() => {
+    setTimeout(() => { document.body.classList.add("fonts-loaded"); }, 1500);
+  });
+</script>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=1280, height=720">
+<title>Workbook — Mi Declaración Soberana</title>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,700;0,900;1,700;1,900&family=Cormorant+Garamond:ital,wght@0,500;1,400;1,600&family=Inter:wght@300;400;600&display=swap" rel="stylesheet">
+<style>
+* { margin:0; padding:0; box-sizing:border-box; }
+body { width:1280px; height:720px; overflow:hidden; }
+
+.pizarra {
+  position:absolute; inset:0;
+  background:#F0E8D5;
+  background-image:
+    linear-gradient(rgba(139,100,60,.11) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(139,100,60,.11) 1px, transparent 1px);
+  background-size:52px 52px;
+}
+.pizarra::before {
+  content:''; position:absolute; left:0; top:0; bottom:0; width:8px;
+  background:linear-gradient(180deg,#3D0C11,#6B1A2A,#3D0C11);
+}
+.pizarra::after {
+  content:''; position:absolute; top:0; left:0; right:0; height:4px;
+  background:linear-gradient(90deg,#6B1A2A,#E8C870,#E8C870,#6B1A2A);
+}
+
+.slide {
+  position:absolute; inset:0;
+  display:flex; flex-direction:column;
+  align-items:center; justify-content:center;
+  padding:48px 72px;
+  opacity:0; pointer-events:none;
+  transition:opacity 0.35s ease;
+}
+.slide.active { opacity:1; pointer-events:all; }
+
+/* ══ S0 — INTRO ══ */
+#s0 { padding:60px 160px; }
+
+.tag {
+  font-family:'Inter',sans-serif; font-weight:300;
+  font-size:12px; letter-spacing:7px; text-transform:uppercase;
+  color:#6B1A2A; text-align:center; margin-bottom:20px;
+  opacity:0;
+}
+.titulo-grande {
+  font-family:'Playfair Display',serif; font-weight:900;
+  font-size:68px; line-height:1.1; color:#2D0810;
+  text-align:center;
+  opacity:0; transform:translateY(16px);
+}
+.titulo-grande em { font-style:italic; color:#6B1A2A; }
+
+.separador {
+  height:2px; width:0; margin:30px auto 0;
+  background:linear-gradient(90deg,transparent,#6B1A2A,#E8C870,#D4A843,transparent);
+  border-radius:2px;
+}
+
+/* ══ S1 — INSTRUCCIÓN ══ */
+#s1 { padding:54px 120px; }
+
+.instruccion-bloque {
+  max-width:900px; text-align:center;
+  opacity:0; transform:translateY(18px);
+}
+.instruccion-pre {
+  font-family:'Inter',sans-serif; font-weight:300;
+  font-size:11px; letter-spacing:7px; text-transform:uppercase;
+  color:#6B1A2A; margin-bottom:22px;
+}
+.instruccion-cuerpo {
+  font-family:'Cormorant Garamond',serif; font-style:italic;
+  font-size:32px; line-height:1.65; color:#3A1818;
+}
+.instruccion-cuerpo .acento { color:#6B1A2A; font-weight:600; }
+
+.nota-inferior {
+  margin-top:28px;
+  font-family:'Inter',sans-serif; font-weight:300;
+  font-size:15px; line-height:1.7; color:rgba(45,8,16,0.5);
+  opacity:0;
+}
+
+/* ══ S2 — MANIFIESTO ══ */
+#s2 { flex-direction:row; gap:52px; align-items:center; padding:44px 80px; }
+
+.col-izq {
+  flex:0 0 260px;
+  display:flex; flex-direction:column; gap:14px;
+  opacity:0; transform:translateX(-44px);
+}
+.col-izq-tag {
+  font-family:'Inter',sans-serif; font-weight:300;
+  font-size:11px; letter-spacing:7px; text-transform:uppercase;
+  color:#6B1A2A;
+}
+.col-izq-titulo {
+  font-family:'Playfair Display',serif; font-weight:900;
+  font-size:42px; line-height:1.1; color:#2D0810;
+}
+.col-izq-sub {
+  font-family:'Cormorant Garamond',serif; font-style:italic;
+  font-size:24px; line-height:1.55; color:rgba(45,8,16,0.55);
+}
+
+.col-cita {
+  flex:1; background:#fff; border-radius:16px;
+  padding:34px 44px;
+  box-shadow:0 6px 32px rgba(61,12,17,0.12), 0 1px 4px rgba(0,0,0,0.07);
+  border:1.5px solid rgba(139,100,60,0.14);
+  display:flex; flex-direction:column;
+  opacity:0; transform:translateY(28px);
+  position:relative;
+}
+.col-cita::before {
+  content:''; position:absolute; left:0; top:20px; bottom:20px;
+  width:4px; border-radius:0 2px 2px 0;
+  background:linear-gradient(180deg,#E8C870,#B8892A,#E8C870);
+}
+.cita-comilla {
+  font-family:'Playfair Display',serif; font-weight:900;
+  font-size:72px; color:#E8C870; line-height:0.5;
+  margin-bottom:16px; opacity:0.8;
+}
+.cita-texto {
+  font-family:'Cormorant Garamond',serif; font-style:italic;
+  font-weight:600; font-size:28px; line-height:1.65; color:#2D0810;
+}
+.cita-texto .linea-bloque {
+  display:block; opacity:0; transform:translateY(10px);
+}
+.cita-texto .acento       { color:#6B1A2A; }
+.cita-texto .acento-dorado { color:#B8892A; }
+
+.cita-firma {
+  font-family:'Cormorant Garamond',serif; font-style:italic;
+  font-size:22px; color:#B8892A; margin-top:18px;
+  padding-top:14px; border-top:1px solid rgba(184,137,42,0.25);
+  opacity:0; letter-spacing:1px;
+}
+
+/* ══ S3 — PREGUNTA + CIERRE ══ */
+#s3 { padding:52px 140px; }
+
+.pregunta-tag {
+  font-family:'Inter',sans-serif; font-weight:300;
+  font-size:12px; letter-spacing:7px; text-transform:uppercase;
+  color:#6B1A2A; text-align:center; margin-bottom:20px;
+  opacity:0;
+}
+.pregunta-principal {
+  font-family:'Playfair Display',serif; font-weight:700;
+  font-size:46px; line-height:1.25; color:#2D0810;
+  text-align:center; opacity:0; transform:translateY(14px);
+}
+.pregunta-principal em { font-style:italic; color:#6B1A2A; }
+
+.pregunta-nota {
+  font-family:'Cormorant Garamond',serif; font-style:italic;
+  font-size:26px; line-height:1.6; color:rgba(45,8,16,0.6);
+  text-align:center; margin-top:22px;
+  opacity:0; transform:translateY(10px);
+  max-width:780px; margin-left:auto; margin-right:auto;
+}
+.pregunta-nota .acento-dorado { color:#B8892A; }
+
+.pausa-linea {
+  height:2px; width:0; margin:28px auto 0;
+  background:linear-gradient(90deg,transparent,#6B1A2A,#E8C870,#D4A843,transparent);
+  border-radius:2px;
+}
+.pausa-label {
+  font-family:'Inter',sans-serif; font-weight:300;
+  font-size:14px; letter-spacing:5px; text-transform:uppercase;
+  color:rgba(107,26,42,0.5); text-align:center; margin-top:18px;
+  opacity:0;
+}
+
+/* ══ KEYFRAMES ══ */
+@keyframes fadeIn   { to { opacity:1; } }
+@keyframes slideUp  { to { opacity:1; transform:translateY(0); } }
+@keyframes slideInL { to { opacity:1; transform:translateX(0); } }
+@keyframes lineGrow { to { width:680px; } }
+</style>
+</head>
+<body>
+<div class="pizarra"></div>
+
+<!-- S0 — TÍTULO -->
+<div class="slide" id="s0">
+  <div class="tag" id="s0tag">Pausa · Workbook</div>
+  <div class="titulo-grande" id="s0titulo">Mi <em>Declaración</em><br>Soberana</div>
+  <div class="separador" id="s0linea"></div>
+</div>
+
+<!-- S1 — INSTRUCCIÓN -->
+<div class="slide" id="s1">
+  <div class="instruccion-bloque" id="s1bloque">
+    <div class="instruccion-pre">Escribe esto en tu workbook</div>
+    <div class="instruccion-cuerpo">
+      Puedes modificarlo si necesitas que suene más tuyo.<br>
+      Pero <span class="acento">escríbelo.</span>
+    </div>
+  </div>
+  <div class="nota-inferior" id="s1nota">
+    Lo que escribes lo instala la mente de manera diferente<br>
+    a lo que solo escuchas o lees en una pantalla.
+  </div>
+</div>
+
+<!-- S2 — MANIFIESTO -->
+<div class="slide" id="s2">
+  <div class="col-izq" id="s2col">
+    <div class="col-izq-tag">Tu declaración</div>
+    <div class="col-izq-titulo">Escríbelo<br>con tus<br>palabras.</div>
+    <div class="col-izq-sub">Modifícalo si necesitas<br>que suene más tuyo.</div>
+  </div>
+  <div class="col-cita" id="s2cita">
+    <div class="cita-comilla">&ldquo;</div>
+    <div class="cita-texto">
+      <span class="linea-bloque" id="cb1">No soy una mujer <span class="acento">rota</span> que necesita ser arreglada.</span>
+      <span class="linea-bloque" id="cb2">Soy una mujer que tiene una dinámica</span>
+      <span class="linea-bloque" id="cb3">que necesita ser <span class="acento">reconfigurada.</span></span>
+      <span class="linea-bloque" id="cb4">Y yo soy quien puede reconfigurarlo.</span>
+      <span class="linea-bloque" id="cb5">Porque soy <span class="acento-dorado">Soberana.</span></span>
+    </div>
+    <div class="cita-firma" id="s2firma">— mi declaración · Código Soberana</div>
+  </div>
+</div>
+
+<!-- S3 — PREGUNTA + CIERRE -->
+<div class="slide" id="s3">
+  <div class="pregunta-tag" id="s3tag">Luego escribe debajo en tu workbook</div>
+  <div class="pregunta-principal" id="s3pregunta">
+    ¿Qué parte de esta declaración<br>
+    te <em>cuesta más creer</em> hoy?
+  </div>
+  <div class="pregunta-nota" id="s3nota">
+    Esa es la parte donde más trabajo hay por hacer.<br>
+    No como castigo — como <span class="acento-dorado">información.</span>
+  </div>
+  <div class="pausa-linea" id="s3linea"></div>
+  <div class="pausa-label" id="s3label">⏸ pausa el video ahora</div>
+</div>
+
+<script>
+function wait(ms){ return new Promise(r=>setTimeout(r,ms)); }
+
+function showSlide(id){
+  document.querySelectorAll('.slide').forEach(s=>s.classList.remove('active'));
+  document.getElementById(id).classList.add('active');
+}
+
+function anim(el, kf, delay=0, dur=600, ease='cubic-bezier(0.16,1,0.3,1)'){
+  if(!el) return;
+  el.style.animation = `${kf} ${dur}ms ${ease} ${delay}ms forwards`;
+}
+
+async function run(){
+  await wait(200);
+
+  // S0 — Título
+  showSlide('s0');
+  await wait(300);
+  anim(document.getElementById('s0tag'),    'fadeIn',  0,   500, 'ease');
+  await wait(350);
+  anim(document.getElementById('s0titulo'), 'slideUp', 0,   720);
+  await wait(600);
+  document.getElementById('s0linea').style.animation = 'lineGrow 0.9s ease 0.1s forwards';
+  await wait(2600);
+
+  // S1 — Instrucción
+  showSlide('s1');
+  await wait(100);
+  anim(document.getElementById('s1bloque'), 'slideUp', 0,   700);
+  await wait(900);
+  anim(document.getElementById('s1nota'),   'fadeIn',  0,   600, 'ease');
+  await wait(3200);
+
+  // S2 — Manifiesto
+  showSlide('s2');
+  await wait(80);
+  anim(document.getElementById('s2col'),  'slideInL', 100, 650);
+  await wait(280);
+  anim(document.getElementById('s2cita'), 'slideUp',  0,   680);
+  await wait(900);
+  for(const id of ['cb1','cb2','cb3','cb4','cb5']){
+    document.getElementById(id).style.animation = 'slideUp 520ms cubic-bezier(0.16,1,0.3,1) forwards';
+    await wait(390);
+  }
+  await wait(500);
+  anim(document.getElementById('s2firma'), 'fadeIn', 0, 600, 'ease');
+  await wait(3200);
+
+  // S3 — Pregunta + cierre
+  showSlide('s3');
+  await wait(80);
+  anim(document.getElementById('s3tag'),      'fadeIn',  0,   400, 'ease');
+  await wait(350);
+  anim(document.getElementById('s3pregunta'), 'slideUp', 0,   700);
+  await wait(800);
+  anim(document.getElementById('s3nota'),     'slideUp', 0,   650);
+  await wait(700);
+  document.getElementById('s3linea').style.animation = 'lineGrow 0.8s ease forwards';
+  await wait(600);
+  anim(document.getElementById('s3label'),    'fadeIn',  0,   500, 'ease');
+}
+
+document.fonts.ready.then(()=>{ setTimeout(run, 1500); });
+</script>
+</body>
+</html>

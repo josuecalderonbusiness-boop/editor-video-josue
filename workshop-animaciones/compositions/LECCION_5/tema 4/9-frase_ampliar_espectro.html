@@ -1,0 +1,143 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<style>body:not(.fonts-loaded)*{animation-play-state:paused!important;}</style>
+<script>document.fonts.ready.then(function(){setTimeout(function(){document.body.classList.add("fonts-loaded");},1200);});</script>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=1280, height=720">
+<title>Frase — Ampliar el espectro</title>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,900;1,700&family=Cormorant+Garamond:ital,wght@1,400&display=swap" rel="stylesheet">
+<style>
+*{margin:0;padding:0;box-sizing:border-box;}
+body{
+  width:1280px;height:720px;overflow:hidden;background:#000;
+  opacity:0;
+  animation:bodyIn .5s ease forwards .1s, bodyOut .7s ease forwards 7.3s;
+}
+@keyframes bodyIn{to{opacity:1;}}
+@keyframes bodyOut{to{opacity:0;}}
+
+.scene{position:absolute;inset:0;background:#000;overflow:hidden;}
+
+/* Glow borgoña izquierda */
+.glow{
+  position:absolute;left:-8%;top:50%;transform:translateY(-50%);
+  width:52%;height:85%;border-radius:50%;
+  background:radial-gradient(ellipse,rgba(107,26,42,.5) 0%,rgba(61,12,17,.2) 45%,transparent 70%);
+  animation:glowPulsa 3.2s ease-in-out infinite;
+}
+@keyframes glowPulsa{
+  0%,100%{opacity:.7;transform:translateY(-50%) scale(1);}
+  50%{opacity:1;transform:translateY(-50%) scale(1.1);}
+}
+
+/* Comillas */
+.comilla{
+  position:absolute;left:72px;top:60px;
+  font-family:'Playfair Display',serif;font-weight:900;font-size:130px;
+  color:#E8C870;line-height:1;
+  opacity:0;
+  animation:comillaIn .6s ease forwards .5s, comillaPulsa 2.5s ease-in-out infinite 1.3s;
+}
+@keyframes comillaIn{from{opacity:0;transform:translateY(-14px);}to{opacity:1;transform:translateY(0);}}
+@keyframes comillaPulsa{
+  0%,100%{text-shadow:0 0 18px rgba(232,200,112,.4);}
+  50%{text-shadow:0 0 45px rgba(232,200,112,1),0 0 90px rgba(232,200,112,.5);}
+}
+
+/* Contenido centrado */
+.wrap{
+  position:absolute;inset:0;
+  display:flex;flex-direction:column;
+  align-items:center;justify-content:center;
+  gap:22px;
+  padding:0 90px;
+}
+
+/* Línea 1 — "Antes de reaccionar" */
+.l1{
+  font-family:'Playfair Display',serif;font-weight:900;
+  font-size:72px;line-height:1;
+  color:rgba(249,243,232,.45);
+  text-align:center;
+  opacity:0;
+  animation:lineaIn .6s ease forwards .8s;
+}
+
+/* Línea 2 — GRANDE protagonista */
+.l2{
+  font-family:'Playfair Display',serif;font-weight:900;
+  font-size:108px;line-height:.95;
+  color:#F9F3E8;
+  text-align:center;
+  text-shadow:0 0 50px rgba(249,243,232,.12);
+  opacity:0;
+  animation:lineaIn .6s ease forwards 1.2s;
+}
+
+/* Separador dorado */
+.sep{
+  width:0;height:3px;
+  background:linear-gradient(90deg,transparent,#E8C870,#D4A843,transparent);
+  box-shadow:0 0 14px rgba(232,200,112,.5);
+  border-radius:2px;
+  animation:sepCrece .8s ease forwards 1.7s;
+}
+@keyframes sepCrece{to{width:600px;}}
+
+/* Chispa */
+.chispa{
+  position:absolute;
+  top:0;width:14px;height:3px;
+  background:white;border-radius:6px;
+  box-shadow:0 0 20px 7px rgba(255,255,220,.9);
+  opacity:0;
+  animation:chispaRun .8s ease forwards 1.7s;
+}
+@keyframes chispaRun{
+  0%{opacity:0;left:calc(50% - 300px);}
+  15%{opacity:1;}85%{opacity:1;}
+  100%{opacity:0;left:calc(50% + 286px);}
+}
+
+/* Línea 3 — dorada itálica */
+.l3{
+  font-family:'Playfair Display',serif;font-weight:900;font-style:italic;
+  font-size:82px;line-height:1;
+  color:#E8C870;
+  text-align:center;
+  text-shadow:
+    0 0 22px rgba(232,200,112,.9),
+    0 0 55px rgba(232,200,112,.5),
+    0 0 100px rgba(184,137,42,.3);
+  opacity:0;
+  animation:lineaIn .6s ease forwards 2.0s, oroGlow 2.6s ease-in-out infinite 2.8s;
+}
+@keyframes oroGlow{
+  0%,100%{text-shadow:0 0 22px rgba(232,200,112,.9),0 0 55px rgba(232,200,112,.5),0 0 100px rgba(184,137,42,.3);}
+  50%{text-shadow:0 0 38px rgba(255,248,180,1),0 0 80px rgba(232,200,112,.85),0 0 150px rgba(184,137,42,.55);}
+}
+
+@keyframes lineaIn{
+  from{opacity:0;transform:translateY(16px);}
+  to{opacity:1;transform:translateY(0);}
+}
+</style>
+</head>
+<body>
+<div class="scene">
+  <div class="glow"></div>
+  <div class="comilla">"</div>
+
+  <div class="wrap">
+    <div class="l1">No se trata de excusar.</div>
+    <div class="l2">Se trata de ver<br>más opciones</div>
+    <div style="position:relative;display:flex;align-items:center;justify-content:center;width:100%;">
+      <div class="sep"></div>
+      <div class="chispa"></div>
+    </div>
+    <div class="l3">antes de reaccionar.</div>
+  </div>
+</div>
+</body>
+</html>

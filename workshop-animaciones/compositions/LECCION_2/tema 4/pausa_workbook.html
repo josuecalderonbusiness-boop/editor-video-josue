@@ -1,0 +1,177 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<title>PAUSA WORKBOOK · Código Soberana</title>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@900&family=Cormorant+Garamond:ital,wght@1,300&family=Inter:wght@300&display=swap" rel="stylesheet">
+<style>
+* { margin:0; padding:0; box-sizing:border-box; }
+
+body {
+  width:1280px; height:720px; overflow:hidden;
+  background:#0F0A0B;
+}
+
+.scene {
+  width:1280px; height:720px;
+  position:relative; overflow:hidden;
+  background: radial-gradient(ellipse 110% 90% at 20% 60%, #2A0A10 0%, #16050A 50%, #0F0A0B 100%);
+  display:flex; flex-direction:column;
+  align-items:center; justify-content:center;
+  opacity:0;
+  animation: fadeIn 0.5s ease forwards 0.1s, fadeOut 0.7s ease forwards 5.3s;
+}
+@keyframes fadeIn  { to { opacity:1; } }
+@keyframes fadeOut { to { opacity:0; } }
+
+.glow-bg {
+  position:absolute;
+  left:-120px; top:50%;
+  transform:translateY(-50%);
+  width:600px; height:500px;
+  border-radius:50%;
+  background: radial-gradient(ellipse, rgba(90,20,30,0.55) 0%, rgba(60,10,18,0.3) 40%, transparent 70%);
+  pointer-events:none;
+}
+
+.content {
+  position:relative; z-index:10;
+  display:flex; flex-direction:column;
+  align-items:center; text-align:center;
+}
+
+/* Label superior */
+.label-top {
+  font-family:'Inter', sans-serif; font-weight:300;
+  font-size:15px; letter-spacing:7px;
+  color:rgba(232,200,112,0.55);
+  text-transform:uppercase;
+  margin-bottom:18px;
+  opacity:0;
+  animation: fadeUp 0.5s ease forwards 0.8s;
+}
+
+/* PAUSA — crema, Playfair 900, recto */
+.t-pausa {
+  font-family:'Playfair Display', serif;
+  font-weight:900;
+  font-style:normal;
+  font-size:148px; line-height:0.95;
+  color:#F0E8D5;
+  text-shadow:
+    0 2px 40px rgba(240,232,213,0.12),
+    0 0 80px rgba(240,232,213,0.05);
+  opacity:0;
+  animation: flashReveal 0.45s steps(1) forwards 1.0s;
+}
+
+/* WORKBOOK — dorado, Playfair 900, recto — MISMA fuente que PAUSA */
+.t-workbook {
+  font-family:'Playfair Display', serif;
+  font-weight:900;
+  font-style:normal;
+  font-size:148px; line-height:0.95;
+  color:#D4A843;
+  text-shadow:
+    0 0 20px rgba(212,168,67,0.9),
+    0 0 50px rgba(212,168,67,0.55),
+    0 0 100px rgba(212,168,67,0.28),
+    0 0 160px rgba(184,137,42,0.12);
+  opacity:0;
+  animation: flashReveal 0.45s steps(1) forwards 1.35s, wbGlow 3s ease-in-out infinite 2.2s;
+}
+
+@keyframes wbGlow {
+  0%,100% {
+    text-shadow:
+      0 0 20px rgba(212,168,67,0.9),
+      0 0 50px rgba(212,168,67,0.55),
+      0 0 100px rgba(212,168,67,0.28),
+      0 0 160px rgba(184,137,42,0.12);
+  }
+  50% {
+    text-shadow:
+      0 0 30px rgba(232,200,112,1),
+      0 0 70px rgba(232,200,112,0.75),
+      0 0 130px rgba(232,200,112,0.4),
+      0 0 200px rgba(184,137,42,0.22);
+  }
+}
+
+/* Línea dorada */
+.linea-wrap {
+  position:relative;
+  margin-top:24px;
+  width:480px; height:4px;
+}
+.linea {
+  position:absolute; top:0; left:0;
+  width:0; height:2px;
+  background: linear-gradient(90deg, transparent 0%, #E8C870 30%, #D4A843 50%, #E8C870 70%, transparent 100%);
+  box-shadow: 0 0 12px rgba(232,200,112,0.6), 0 0 30px rgba(232,200,112,0.3);
+  animation: lineaGrow 0.9s ease forwards 1.75s;
+}
+@keyframes lineaGrow { to { width:480px; } }
+
+.chispa {
+  position:absolute; top:-3px; left:0;
+  width:8px; height:8px; border-radius:50%;
+  background:#fff;
+  box-shadow: 0 0 10px #E8C870, 0 0 24px #E8C870, 0 0 40px rgba(232,200,112,0.5);
+  opacity:0;
+  animation: chispaRun 0.9s ease forwards 1.75s;
+}
+@keyframes chispaRun {
+  0%   { left:0;     opacity:0; }
+  6%   { opacity:1; }
+  94%  { opacity:1; }
+  100% { left:480px; opacity:0; }
+}
+
+/* Código Soberana branding */
+.branding {
+  font-family:'Cormorant Garamond', serif;
+  font-style:italic; font-weight:300;
+  font-size:20px; letter-spacing:6px;
+  color:rgba(232,200,112,0.4);
+  text-transform:uppercase;
+  margin-top:22px;
+  opacity:0;
+  animation: fadeUp 0.6s ease forwards 2.2s;
+}
+
+@keyframes fadeUp {
+  from { opacity:0; transform:translateY(12px); }
+  to   { opacity:1; transform:translateY(0); }
+}
+
+@keyframes flashReveal {
+  0%  { opacity:0; }
+  14% { opacity:1; }
+  28% { opacity:0; }
+  48% { opacity:1; }
+  66% { opacity:0; }
+  100%{ opacity:1; }
+}
+</style>
+</head>
+<body>
+<div class="scene">
+  <div class="glow-bg"></div>
+
+  <div class="content">
+    <div class="label-top">Código Soberana</div>
+    <div class="t-pausa">PAUSA</div>
+    <div class="t-workbook">WORKBOOK</div>
+    <div class="linea-wrap">
+      <div class="linea"></div>
+      <div class="chispa"></div>
+    </div>
+  </div>
+</div>
+
+<script>
+document.fonts.ready.then(() => { setTimeout(() => {}, 1500); });
+</script>
+</body>
+</html>

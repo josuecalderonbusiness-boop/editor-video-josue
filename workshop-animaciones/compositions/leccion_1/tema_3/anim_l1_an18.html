@@ -1,0 +1,159 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<style>
+  body:not(.fonts-loaded) * { animation-play-state: paused !important; transition: none !important; }
+</style>
+<script>
+  document.fonts.ready.then(() => {
+    setTimeout(() => { document.body.classList.add("fonts-loaded"); }, 1500);
+  });
+</script>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=1280, height=720">
+<title>anim_l1_an18 — Franja noticias</title>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,700;0,900;1,400&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+  * { margin:0; padding:0; box-sizing:border-box; }
+  body { width:1280px; height:720px; overflow:hidden; background:#00FF00; }
+
+  .scene {
+    width:1280px; height:720px; position:relative;
+    background:#00FF00;
+    opacity:0; animation:fadeIn .4s ease-out .1s forwards;
+  }
+  @keyframes fadeIn { to{opacity:1} }
+  .scene.out { animation:fadeOut .5s ease-in forwards; }
+  @keyframes fadeOut { to{opacity:0} }
+
+  /* Franja inferior estilo noticias */
+  .ticker-wrap {
+    position:absolute; bottom:0; left:0; right:0;
+    height:110px;
+  }
+
+  /* Banda negra superior de la franja */
+  .ticker-top {
+    height:38px;
+    background:rgba(15,10,11,.95);
+    display:flex; align-items:center; padding:0 20px;
+    border-top:3px solid #E8C870;
+    opacity:0; animation:slideUp .4s ease-out .3s forwards;
+  }
+  @keyframes slideUp {
+    from{opacity:0;transform:translateY(10px)}
+    to{opacity:1;transform:translateY(0)}
+  }
+
+  .ticker-label {
+    font-family:'Inter',sans-serif; font-size:13px; font-weight:600;
+    color:#E8C870; letter-spacing:.2em; text-transform:uppercase;
+    white-space:nowrap; padding-right:20px; border-right:2px solid #6B1A2A;
+    margin-right:20px;
+    text-shadow:0 0 10px rgba(232,200,112,.6);
+  }
+
+  .ticker-sub {
+    font-family:'Inter',sans-serif; font-size:13px; font-weight:400;
+    color:#C97080; letter-spacing:.1em;
+  }
+
+  /* Banda principal con el texto */
+  .ticker-main {
+    height:72px;
+    background:rgba(61,12,17,.96);
+    display:flex; align-items:center;
+    overflow:hidden;
+    border-top:1px solid rgba(232,200,112,.3);
+    opacity:0; animation:slideUp .4s ease-out .5s forwards;
+  }
+
+  /* Tag izquierdo */
+  .ticker-tag {
+    flex-shrink:0;
+    height:100%;
+    background:linear-gradient(135deg,#6B1A2A,#3D0C11);
+    display:flex; align-items:center; justify-content:center;
+    padding:0 24px;
+    border-right:3px solid #E8C870;
+  }
+  .ticker-tag span {
+    font-family:'Inter',sans-serif; font-size:13px; font-weight:600;
+    color:#E8C870; letter-spacing:.15em; text-transform:uppercase;
+    writing-mode:horizontal-tb;
+    text-shadow:0 0 10px rgba(232,200,112,.5);
+  }
+
+  /* Texto principal desplazándose */
+  .ticker-text-wrap {
+    flex:1; overflow:hidden; padding:0 24px;
+  }
+
+  .ticker-text {
+    font-family:'Playfair Display',Georgia,serif;
+    font-size:34px; font-weight:700;
+    color:#F9F3E8; white-space:nowrap;
+    text-shadow:0 0 20px rgba(255,255,255,.2);
+    animation:tickerScroll 8s linear 1.2s forwards;
+    display:inline-block;
+    transform:translateX(100%);
+  }
+
+  .ticker-text em {
+    font-style:italic; color:#E8C870;
+    text-shadow:0 0 20px rgba(232,200,112,.8), 0 0 40px rgba(220,180,60,.4);
+  }
+
+  @keyframes tickerScroll {
+    0%   { transform:translateX(100%); }
+    15%  { transform:translateX(20px); }
+    80%  { transform:translateX(20px); }
+    100% { transform:translateX(-110%); }
+  }
+
+  /* Punto de color izquierdo parpadeante */
+  .live-dot {
+    width:10px; height:10px; border-radius:50%;
+    background:#E8C870; flex-shrink:0; margin:0 16px;
+    animation:dotPulse 1s ease-in-out infinite;
+    box-shadow:0 0 8px rgba(232,200,112,.8);
+  }
+  @keyframes dotPulse {
+    0%,100%{opacity:1;transform:scale(1)}
+    50%{opacity:.4;transform:scale(.7)}
+  }
+</style>
+</head>
+<body>
+<div class="scene" id="scene">
+
+  <div class="ticker-wrap">
+    <!-- Banda superior -->
+    <div class="ticker-top">
+      <span class="ticker-label">Código Soberana</span>
+      <span class="ticker-sub">Lección 1 · El sistema relacional</span>
+    </div>
+
+    <!-- Banda principal -->
+    <div class="ticker-main">
+      <div class="ticker-tag">
+        <span>Insight</span>
+      </div>
+      <div class="live-dot"></div>
+      <div class="ticker-text-wrap">
+        <span class="ticker-text">
+          No te voy a pedir que cambies a tu pareja.&nbsp;&nbsp;
+          <em>Te voy a enseñar a cambiar el sistema.</em>
+          &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+        </span>
+      </div>
+    </div>
+  </div>
+
+</div>
+<script>
+  const DURACION_MS = 9000;
+  setTimeout(() => { document.getElementById('scene').classList.add('out'); }, DURACION_MS);
+</script>
+</body>
+</html>

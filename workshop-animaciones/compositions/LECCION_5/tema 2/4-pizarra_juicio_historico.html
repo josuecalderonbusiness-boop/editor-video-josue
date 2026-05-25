@@ -1,0 +1,410 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=1280, height=720">
+<title>Pizarra — Juicio Histórico Colectivo</title>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,700;0,900;1,700&family=Cormorant+Garamond:ital,wght@1,400;1,600&family=Inter:wght@300;400;500&family=Patrick+Hand&display=swap" rel="stylesheet">
+<style>
+* { margin: 0; padding: 0; box-sizing: border-box; }
+
+body {
+  width: 1280px;
+  height: 720px;
+  overflow: hidden;
+  background: #EDE3CE;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  position: relative;
+  font-family: 'Inter', sans-serif;
+}
+
+/* Cuadrícula */
+body::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background-image:
+    linear-gradient(rgba(180,160,120,.18) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(180,160,120,.18) 1px, transparent 1px);
+  background-size: 44px 44px;
+  pointer-events: none;
+  z-index: 0;
+}
+
+.borde-izq {
+  position: absolute; left: 0; top: 0; bottom: 0; width: 8px;
+  background: linear-gradient(180deg, #6B1A2A, #3D0C11 50%, #8B2D3F);
+  z-index: 10;
+}
+.borde-sup {
+  position: absolute; top: 0; left: 0; right: 0; height: 6px;
+  background: linear-gradient(90deg, #E8C870, #D4A843 50%, #E8C870);
+  z-index: 10;
+}
+
+/* ============================================
+   ESCENA 1: CHECKLIST
+   Duración total: 0s → 9s
+   ============================================ */
+#escena1 {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 2;
+  animation: escena1Out .6s ease forwards 9s;
+}
+@keyframes escena1Out {
+  to { opacity: 0; transform: scale(.96); }
+}
+
+.tarjeta-checks {
+  background: #fff;
+  border-radius: 28px;
+  border: 2px solid rgba(107,26,42,.1);
+  padding: 50px 70px 54px;
+  display: flex;
+  flex-direction: column;
+  gap: 22px;
+  min-width: 720px;
+  position: relative;
+}
+
+.tarjeta-checks::before {
+  content: 'respondiendo a…';
+  position: absolute;
+  top: -14px;
+  left: 50%;
+  transform: translateX(-50%);
+  font-family: 'Inter', sans-serif;
+  font-size: 11px;
+  letter-spacing: 5px;
+  text-transform: uppercase;
+  color: #8B2D3F;
+  background: #EDE3CE;
+  padding: 0 16px;
+  white-space: nowrap;
+}
+
+/* Cada item: check + texto */
+.check-item {
+  display: flex;
+  align-items: center;
+  gap: 22px;
+  opacity: 0;
+}
+
+.check-item:nth-child(1) { animation: itemEntra .5s cubic-bezier(.25,.46,.45,.94) forwards .6s; }
+.check-item:nth-child(2) { animation: itemEntra .5s cubic-bezier(.25,.46,.45,.94) forwards 1.8s; }
+.check-item:nth-child(3) { animation: itemEntra .5s cubic-bezier(.25,.46,.45,.94) forwards 3.0s; }
+.check-item:nth-child(4) { animation: itemEntra .5s cubic-bezier(.25,.46,.45,.94) forwards 4.2s; }
+
+@keyframes itemEntra {
+  from { opacity: 0; transform: translateX(-16px); }
+  to   { opacity: 1; transform: translateX(0); }
+}
+
+/* Círculo del check */
+.check-circulo {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  border: 2.5px solid #ccc;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  position: relative;
+  overflow: hidden;
+}
+
+/* El fill verde que aparece */
+.check-item:nth-child(1) .check-circulo { animation: checkFill .35s ease forwards .95s; }
+.check-item:nth-child(2) .check-circulo { animation: checkFill .35s ease forwards 2.15s; }
+.check-item:nth-child(3) .check-circulo { animation: checkFill .35s ease forwards 3.35s; }
+.check-item:nth-child(4) .check-circulo { animation: checkFill .35s ease forwards 4.55s; }
+
+@keyframes checkFill {
+  to { background: #4CAF50; border-color: #4CAF50; }
+}
+
+/* El ✓ SVG dentro */
+.check-svg {
+  width: 22px;
+  height: 22px;
+  opacity: 0;
+}
+.check-item:nth-child(1) .check-svg { animation: checkMarkIn .3s ease forwards 1.1s; }
+.check-item:nth-child(2) .check-svg { animation: checkMarkIn .3s ease forwards 2.3s; }
+.check-item:nth-child(3) .check-svg { animation: checkMarkIn .3s ease forwards 3.5s; }
+.check-item:nth-child(4) .check-svg { animation: checkMarkIn .3s ease forwards 4.7s; }
+
+@keyframes checkMarkIn {
+  from { opacity: 0; transform: scale(.5); }
+  to   { opacity: 1; transform: scale(1); }
+}
+
+.check-texto {
+  font-family: 'Patrick Hand', cursive;
+  font-size: 36px;
+  color: #2a1008;
+  line-height: 1.15;
+}
+
+/* ============================================
+   ESCENA 2: FRASE "él solo llegó tarde"
+   Duración: 9.8s → 13s
+   ============================================ */
+#escena2 {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 3;
+  opacity: 0;
+  animation: escena2In .7s ease forwards 9.8s, escena2Out .6s ease forwards 13s;
+}
+@keyframes escena2In  { to { opacity: 1; } }
+@keyframes escena2Out { to { opacity: 0; } }
+
+.frase-sola {
+  font-family: 'Playfair Display', serif;
+  font-weight: 900;
+  font-size: 86px;
+  line-height: 1.05;
+  color: #3D0C11;
+  text-align: center;
+  max-width: 900px;
+}
+
+.frase-sola em {
+  font-style: italic;
+  color: #8B2D3F;
+}
+
+/* ============================================
+   ESCENA 3: PUERTA + TEXTO FINAL
+   Duración: 13.8s →
+   ============================================ */
+#escena3 {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-direction: column;
+  gap: 0;
+  z-index: 4;
+  opacity: 0;
+  animation: escena3In .8s ease forwards 13.8s;
+}
+@keyframes escena3In { to { opacity: 1; } }
+
+/* La puerta SVG */
+#puerta-wrap {
+  position: relative;
+  width: 340px;
+  height: 420px;
+}
+
+/* Animación de acercamiento (zoom) */
+#puerta-wrap svg {
+  width: 100%;
+  height: 100%;
+  animation: puertaZoom 3s cubic-bezier(.25,.46,.45,.94) forwards 14.2s;
+  transform-origin: center bottom;
+}
+@keyframes puertaZoom {
+  from { transform: scale(1); }
+  to   { transform: scale(2.8) translateY(-10px); }
+}
+
+/* El panel de la puerta que se abre */
+#panel-puerta {
+  transform-origin: left center;
+  animation: abrirPuerta 1.8s cubic-bezier(.25,.46,.45,.94) forwards 14.8s;
+}
+@keyframes abrirPuerta {
+  from { transform: perspective(600px) rotateY(0deg); }
+  to   { transform: perspective(600px) rotateY(-75deg); }
+}
+
+/* Luz del interior */
+#luz-interior {
+  opacity: 0;
+  animation: luzIn .8s ease forwards 15.6s;
+}
+@keyframes luzIn { to { opacity: 1; } }
+
+/* TEXTO FINAL */
+#texto-final {
+  position: absolute;
+  bottom: 80px;
+  left: 0; right: 0;
+  text-align: center;
+  opacity: 0;
+  animation: textoFinalIn .9s cubic-bezier(.25,.46,.45,.94) forwards 17s;
+}
+@keyframes textoFinalIn {
+  from { opacity: 0; transform: translateY(30px) scale(.95); }
+  to   { opacity: 1; transform: translateY(0) scale(1); }
+}
+
+.texto-final-label {
+  font-family: 'Inter', sans-serif;
+  font-weight: 300;
+  font-size: 12px;
+  letter-spacing: 7px;
+  text-transform: uppercase;
+  color: rgba(107,26,42,.55);
+  margin-bottom: 10px;
+}
+
+.texto-final-grande {
+  font-family: 'Playfair Display', serif;
+  font-weight: 900;
+  font-size: 96px;
+  line-height: 1.0;
+  color: #3D0C11;
+}
+
+.texto-final-grande span {
+  color: #6B1A2A;
+}
+
+.texto-final-sub {
+  font-family: 'Cormorant Garamond', serif;
+  font-style: italic;
+  font-size: 36px;
+  color: rgba(61,12,17,.65);
+  margin-top: 8px;
+}
+
+.linea-dorada {
+  width: 0px;
+  height: 3px;
+  background: linear-gradient(90deg, transparent, #E8C870, #D4A843, transparent);
+  border-radius: 2px;
+  margin: 14px auto 0;
+  animation: lineaCrece .7s ease forwards 17.5s;
+}
+@keyframes lineaCrece { to { width: 600px; } }
+</style>
+</head>
+<body>
+
+<div class="borde-izq"></div>
+<div class="borde-sup"></div>
+
+<!-- ══════════════════════════════════
+     ESCENA 1 — CHECKLIST
+     ══════════════════════════════════ -->
+<div id="escena1">
+  <div class="tarjeta-checks">
+
+    <div class="check-item">
+      <div class="check-circulo">
+        <svg class="check-svg" viewBox="0 0 24 24" fill="none">
+          <polyline points="20 6 9 17 4 12" stroke="white" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/>
+        </svg>
+      </div>
+      <div class="check-texto">tu ex</div>
+    </div>
+
+    <div class="check-item">
+      <div class="check-circulo">
+        <svg class="check-svg" viewBox="0 0 24 24" fill="none">
+          <polyline points="20 6 9 17 4 12" stroke="white" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/>
+        </svg>
+      </div>
+      <div class="check-texto">tu padre</div>
+    </div>
+
+    <div class="check-item">
+      <div class="check-circulo">
+        <svg class="check-svg" viewBox="0 0 24 24" fill="none">
+          <polyline points="20 6 9 17 4 12" stroke="white" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/>
+        </svg>
+      </div>
+      <div class="check-texto">aquella amiga del colegio</div>
+    </div>
+
+    <div class="check-item">
+      <div class="check-circulo">
+        <svg class="check-svg" viewBox="0 0 24 24" fill="none">
+          <polyline points="20 6 9 17 4 12" stroke="white" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/>
+        </svg>
+      </div>
+      <div class="check-texto">el vecino que dijo algo que no debía</div>
+    </div>
+
+  </div>
+</div>
+
+<!-- ══════════════════════════════════
+     ESCENA 2 — FRASE SOLA
+     ══════════════════════════════════ -->
+<div id="escena2">
+  <div class="frase-sola">
+    él solo llegó<br><em>tarde del trabajo.</em>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════
+     ESCENA 3 — PUERTA + TEXTO FINAL
+     ══════════════════════════════════ -->
+<div id="escena3">
+
+  <div id="puerta-wrap">
+    <svg viewBox="0 0 300 380" xmlns="http://www.w3.org/2000/svg">
+      <!-- Luz interior (fondo cálido) -->
+      <g id="luz-interior">
+        <rect x="42" y="28" width="178" height="310" rx="6" fill="#F5D98B" opacity=".55"/>
+      </g>
+
+      <!-- Marco exterior de la puerta -->
+      <rect x="30" y="20" width="200" height="330" rx="8" fill="none" stroke="#3D0C11" stroke-width="6"/>
+
+      <!-- Panel de la puerta (se abre) -->
+      <g id="panel-puerta">
+        <!-- Panel principal -->
+        <rect x="36" y="26" width="188" height="318" rx="5" fill="#C8A96E" stroke="#8B6520" stroke-width="3"/>
+        <!-- Moldura superior -->
+        <rect x="50" y="40" width="160" height="120" rx="4" fill="none" stroke="#8B6520" stroke-width="2"/>
+        <!-- Moldura inferior -->
+        <rect x="50" y="174" width="160" height="148" rx="4" fill="none" stroke="#8B6520" stroke-width="2"/>
+        <!-- Manija -->
+        <circle cx="195" cy="192" r="9" fill="#D4A843" stroke="#8B6520" stroke-width="2"/>
+        <line x1="195" y1="201" x2="195" y2="218" stroke="#8B6520" stroke-width="3" stroke-linecap="round"/>
+      </g>
+
+      <!-- Escalones / umbral -->
+      <rect x="18" y="348" width="224" height="10" rx="3" fill="#8B6520" opacity=".5"/>
+      <rect x="8"  y="356" width="244" height="8"  rx="3" fill="#8B6520" opacity=".3"/>
+    </svg>
+  </div>
+
+  <!-- TEXTO FINAL -->
+  <div id="texto-final">
+    <div class="texto-final-label">distorsión cognitiva</div>
+    <div class="texto-final-grande">Juicio <span>histórico</span><br>colectivo</div>
+    <div class="texto-final-sub">Respondes al patrón, no a la persona</div>
+    <div class="linea-dorada"></div>
+  </div>
+
+</div>
+
+<script>
+  // Reiniciar animación al hacer click (útil para preview)
+  document.body.addEventListener('click', () => {
+    document.body.style.animation = 'none';
+    location.reload();
+  });
+</script>
+
+</body>
+</html>

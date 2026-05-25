@@ -1,0 +1,135 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<style>
+  body:not(.fonts-loaded) * { animation-play-state:paused !important; transition:none !important; }
+</style>
+<script>
+  document.fonts.ready.then(() => { setTimeout(() => { document.body.classList.add("fonts-loaded"); }, 1500); });
+</script>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=1280, height=720">
+<title>anim_l2_an11 — Pizarra agotamiento</title>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700;900&family=Cormorant+Garamond:ital,wght@1,400;1,600&family=Inter:wght@300;400;500&display=swap" rel="stylesheet">
+<style>
+* { margin:0; padding:0; box-sizing:border-box; }
+body { width:1280px; height:720px; overflow:hidden; }
+.scene {
+  width:1280px; height:720px; position:relative; overflow:hidden;
+  background-color:#EDE3CE;
+  background-image:
+    linear-gradient(rgba(90,18,32,0.07) 1px, transparent 1px),
+    linear-gradient(90deg,rgba(90,18,32,0.07) 1px, transparent 1px);
+  background-size:48px 48px;
+  opacity:0; animation:fadeIn 0.5s ease forwards 0.1s, fadeOut 0.5s ease forwards 17s;
+}
+@keyframes fadeIn { to{opacity:1} }
+@keyframes fadeOut { to{opacity:0} }
+.borde-izq { position:absolute; left:0; top:0; bottom:0; width:8px; background:linear-gradient(180deg,#5A1220,#8B2D3F); }
+.borde-sup {
+  position:absolute; top:0; left:0; right:0; height:5px;
+  background:linear-gradient(90deg,#D4A843,#B8892A,transparent);
+  width:0; animation:lineaGrow 0.8s ease forwards 0.4s;
+}
+@keyframes lineaGrow { to{width:100%} }
+
+.titulo-pizarra {
+  position:absolute; top:42px; left:60px;
+  font-family:'Playfair Display',serif; font-weight:700; font-size:20px;
+  color:#3D0C11; letter-spacing:1px; text-transform:uppercase;
+  opacity:0; animation:fadeUp 0.5s ease forwards 0.6s;
+}
+.titulo-pizarra::after {
+  content:''; display:block; width:0; height:2px;
+  background:linear-gradient(90deg,#5A1220,#B8892A,transparent);
+  margin-top:5px; animation:lineaGrow 0.5s ease forwards 1s;
+}
+@keyframes fadeUp { from{opacity:0;transform:translateY(10px)} to{opacity:1;transform:translateY(0)} }
+
+/* Items que se entregan */
+.entregas-wrap {
+  position:absolute; top:110px; left:80px; right:80px;
+  display:flex; flex-wrap:wrap; gap:14px 20px;
+}
+
+.entrega-item {
+  font-family:'Cormorant Garamond',serif; font-style:italic;
+  font-size:28px; color:#3D0C11;
+  display:flex; align-items:center; gap:10px;
+  opacity:0;
+  /* cada item se desvanece al aparecer la frase final */
+}
+.entrega-item::before {
+  content:''; display:block; width:8px; height:8px;
+  border-radius:50%; background:#5A1220; flex-shrink:0;
+}
+
+.entrega-item:nth-child(1){ animation:fadeUp 0.4s ease forwards 0.9s, fadeOutItem 0.4s ease forwards 5.5s; }
+.entrega-item:nth-child(2){ animation:fadeUp 0.4s ease forwards 1.2s, fadeOutItem 0.4s ease forwards 5.7s; }
+.entrega-item:nth-child(3){ animation:fadeUp 0.4s ease forwards 1.5s, fadeOutItem 0.4s ease forwards 5.9s; }
+.entrega-item:nth-child(4){ animation:fadeUp 0.4s ease forwards 1.8s, fadeOutItem 0.4s ease forwards 6.1s; }
+.entrega-item:nth-child(5){ animation:fadeUp 0.4s ease forwards 2.1s, fadeOutItem 0.4s ease forwards 6.3s; }
+.entrega-item:nth-child(6){ animation:fadeUp 0.4s ease forwards 2.4s, fadeOutItem 0.4s ease forwards 6.5s; }
+.entrega-item:nth-child(7){ animation:fadeUp 0.4s ease forwards 2.7s, fadeOutItem 0.4s ease forwards 6.7s; }
+
+@keyframes fadeOutItem { to{opacity:0;transform:translateY(-8px)} }
+
+/* Etiqueta "Entregaron" */
+.etiqueta {
+  position:absolute; top:110px; left:80px;
+  font-family:'Inter',sans-serif; font-weight:300; font-size:13px;
+  letter-spacing:4px; text-transform:uppercase; color:#5A1220;
+  opacity:0; animation:fadeUp 0.4s ease forwards 0.7s, fadeOutItem 0.4s ease forwards 5.3s;
+}
+
+/* Frase resultado */
+.resultado {
+  position:absolute; inset:0;
+  display:flex; flex-direction:column; align-items:center; justify-content:center;
+  background:rgba(40,8,16,0.95);
+  opacity:0; animation:fadeIn 0.7s ease forwards 6.8s;
+  padding:0 100px; text-align:center;
+}
+.resultado-texto {
+  font-family:'Cormorant Garamond',serif; font-style:italic; font-weight:600;
+  font-size:52px; color:#F9F3E8; line-height:1.38;
+  text-shadow:0 0 30px rgba(249,243,232,0.1);
+}
+.resultado-texto em { color:#E8C870; text-shadow:0 0 20px rgba(232,200,112,0.4); }
+.resultado-sub {
+  font-family:'Cormorant Garamond',serif; font-style:italic;
+  font-size:30px; color:#C97080; margin-top:20px; line-height:1.4;
+  opacity:0; animation:fadeUp 0.6s ease forwards 7.8s;
+}
+</style>
+</head>
+<body>
+<div class="scene">
+  <div class="borde-izq"></div>
+  <div class="borde-sup"></div>
+
+  <div class="etiqueta">Entregaron:</div>
+
+  <div class="entregas-wrap">
+    <div class="entrega-item" style="margin-top:32px;">Su tiempo</div>
+    <div class="entrega-item" style="margin-top:32px;">Su energía</div>
+    <div class="entrega-item" style="margin-top:32px;">Su cuerpo</div>
+    <div class="entrega-item" style="margin-top:32px;">Sus sueños</div>
+    <div class="entrega-item" style="margin-top:32px;">Su criterio</div>
+    <div class="entrega-item" style="margin-top:32px;">Su paz</div>
+    <div class="entrega-item" style="margin-top:32px;">Sus decisiones</div>
+  </div>
+
+  <div class="resultado">
+    <div class="resultado-texto">
+      Dieron tanto que al final<br>
+      <em>ya no quedaba nadie a quien amar.</em>
+    </div>
+    <div class="resultado-sub">
+      Solo una versión agotada de sí mismas,<br>
+      esperando que alguien les devolviera lo que habían dado.
+    </div>
+  </div>
+</div>
+</body>
+</html>

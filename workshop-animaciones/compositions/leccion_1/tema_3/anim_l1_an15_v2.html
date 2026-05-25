@@ -1,0 +1,345 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<style>
+  body:not(.fonts-loaded) * { animation-play-state: paused !important; transition: none !important; }
+</style>
+<script>
+  document.fonts.ready.then(() => {
+    setTimeout(() => { document.body.classList.add("fonts-loaded"); }, 1500);
+  });
+</script>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=1280, height=720">
+<title>anim_l1_an15 — Lo que parecía falta de amor</title>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@1,400;1,600&family=Playfair+Display:wght@700;900&display=swap" rel="stylesheet">
+<style>
+* { margin:0; padding:0; box-sizing:border-box; }
+body { width:1280px; height:720px; overflow:hidden; background:#F0E8D5; }
+
+/* ── Pizarra base ── */
+.pizarra {
+  width:1280px; height:720px; position:relative; overflow:hidden;
+  background:#F0E8D5;
+  background-image:
+    linear-gradient(rgba(160,135,90,.18) 1px,transparent 1px),
+    linear-gradient(90deg,rgba(160,135,90,.18) 1px,transparent 1px);
+  background-size:56px 56px;
+}
+/* Borde izq borgoña */
+.pizarra::before {
+  content:''; position:absolute; left:0;top:0;bottom:0; width:7px;
+  background:linear-gradient(180deg,#3D0C11,#6B1A2A,#3D0C11);
+  z-index:30;
+}
+/* Línea dorada superior */
+.pizarra::after {
+  content:''; position:absolute; top:0;left:0;right:0; height:4px;
+  background:linear-gradient(90deg,#6B1A2A,#E8C870,#D4A843,#E8C870,#6B1A2A);
+  z-index:30;
+}
+
+/* ── Slides ── */
+.slide {
+  position:absolute; inset:0;
+  display:flex; align-items:center; justify-content:center;
+  opacity:0; pointer-events:none;
+}
+
+/* ════ SLIDE 0: Apertura ════ */
+#s0 { flex-direction:column; gap:0; animation:slideShow 0s ease-out 0.2s forwards; }
+@keyframes slideShow { to { opacity:1; } }
+
+.s0-label {
+  font-family:'Cormorant Garamond',Georgia,serif;
+  font-style:italic; font-size:38px; color:#8B2D3F; letter-spacing:.06em;
+  opacity:0; transform:translateY(-10px);
+  animation:fadeUp .5s ease-out 0.4s forwards;
+}
+.s0-titulo {
+  font-family:'Playfair Display',Georgia,serif;
+  font-weight:900; font-size:108px; color:#3D0C11;
+  line-height:.9; text-align:center;
+  opacity:0; transform:translateY(20px);
+  animation:fadeUp .6s ease-out 0.8s forwards;
+}
+.s0-titulo span { color:#6B1A2A; }
+.s0-linea {
+  width:0; height:5px; margin-top:18px;
+  background:linear-gradient(90deg,#E8C870,#D4A843);
+  box-shadow:0 0 20px rgba(232,200,112,.7);
+  animation:lineGrow .8s ease-out 1.3s forwards;
+}
+@keyframes lineGrow { to{width:620px} }
+@keyframes fadeUp { to{opacity:1;transform:translateY(0)} }
+
+/* ── Tarjeta genérica ── */
+.card {
+  position:absolute;
+  width:1180px; height:620px;
+  border-radius:16px;
+  display:flex; flex-direction:column;
+  align-items:center; justify-content:center;
+  padding:40px 60px;
+  box-shadow:0 24px 80px rgba(61,12,17,.35), 0 6px 20px rgba(61,12,17,.15);
+  transform:translateY(800px);
+  opacity:0;
+}
+
+/* ════ SLIDE 1: "SÍ SE AMABAN" ════ */
+#s1 { animation:none; }
+#c1 {
+  background:linear-gradient(145deg,#3D0C11 0%,#1a0608 100%);
+  border:1px solid rgba(232,200,112,.15);
+  animation:cardIn1 .7s cubic-bezier(.2,0,.1,1) 2.2s forwards;
+}
+@keyframes cardIn1 {
+  0%  { opacity:1; transform:translateY(820px); }
+  70% { transform:translateY(-18px); }
+  100%{ transform:translateY(0); opacity:1; }
+}
+
+#s1 { animation:sShow .01s 2.2s forwards; }
+@keyframes sShow { to{opacity:1} }
+
+.c1-pre {
+  font-family:'Cormorant Garamond',serif; font-style:italic;
+  font-size:46px; color:#C97080; letter-spacing:.08em; margin-bottom:8px;
+  opacity:0; animation:fadeUp .4s .3s forwards;
+  animation-delay:2.7s;
+}
+.c1-main {
+  font-family:'Playfair Display',serif; font-weight:900;
+  font-size:164px; color:#F9F3E8; line-height:.85; text-align:center;
+  text-shadow:0 0 60px rgba(249,243,232,.12);
+  opacity:0; animation:fadeUp .5s 3.0s forwards;
+}
+.c1-main span { color:#E8C870; display:block; font-size:130px; }
+.c1-sub {
+  font-family:'Cormorant Garamond',serif; font-style:italic;
+  font-size:48px; color:rgba(249,243,232,.6); margin-top:12px;
+  opacity:0; animation:fadeUp .4s 3.5s forwards;
+}
+/* Check dorado */
+.check {
+  position:absolute; bottom:28px; right:40px;
+  opacity:0; animation:fadeUp .4s 4.0s forwards;
+}
+.check svg { width:52px; height:52px; }
+.check path { stroke-dasharray:80; stroke-dashoffset:80; animation:drawCheck .6s ease-out 4.1s forwards; }
+@keyframes drawCheck { to{stroke-dashoffset:0} }
+
+/* ════ SLIDE 2: EL IDIOMA ════ */
+#s2 { animation:sShow .01s 5.5s forwards; }
+#c2 {
+  background:linear-gradient(145deg,#2D0810 0%,#6B1A2A 100%);
+  border:1px solid rgba(232,200,112,.2);
+  animation:cardIn2 .7s cubic-bezier(.2,0,.1,1) 5.5s forwards;
+}
+@keyframes cardIn2 {
+  0%  { opacity:1; transform:translateY(820px); }
+  70% { transform:translateY(-18px); }
+  100%{ transform:translateY(0); opacity:1; }
+}
+
+.c2-wrap {
+  display:flex; gap:60px; align-items:center; width:100%;
+}
+/* Icono SVG de dos bocas / idiomas */
+.c2-icon {
+  flex-shrink:0; opacity:0; animation:fadeUp .5s 6.2s forwards;
+}
+.c2-texto { flex:1; }
+.c2-label {
+  font-family:'Cormorant Garamond',serif; font-style:italic;
+  font-size:42px; color:#C97080; margin-bottom:6px;
+  opacity:0; animation:fadeUp .4s 6.0s forwards;
+}
+.c2-main {
+  font-family:'Playfair Display',serif; font-weight:900;
+  font-size:140px; color:#F9F3E8; line-height:.85;
+  opacity:0; animation:fadeUp .5s 6.3s forwards;
+}
+.c2-main em { color:#E8C870; font-style:normal; font-size:80px; display:block; line-height:1.2; }
+.c2-sub {
+  font-family:'Cormorant Garamond',serif; font-style:italic;
+  font-size:46px; color:rgba(249,243,232,.65); margin-top:10px;
+  opacity:0; animation:fadeUp .4s 6.8s forwards;
+}
+#c2 .check { animation:fadeUp .4s 7.3s forwards; }
+
+/* ════ SLIDE 3: LA BRECHA ════ */
+#s3 { animation:sShow .01s 9.0s forwards; }
+#c3 {
+  background:#0F0A0B;
+  border:2px solid rgba(232,200,112,.25);
+  animation:cardIn3 .7s cubic-bezier(.2,0,.1,1) 9.0s forwards;
+  flex-direction:row; gap:0; padding:0; overflow:hidden;
+}
+@keyframes cardIn3 {
+  0%  { opacity:1; transform:translateY(820px); }
+  70% { transform:translateY(-18px); }
+  100%{ transform:translateY(0); opacity:1; }
+}
+
+.c3-col {
+  flex:1; display:flex; flex-direction:column;
+  align-items:center; justify-content:center; padding:40px 32px;
+}
+.c3-col.left { border-right:1px solid rgba(232,200,112,.15); }
+.c3-tag {
+  font-family:'Cormorant Garamond',serif; font-style:italic;
+  font-size:36px; letter-spacing:.1em; margin-bottom:10px;
+  opacity:0;
+}
+.c3-tag.el { color:#C97080; animation:fadeUp .4s 9.6s forwards; }
+.c3-tag.ella { color:#E8C870; animation:fadeUp .4s 10.1s forwards; }
+.c3-word {
+  font-family:'Playfair Display',serif; font-weight:900;
+  font-size:150px; line-height:.85; text-align:center;
+  opacity:0;
+}
+.c3-word.el { color:#C97080; text-shadow:0 0 40px rgba(201,112,128,.3); animation:fadeUp .5s 9.8s forwards; }
+.c3-word.ella { color:#E8C870; text-shadow:0 0 40px rgba(232,200,112,.3); animation:fadeUp .5s 10.3s forwards; }
+.c3-desc {
+  font-family:'Cormorant Garamond',serif; font-style:italic;
+  font-size:40px; text-align:center; margin-top:10px;
+  opacity:0;
+}
+.c3-desc.el { color:rgba(201,112,128,.7); animation:fadeUp .4s 10.1s forwards; }
+.c3-desc.ella { color:rgba(232,200,112,.7); animation:fadeUp .4s 10.6s forwards; }
+
+/* Divisor central con brecha */
+.c3-center {
+  width:2px; height:100%; background:linear-gradient(180deg,transparent,#E8C870,transparent);
+  position:relative; display:flex; align-items:center; justify-content:center;
+  flex-shrink:0;
+}
+.c3-brecha {
+  background:#0F0A0B; padding:8px 0; width:80px; text-align:center;
+  font-family:'Playfair Display',serif; font-weight:900;
+  font-size:28px; color:#E8C870; letter-spacing:.15em;
+  opacity:0; animation:fadeUp .4s 10.4s forwards;
+  writing-mode:vertical-rl;
+}
+
+/* ════ SLIDE 4: CONCLUSIÓN ════ */
+#s4 { animation:sShow .01s 12.0s forwards; }
+#c4 {
+  background:linear-gradient(145deg,#3D0C11 0%,#6B1A2A 60%,#3D0C11 100%);
+  border:1px solid rgba(232,200,112,.3);
+  animation:cardIn4 .7s cubic-bezier(.2,0,.1,1) 12.0s forwards;
+  text-align:center; gap:16px;
+}
+@keyframes cardIn4 {
+  0%  { opacity:1; transform:translateY(820px); }
+  70% { transform:translateY(-18px); }
+  100%{ transform:translateY(0); opacity:1; }
+}
+
+.c4-top {
+  font-family:'Cormorant Garamond',serif; font-style:italic;
+  font-size:44px; color:#C97080;
+  opacity:0; animation:fadeUp .4s 12.5s forwards;
+}
+.c4-main {
+  font-family:'Playfair Display',serif; font-weight:900;
+  font-size:110px; color:#F9F3E8; line-height:.9;
+  opacity:0; animation:fadeUp .5s 12.8s forwards;
+}
+.c4-linea {
+  width:0; height:4px; margin:10px auto;
+  background:linear-gradient(90deg,#E8C870,#D4A843);
+  box-shadow:0 0 16px rgba(232,200,112,.6);
+  animation:lineGrow2 .7s ease-out 13.4s forwards;
+}
+@keyframes lineGrow2 { to{width:500px} }
+.c4-sub {
+  font-family:'Cormorant Garamond',serif; font-style:italic;
+  font-size:52px; color:rgba(249,243,232,.75);
+  opacity:0; animation:fadeUp .4s 13.6s forwards;
+}
+.c4-sub span { color:#E8C870; }
+</style>
+</head>
+<body>
+<div class="pizarra">
+
+  <!-- ── SLIDE 0: Apertura ── -->
+  <div class="slide" id="s0">
+    <span class="s0-label">Lo que parecía →</span>
+    <p class="s0-titulo">FALTA<br><span>DE AMOR</span></p>
+    <div class="s0-linea"></div>
+  </div>
+
+  <!-- ── SLIDE 1: Sí se amaban ── -->
+  <div class="slide" id="s1">
+    <div class="card" id="c1">
+      <p class="c1-pre">la realidad era</p>
+      <p class="c1-main">SÍ<span>SE AMABAN</span></p>
+      <p class="c1-sub">Los dos. Al mismo tiempo.</p>
+      <div class="check">
+        <svg viewBox="0 0 52 52"><path d="M12 26 L22 38 L40 16" stroke="#E8C870" stroke-width="4" stroke-linecap="round" stroke-linejoin="round" fill="none"/></svg>
+      </div>
+    </div>
+  </div>
+
+  <!-- ── SLIDE 2: El idioma ── -->
+  <div class="slide" id="s2">
+    <div class="card" id="c2">
+      <div class="c2-wrap">
+        <div class="c2-icon">
+          <!-- Ícono SVG: corazón con señal de "sin traducción" -->
+          <svg width="160" height="160" viewBox="0 0 160 160">
+            <!-- Corazón -->
+            <path d="M80 130 C80 130 20 88 20 50 C20 30 36 18 52 18 C62 18 71 24 80 34 C89 24 98 18 108 18 C124 18 140 30 140 50 C140 88 80 130 80 130Z" fill="none" stroke="#C97080" stroke-width="3" stroke-dasharray="300" stroke-dashoffset="300" style="animation:drawCheck .8s ease-out 6.5s forwards"/>
+            <!-- Línea de bloqueo -->
+            <line x1="30" y1="130" x2="130" y2="30" stroke="#E8C870" stroke-width="5" stroke-linecap="round" opacity="0" style="animation:fadeUp .4s 7.0s forwards"/>
+            <!-- Círculo -->
+            <circle cx="80" cy="80" r="68" fill="none" stroke="rgba(201,112,128,.2)" stroke-width="2"/>
+          </svg>
+        </div>
+        <div class="c2-texto">
+          <p class="c2-label">el problema era</p>
+          <p class="c2-main">SIN<em>IDIOMA</em></p>
+          <p class="c2-sub">Él amaba a su manera.<br>Ella necesitaba otra.</p>
+        </div>
+      </div>
+      <div class="check">
+        <svg viewBox="0 0 52 52"><path d="M12 26 L22 38 L40 16" stroke="#E8C870" stroke-width="4" stroke-linecap="round" stroke-linejoin="round" fill="none"/></svg>
+      </div>
+    </div>
+  </div>
+
+  <!-- ── SLIDE 3: La brecha — dos columnas ── -->
+  <div class="slide" id="s3">
+    <div class="card" id="c3">
+      <div class="c3-col left">
+        <span class="c3-tag el">él</span>
+        <p class="c3-word el">DABA</p>
+        <p class="c3-desc el">a su manera</p>
+      </div>
+      <div class="c3-center">
+        <span class="c3-brecha">BRECHA</span>
+      </div>
+      <div class="c3-col">
+        <span class="c3-tag ella">ella</span>
+        <p class="c3-word ella">RECIBÍA</p>
+        <p class="c3-desc ella">en otro idioma</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- ── SLIDE 4: Conclusión ── -->
+  <div class="slide" id="s4">
+    <div class="card" id="c4">
+      <p class="c4-top">la conclusión de los dos</p>
+      <p class="c4-main">"YA NO<br>ME AMA"</p>
+      <div class="c4-linea"></div>
+      <p class="c4-sub">El amor no desapareció.<br>Quedó <span>atrapado.</span></p>
+    </div>
+  </div>
+
+</div>
+</body>
+</html>

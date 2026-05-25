@@ -1,0 +1,133 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<style>
+  body:not(.fonts-loaded) * { animation-play-state: paused !important; transition: none !important; }
+</style>
+<script>
+  document.fonts.ready.then(() => {
+    setTimeout(() => { document.body.classList.add("fonts-loaded"); }, 1500);
+  });
+</script>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=1280, height=720">
+<title>anim_l1_an7 — INICIO TEMA</title>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@1,300;1,500&family=Inter:wght@300;400&display=swap" rel="stylesheet">
+<style>
+  * { margin:0; padding:0; box-sizing:border-box; }
+  body { width:1280px; height:720px; overflow:hidden; background:#00FF00; }
+
+  .scene {
+    width:1280px; height:720px; position:relative;
+    display:flex; flex-direction:column;
+    align-items:flex-start; justify-content:center;
+    padding-left:100px; background:#00FF00;
+    opacity:0; animation:sceneIn .5s ease-out .1s forwards;
+  }
+  @keyframes sceneIn { to{opacity:1} }
+  .scene.out { animation:sceneOut .7s ease-in forwards; }
+  @keyframes sceneOut { to{opacity:0} }
+
+  /* Banda semitransparente */
+  .band {
+    position:absolute; left:0; top:50%; transform:translateY(-50%);
+    width:0; height:160px;
+    background:linear-gradient(90deg, rgba(15,10,11,.92) 0%, rgba(15,10,11,.80) 70%, transparent 100%);
+    animation:expandBand .5s cubic-bezier(.2,0,.1,1) .2s forwards;
+  }
+  @keyframes expandBand { to{width:780px} }
+
+  /* Barra izquierda dorada */
+  .left-bar {
+    position:absolute; left:0; top:50%; transform:translateY(-50%);
+    width:5px; height:0;
+    background:linear-gradient(180deg, transparent, #E8C870, #D4A843, #E8C870, transparent);
+    box-shadow:0 0 12px rgba(232,200,112,.6), 0 0 25px rgba(232,200,112,.3);
+    animation:growBar .5s ease-out .5s forwards;
+  }
+  @keyframes growBar { to{height:160px} }
+
+  .content { position:relative; z-index:2; padding-left:24px; }
+
+  /* Referencia lección arriba */
+  .leccion-ref {
+    font-family:'Inter',sans-serif; font-size:14px; font-weight:300;
+    color:#E8C870; letter-spacing:.28em; text-transform:uppercase;
+    opacity:0; animation:fadeIn .4s ease-out .7s forwards;
+    margin-bottom:10px;
+    text-shadow:0 0 15px rgba(232,200,112,.5);
+  }
+  @keyframes fadeIn { to{opacity:1} }
+
+  /* Título del tema — escritura letra a letra */
+  .tema-titulo {
+    font-family:'Cormorant Garamond',Georgia,serif;
+    font-style:italic; font-size:64px; font-weight:300;
+    color:#F9F3E8; line-height:1.15; letter-spacing:.01em;
+    text-shadow:
+      0 0 25px rgba(249,243,232,.25),
+      0 0 55px rgba(249,243,232,.10);
+  }
+
+  .tema-titulo .letter {
+    opacity:0; display:inline;
+    transition:opacity .06s ease;
+  }
+
+  /* Cursor */
+  .cursor {
+    display:inline-block; width:3px; height:.82em;
+    background:#E8C870; margin-left:3px; vertical-align:middle;
+    animation:blink .5s step-end infinite; opacity:0;
+    box-shadow:0 0 8px rgba(232,200,112,.8);
+  }
+  @keyframes blink { 0%,100%{opacity:1} 50%{opacity:0} }
+
+  .scene.out { animation:sceneOut .7s ease-in forwards; }
+  @keyframes sceneOut { to{opacity:0} }
+</style>
+</head>
+<body>
+<div class="scene" id="scene">
+  <div class="band"></div>
+  <div class="left-bar"></div>
+  <div class="content">
+    <p class="leccion-ref">Lección 1 — ¿Qué es el Código Soberana?</p>
+    <div class="tema-titulo">
+      <span id="temaText"></span><span class="cursor" id="cursor"></span>
+    </div>
+  </div>
+</div>
+<script>
+  const texto = "¿Quién soy y por qué puedo hablar de esto?";
+  const DELAY_INICIO = 900;
+  const VELOCIDAD = 52;
+  const DURACION_VISIBLE = 3500;
+
+  const container = document.getElementById('temaText');
+  texto.split('').forEach(char => {
+    const span = document.createElement('span');
+    span.className = 'letter';
+    span.textContent = char === ' ' ? '\u00A0' : char;
+    container.appendChild(span);
+  });
+
+  const letters = container.querySelectorAll('.letter');
+
+  setTimeout(() => { document.getElementById('cursor').style.opacity = '1'; }, DELAY_INICIO - 200);
+
+  letters.forEach((l, i) => {
+    setTimeout(() => { l.style.opacity = '1'; }, DELAY_INICIO + i * VELOCIDAD);
+  });
+
+  const finEscritura = DELAY_INICIO + letters.length * VELOCIDAD;
+
+  setTimeout(() => {
+    const c = document.getElementById('cursor');
+    c.style.animation = 'none'; c.style.opacity = '0';
+  }, finEscritura + 500);
+
+  setTimeout(() => { document.getElementById('scene').classList.add('out'); }, finEscritura + DURACION_VISIBLE);
+</script>
+</body>
+</html>

@@ -1,0 +1,399 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<style>body:not(.fonts-loaded) * { animation-play-state: paused !important; transition: none !important; }</style>
+<script>document.fonts.ready.then(() => { setTimeout(() => { document.body.classList.add("fonts-loaded"); }, 1500); });</script>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=1280, height=720">
+<title>El Tiempo — Fuera de tu Control</title>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,900;1,400;1,900&family=Cormorant+Garamond:ital,wght@1,400;1,600&display=swap" rel="stylesheet">
+<style>
+* { margin:0; padding:0; box-sizing:border-box; }
+body { width:1280px; height:720px; overflow:hidden; }
+
+.fondo {
+  position:absolute; inset:0;
+  background:linear-gradient(135deg,#0F0A0B 0%,#1A0810 45%,#3D0C11 100%);
+}
+
+/* Partículas de fondo */
+.particulas { position:absolute; inset:0; pointer-events:none; overflow:hidden; }
+.particula {
+  position:absolute; border-radius:50%;
+  background:rgba(232,200,112,0.06);
+  animation:flotarP linear infinite;
+}
+@keyframes flotarP {
+  0%   { transform:translateY(0) scale(1); opacity:0; }
+  10%  { opacity:1; }
+  90%  { opacity:.4; }
+  100% { transform:translateY(-720px) scale(1.5); opacity:0; }
+}
+
+.slide { position:absolute; inset:0; display:flex; align-items:center; justify-content:center; opacity:0; pointer-events:none; z-index:2; }
+@keyframes cardIn  { 0%{opacity:0;transform:translateY(55px) scale(.94)} 70%{transform:translateY(-4px) scale(1.01)} 100%{opacity:1;transform:none} }
+@keyframes cardOut { 0%{opacity:1;transform:none} 100%{opacity:0;transform:translateY(-45px) scale(.95)} }
+@keyframes fadeIn  { to{opacity:1} }
+@keyframes lineGrow{ to{width:100%;opacity:1} }
+@keyframes goldGlow{ 0%,100%{text-shadow:0 0 30px rgba(232,200,112,.4)} 50%{text-shadow:0 0 80px rgba(255,245,180,.9),0 0 120px rgba(232,200,112,.6)} }
+@keyframes wordPop { 0%{opacity:0;transform:translateY(22px) scale(.88)} 100%{opacity:1;transform:none} }
+@keyframes slideL  { 0%{opacity:0;transform:translateX(-60px)} 100%{opacity:1;transform:none} }
+@keyframes slideR  { 0%{opacity:0;transform:translateX(60px)} 100%{opacity:1;transform:none} }
+@keyframes pulse   { 0%,100%{opacity:1} 50%{opacity:.6} }
+@keyframes diaAnim { 0%{background:#1A0810} 50%{background:#0A1628} 100%{background:#1A0810} }
+@keyframes cruzX   { 0%{width:0} 100%{width:108%} }
+@keyframes checkD  { 0%{stroke-dashoffset:60} 100%{stroke-dashoffset:0} }
+@keyframes tagSlide{ 0%{opacity:0;transform:translateX(30px)} 100%{opacity:1;transform:none} }
+
+/* S0: INTRO — tiempo */
+#s0 { flex-direction:column; gap:0; padding:0 100px; }
+#s0 .sup {
+  font-family:'Cormorant Garamond',serif; font-style:italic;
+  font-size:46px; color:rgba(249,243,232,.45); text-align:center;
+  opacity:0; animation:fadeIn .5s ease-out .3s forwards; margin-bottom:10px;
+}
+#s0 .big {
+  font-family:'Playfair Display',serif; font-weight:900;
+  font-size:138px; color:#F9F3E8; text-align:center; line-height:.95;
+  opacity:0; animation:cardIn .7s ease-out .6s forwards;
+  text-shadow:0 0 60px rgba(249,243,232,.15);
+}
+#s0 .sub {
+  font-family:'Cormorant Garamond',serif; font-style:italic;
+  font-size:50px; color:rgba(249,243,232,.4); text-align:center;
+  opacity:0; animation:fadeIn .5s ease-out 1s forwards; margin-top:8px;
+}
+#s0 .divider {
+  height:3px; width:0; margin:20px auto 0; border-radius:2px;
+  background:linear-gradient(90deg,transparent,rgba(249,243,232,.25),transparent);
+  animation:lineGrow .6s ease-out 1.3s forwards; opacity:0;
+}
+
+/* S1: CALENDARIOS — día y noche */
+#s1 { flex-direction:column; padding:0 70px; gap:16px; }
+#s1 .anos-row {
+  display:flex; gap:26px; align-items:flex-start; width:100%;
+  opacity:0; animation:cardIn .5s ease-out .2s forwards;
+}
+.ano-bloque { flex:1; }
+.ano-label {
+  font-family:'Playfair Display',serif; font-weight:900;
+  font-size:64px; color:#F9F3E8; line-height:1; margin-bottom:10px;
+  text-shadow:0 0 30px rgba(249,243,232,.12);
+}
+.dias-grid {
+  display:grid; grid-template-columns:repeat(13,1fr); gap:3px;
+}
+.dia {
+  aspect-ratio:1; border-radius:3px;
+  background:rgba(249,243,232,.08);
+  border:1px solid rgba(249,243,232,.05);
+  transition:background 0.1s;
+}
+.dia.noche { background:rgba(26,8,16,.9); border-color:rgba(107,26,42,.2); }
+.dia.activo { background:rgba(232,200,112,.6); border-color:rgba(232,200,112,.4); box-shadow:0 0 6px rgba(232,200,112,.4); }
+.dia.pasado { background:rgba(107,26,42,.5); border-color:rgba(201,112,128,.2); }
+
+#s1 .aviso {
+  font-family:'Cormorant Garamond',serif; font-style:italic;
+  font-size:36px; color:rgba(232,200,112,.55); text-align:center;
+  opacity:0; animation:fadeIn .5s ease-out 1.4s forwards; margin-top:4px;
+}
+
+/* S2: WRAPPED — texto enorme */
+#s2 { flex-direction:column; padding:0 80px; gap:0; text-align:center; }
+#s2 .pre {
+  font-family:'Cormorant Garamond',serif; font-style:italic;
+  font-size:44px; color:rgba(249,243,232,.4);
+  opacity:0; animation:fadeIn .4s ease-out .3s forwards; margin-bottom:6px;
+}
+#s2 .palabra-top {
+  font-family:'Playfair Display',serif; font-weight:900;
+  font-size:80px; line-height:1; color:rgba(249,243,232,.65);
+  opacity:0; animation:wordPop .5s ease-out .5s forwards;
+}
+#s2 .palabra-clave {
+  font-family:'Playfair Display',serif; font-weight:900; font-style:italic;
+  font-size:160px; line-height:.9; color:#E8C870;
+  animation:goldGlow 2.5s ease-in-out 1.2s infinite;
+  opacity:0; animation:wordPop .6s ease-out .7s forwards, goldGlow 2.5s ease-in-out 1.4s infinite;
+}
+#s2 .palabra-bot {
+  font-family:'Playfair Display',serif; font-weight:900;
+  font-size:72px; line-height:1.05; color:rgba(249,243,232,.55);
+  opacity:0; animation:wordPop .5s ease-out 1s forwards;
+}
+#s2 .linea-final {
+  height:3px; width:0; margin:20px auto 0; border-radius:2px;
+  background:linear-gradient(90deg,transparent,#E8C870,transparent);
+  opacity:0; animation:lineGrow .7s ease-out 1.4s forwards;
+}
+
+/* S3: COSAS TACHADAS */
+#s3 { flex-direction:column; padding:0 80px; gap:18px; }
+#s3 .titulo-s3 {
+  font-family:'Cormorant Garamond',serif; font-style:italic;
+  font-size:38px; color:rgba(249,243,232,.4); text-align:center;
+  opacity:0; animation:fadeIn .4s ease-out .1s forwards; margin-bottom:4px;
+}
+.items-grid {
+  display:grid; grid-template-columns:1fr 1fr; gap:14px 40px; width:100%;
+}
+.item-fila {
+  display:flex; align-items:center; gap:20px;
+  opacity:0;
+}
+.item-icono-wrap { position:relative; width:56px; height:56px; flex-shrink:0; }
+.item-icono-wrap svg { position:absolute; inset:0; }
+.item-texto {
+  font-family:'Playfair Display',serif; font-weight:900;
+  font-size:62px; line-height:1; color:#F9F3E8;
+  position:relative; display:inline-block;
+}
+.tachado-line {
+  position:absolute; top:50%; left:-4px; right:-4px; height:5px;
+  background:#C97080; border-radius:3px; transform:translateY(-50%);
+  width:0; box-shadow:0 0 10px rgba(201,112,128,.5);
+}
+.check-tag {
+  font-family:'Cormorant Garamond',serif; font-style:italic;
+  font-size:26px; color:rgba(201,112,128,.7); margin-left:6px;
+  opacity:0;
+}
+</style>
+</head>
+<body>
+<div class="fondo"></div>
+<div class="particulas" id="particulas"></div>
+
+<!-- S0: tiempo -->
+<div class="slide" id="s0">
+  <div style="width:100%;text-align:center;">
+    <div class="sup">Piensa en cuánto</div>
+    <div class="big">TIEMPO</div>
+    <div class="sub">en los últimos dos años</div>
+    <div class="divider" style="width:400px;"></div>
+  </div>
+</div>
+
+<!-- S1: calendarios -->
+<div class="slide" id="s1">
+  <div class="anos-row" id="anosRow">
+    <div class="ano-bloque">
+      <div class="ano-label">2024</div>
+      <div class="dias-grid" id="grid2024"></div>
+    </div>
+    <div class="ano-bloque">
+      <div class="ano-label">2025</div>
+      <div class="dias-grid" id="grid2025"></div>
+    </div>
+    <div class="ano-bloque">
+      <div class="ano-label">2026</div>
+      <div class="dias-grid" id="grid2026"></div>
+    </div>
+  </div>
+  <div class="aviso" id="avisoTiempo">... invertido en algo fuera de tu control.</div>
+</div>
+
+<!-- S2: wrapped — texto enorme -->
+<div class="slide" id="s2">
+  <div class="pre">tratando de cambiar</div>
+  <div class="palabra-top">algo que está</div>
+  <div class="palabra-clave">FUERA</div>
+  <div class="palabra-bot">de tu control.</div>
+  <div class="linea-final" style="width:540px;"></div>
+</div>
+
+<!-- S3: items tachados -->
+<div class="slide" id="s3">
+  <div class="titulo-s3">Invertiste tiempo intentando cambiar...</div>
+  <div class="items-grid" id="itemsGrid">
+
+    <div class="item-fila" id="it0">
+      <div class="item-icono-wrap">
+        <svg viewBox="0 0 56 56"><circle cx="28" cy="28" r="24" fill="rgba(61,12,17,.8)" stroke="rgba(107,26,42,.5)" stroke-width="1.5"/></svg>
+        <svg viewBox="0 0 56 56" id="check0" style="opacity:0"><polyline points="14,28 24,38 42,18" fill="none" stroke="#E8C870" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" stroke-dasharray="60" stroke-dashoffset="60"/></svg>
+        <svg viewBox="0 0 56 56" id="cruz0" style="opacity:0"><line x1="16" y1="16" x2="40" y2="40" stroke="#C97080" stroke-width="3.5" stroke-linecap="round"/><line x1="40" y1="16" x2="16" y2="40" stroke="#C97080" stroke-width="3.5" stroke-linecap="round"/></svg>
+      </div>
+      <div>
+        <span class="item-texto" id="txt0">A él<span class="tachado-line" id="tl0"></span></span>
+        <span class="check-tag" id="ct0">no cambió</span>
+      </div>
+    </div>
+
+    <div class="item-fila" id="it1">
+      <div class="item-icono-wrap">
+        <svg viewBox="0 0 56 56"><circle cx="28" cy="28" r="24" fill="rgba(61,12,17,.8)" stroke="rgba(107,26,42,.5)" stroke-width="1.5"/></svg>
+        <svg viewBox="0 0 56 56" id="check1" style="opacity:0"><polyline points="14,28 24,38 42,18" fill="none" stroke="#E8C870" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" stroke-dasharray="60" stroke-dashoffset="60"/></svg>
+        <svg viewBox="0 0 56 56" id="cruz1" style="opacity:0"><line x1="16" y1="16" x2="40" y2="40" stroke="#C97080" stroke-width="3.5" stroke-linecap="round"/><line x1="40" y1="16" x2="16" y2="40" stroke="#C97080" stroke-width="3.5" stroke-linecap="round"/></svg>
+      </div>
+      <div>
+        <span class="item-texto" id="txt1">Su actitud<span class="tachado-line" id="tl1"></span></span>
+        <span class="check-tag" id="ct1">no cambió</span>
+      </div>
+    </div>
+
+    <div class="item-fila" id="it2">
+      <div class="item-icono-wrap">
+        <svg viewBox="0 0 56 56"><circle cx="28" cy="28" r="24" fill="rgba(61,12,17,.8)" stroke="rgba(107,26,42,.5)" stroke-width="1.5"/></svg>
+        <svg viewBox="0 0 56 56" id="check2" style="opacity:0"><polyline points="14,28 24,38 42,18" fill="none" stroke="#E8C870" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" stroke-dasharray="60" stroke-dashoffset="60"/></svg>
+        <svg viewBox="0 0 56 56" id="cruz2" style="opacity:0"><line x1="16" y1="16" x2="40" y2="40" stroke="#C97080" stroke-width="3.5" stroke-linecap="round"/><line x1="40" y1="16" x2="16" y2="40" stroke="#C97080" stroke-width="3.5" stroke-linecap="round"/></svg>
+      </div>
+      <div>
+        <span class="item-texto" id="txt2">Su comunicación<span class="tachado-line" id="tl2"></span></span>
+        <span class="check-tag" id="ct2">no cambió</span>
+      </div>
+    </div>
+
+    <div class="item-fila" id="it3">
+      <div class="item-icono-wrap">
+        <svg viewBox="0 0 56 56"><circle cx="28" cy="28" r="24" fill="rgba(61,12,17,.8)" stroke="rgba(107,26,42,.5)" stroke-width="1.5"/></svg>
+        <svg viewBox="0 0 56 56" id="check3" style="opacity:0"><polyline points="14,28 24,38 42,18" fill="none" stroke="#E8C870" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" stroke-dasharray="60" stroke-dashoffset="60"/></svg>
+        <svg viewBox="0 0 56 56" id="cruz3" style="opacity:0"><line x1="16" y1="16" x2="40" y2="40" stroke="#C97080" stroke-width="3.5" stroke-linecap="round"/><line x1="40" y1="16" x2="16" y2="40" stroke="#C97080" stroke-width="3.5" stroke-linecap="round"/></svg>
+      </div>
+      <div>
+        <span class="item-texto" id="txt3">Sus prioridades<span class="tachado-line" id="tl3"></span></span>
+        <span class="check-tag" id="ct3">no cambió</span>
+      </div>
+    </div>
+
+    <div class="item-fila" id="it4">
+      <div class="item-icono-wrap">
+        <svg viewBox="0 0 56 56"><circle cx="28" cy="28" r="24" fill="rgba(61,12,17,.8)" stroke="rgba(107,26,42,.5)" stroke-width="1.5"/></svg>
+        <svg viewBox="0 0 56 56" id="check4" style="opacity:0"><polyline points="14,28 24,38 42,18" fill="none" stroke="#E8C870" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" stroke-dasharray="60" stroke-dashoffset="60"/></svg>
+        <svg viewBox="0 0 56 56" id="cruz4" style="opacity:0"><line x1="16" y1="16" x2="40" y2="40" stroke="#C97080" stroke-width="3.5" stroke-linecap="round"/><line x1="40" y1="16" x2="16" y2="40" stroke="#C97080" stroke-width="3.5" stroke-linecap="round"/></svg>
+      </div>
+      <div>
+        <span class="item-texto" id="txt4">Su distancia<span class="tachado-line" id="tl4"></span></span>
+        <span class="check-tag" id="ct4">no cambió</span>
+      </div>
+    </div>
+
+    <div class="item-fila" id="it5">
+      <div class="item-icono-wrap">
+        <svg viewBox="0 0 56 56"><circle cx="28" cy="28" r="24" fill="rgba(61,12,17,.8)" stroke="rgba(107,26,42,.5)" stroke-width="1.5"/></svg>
+        <svg viewBox="0 0 56 56" id="check5" style="opacity:0"><polyline points="14,28 24,38 42,18" fill="none" stroke="#E8C870" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" stroke-dasharray="60" stroke-dashoffset="60"/></svg>
+        <svg viewBox="0 0 56 56" id="cruz5" style="opacity:0"><line x1="16" y1="16" x2="40" y2="40" stroke="#C97080" stroke-width="3.5" stroke-linecap="round"/><line x1="40" y1="16" x2="16" y2="40" stroke="#C97080" stroke-width="3.5" stroke-linecap="round"/></svg>
+      </div>
+      <div>
+        <span class="item-texto" id="txt5">Su disposición<span class="tachado-line" id="tl5"></span></span>
+        <span class="check-tag" id="ct5">no cambió</span>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<script>
+/* PARTÍCULAS */
+(function(){
+  const c = document.getElementById('particulas');
+  for(let i=0; i<18; i++){
+    const p = document.createElement('div');
+    p.className = 'particula';
+    const s = 4 + Math.random()*10;
+    p.style.cssText = `width:${s}px;height:${s}px;left:${Math.random()*100}%;top:${100+Math.random()*100}%;animation-duration:${8+Math.random()*12}s;animation-delay:${Math.random()*8}s;`;
+    c.appendChild(p);
+  }
+})();
+
+function wait(ms){ return new Promise(r=>setTimeout(r,ms)); }
+
+function showSlide(id){
+  document.querySelectorAll('.slide').forEach(s=>{ s.style.opacity='0'; s.style.pointerEvents='none'; s.style.animation=''; });
+  const e = document.getElementById(id);
+  e.style.opacity='1'; e.style.pointerEvents='auto';
+}
+function hideSlide(id, cb){
+  const e = document.getElementById(id);
+  e.style.animation='cardOut 380ms ease-in forwards';
+  setTimeout(()=>{ e.style.opacity='0'; e.style.pointerEvents='none'; e.style.animation=''; if(cb)cb(); }, 380);
+}
+
+/* Generar grillas de días con animación día/noche */
+function buildGrid(gridId, total, pasados, activo){
+  const g = document.getElementById(gridId);
+  for(let i=0; i<total; i++){
+    const d = document.createElement('div');
+    d.className = 'dia' + (i===activo ? ' activo' : i<pasados ? ' pasado' : '');
+    g.appendChild(d);
+  }
+}
+
+async function animarDias(gridId, totalDias){
+  const dias = document.getElementById(gridId).querySelectorAll('.dia');
+  for(let i=0; i<Math.min(totalDias, dias.length); i++){
+    dias[i].classList.remove('pasado');
+    /* alterna día(claro)/noche(oscuro) cada ~15 celdas */
+    const esNoche = (Math.floor(i/2) % 2 === 1);
+    if(esNoche){ dias[i].style.background='rgba(10,12,28,.9)'; dias[i].style.borderColor='rgba(56,80,130,.2)'; }
+    else { dias[i].style.background='rgba(232,200,112,.55)'; dias[i].style.borderColor='rgba(232,200,112,.3)'; }
+    await wait(22);
+    dias[i].style.background='rgba(107,26,42,.45)';
+    dias[i].style.borderColor='rgba(201,112,128,.2)';
+  }
+}
+
+async function animarItem(i){
+  const fila = document.getElementById('it'+i);
+  fila.style.animation = `slideL 0.45s cubic-bezier(0.16,1,0.3,1) forwards`;
+  await wait(500);
+  /* mostrar X */
+  const cruz = document.getElementById('cruz'+i);
+  cruz.style.opacity='1';
+  await wait(600);
+  /* tachar */
+  const tl = document.getElementById('tl'+i);
+  tl.style.animation='cruzX 0.4s ease-out forwards';
+  await wait(450);
+  /* tag "no cambió" */
+  const ct = document.getElementById('ct'+i);
+  ct.style.animation='tagSlide 0.35s ease-out forwards';
+}
+
+async function run(){
+  await wait(200);
+
+  /* S0 */
+  showSlide('s0');
+  await wait(3400);
+
+  /* S1 — calendarios */
+  hideSlide('s0', async()=>{
+    await wait(80);
+    showSlide('s1');
+    buildGrid('grid2024', 52, 0, -1);
+    buildGrid('grid2025', 52, 0, -1);
+    buildGrid('grid2026', 20, 0, 19);
+    await wait(400);
+    await animarDias('grid2024', 52);
+    await wait(100);
+    await animarDias('grid2025', 52);
+    await wait(100);
+    await animarDias('grid2026', 20);
+    await wait(3000);
+
+    /* S2 — wrapped */
+    hideSlide('s1', async()=>{
+      await wait(80);
+      showSlide('s2');
+      await wait(4200);
+
+      /* S3 — items tachados */
+      hideSlide('s2', async()=>{
+        await wait(80);
+        showSlide('s3');
+        await wait(300);
+        for(let i=0; i<6; i++){
+          await animarItem(i);
+          await wait(180);
+        }
+      });
+    });
+  });
+}
+
+document.fonts.ready.then(()=>{ setTimeout(run, 1500); });
+</script>
+</body>
+</html>

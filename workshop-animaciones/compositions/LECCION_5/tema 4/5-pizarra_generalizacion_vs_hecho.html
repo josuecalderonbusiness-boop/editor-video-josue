@@ -1,0 +1,169 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<style>body:not(.fonts-loaded)*{animation-play-state:paused!important;}</style>
+<script>document.fonts.ready.then(function(){setTimeout(function(){document.body.classList.add("fonts-loaded");},1200);});</script>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=1280, height=720">
+<title>Pizarra — Generalización vs Hecho</title>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,700;0,900;1,700&family=Cormorant+Garamond:ital,wght@1,400;1,600&family=Inter:wght@300;400;500&display=swap" rel="stylesheet">
+<style>
+*{margin:0;padding:0;box-sizing:border-box;}
+body{
+  width:1280px;height:720px;overflow:hidden;
+  background:#EDE3CE;
+  opacity:0;
+  animation:bodyIn .45s ease forwards .1s, bodyOut .6s ease forwards 9.4s;
+}
+@keyframes bodyIn{to{opacity:1;}}
+@keyframes bodyOut{to{opacity:0;}}
+
+.pizarra{position:absolute;inset:0;background:#EDE3CE;}
+.pizarra::before{
+  content:'';position:absolute;inset:0;
+  background-image:
+    linear-gradient(rgba(180,160,120,.15) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(180,160,120,.15) 1px, transparent 1px);
+  background-size:48px 48px;
+}
+.borde-izq{
+  position:absolute;left:0;top:0;bottom:0;width:8px;
+  background:linear-gradient(180deg,#6B1A2A,#3D0C11 50%,#8B2D3F);
+  transform:scaleY(0);transform-origin:top;
+  animation:bordeCrece .5s ease forwards .3s;
+}
+@keyframes bordeCrece{to{transform:scaleY(1);}}
+.borde-sup{
+  position:absolute;top:0;left:0;right:0;height:6px;
+  background:linear-gradient(90deg,#E8C870,#D4A843 50%,#E8C870);
+  transform:scaleX(0);transform-origin:left;
+  animation:bordeH .6s ease forwards .4s;
+}
+@keyframes bordeH{to{transform:scaleX(1);}}
+
+.escena{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;}
+
+.tarjeta{
+  position:absolute;width:920px;
+  display:flex;flex-direction:column;align-items:center;gap:0;
+}
+.tag{
+  font-family:'Inter',sans-serif;font-weight:500;
+  font-size:12px;letter-spacing:7px;text-transform:uppercase;
+  padding:7px 22px;border-radius:30px;margin-bottom:26px;
+}
+.tag.gen{color:#8B2D3F;background:rgba(107,26,42,.1);border:1px solid rgba(107,26,42,.25);}
+.tag.hecho{color:#6B4A00;background:rgba(232,200,112,.18);border:1px solid rgba(212,168,67,.4);}
+
+.signo{font-size:52px;margin-bottom:8px;opacity:0;animation:signoIn .5s cubic-bezier(.34,1.56,.64,1) forwards var(--sd);}
+@keyframes signoIn{from{opacity:0;transform:scale(.2) rotate(-20deg);}to{opacity:1;transform:scale(1) rotate(0);}}
+
+.comilla{
+  font-family:'Playfair Display',serif;font-weight:900;
+  font-size:110px;line-height:.6;
+  align-self:flex-start;margin-left:30px;margin-bottom:4px;
+}
+.comilla.gen{color:rgba(139,45,63,.35);}
+.comilla.hecho{color:rgba(232,200,112,.55);}
+
+.texto-grande{
+  font-family:'Playfair Display',serif;font-weight:900;font-style:italic;
+  text-align:center;padding:0 20px;
+}
+
+.linea{height:3px;width:0;margin-top:26px;border-radius:2px;}
+.linea.gen{background:linear-gradient(90deg,transparent,#8B2D3F,transparent);}
+.linea.hecho{background:linear-gradient(90deg,transparent,#E8C870,#D4A843,transparent);}
+
+.label-inf{
+  font-family:'Cormorant Garamond',serif;font-style:italic;
+  font-size:30px;margin-top:16px;text-align:center;
+}
+.label-inf.gen{color:rgba(139,45,63,.65);}
+.label-inf.hecho{color:rgba(107,72,0,.7);}
+
+@keyframes cardEntra{from{opacity:0;transform:translateY(60px) scale(.94);}to{opacity:1;transform:translateY(0) scale(1);}}
+@keyframes cardSale{from{opacity:1;transform:translateX(0);}to{opacity:0;transform:translateX(-110px) scale(.95);}}
+@keyframes lineaCrece{to{width:700px;}}
+@keyframes tagIn{from{opacity:0;transform:translateY(-10px);}to{opacity:1;transform:translateY(0);}}
+@keyframes textoIn{from{opacity:0;transform:translateY(22px);}to{opacity:1;transform:translateY(0);}}
+
+.tarjeta.oculta{opacity:0;pointer-events:none;}
+.tarjeta.entra{animation:cardEntra .65s cubic-bezier(.25,.46,.45,.94) forwards;}
+.tarjeta.sale{animation:cardSale .5s ease forwards;}
+
+.tarjeta .tag{opacity:0;animation:tagIn .4s ease forwards .5s;}
+.tarjeta .signo{--sd:.4s;}
+.tarjeta .comilla{opacity:0;animation:tagIn .35s ease forwards .6s;}
+.tarjeta .texto-grande{opacity:0;animation:textoIn .55s cubic-bezier(.25,.46,.45,.94) forwards .75s;}
+.tarjeta .linea{animation:lineaCrece .7s ease forwards 1.1s;}
+.tarjeta .label-inf{opacity:0;animation:tagIn .4s ease forwards 1.4s;}
+
+.flecha-central{
+  position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);
+  width:80px;height:80px;opacity:0;z-index:20;
+  animation:flechaIn .4s cubic-bezier(.34,1.56,.64,1) forwards 4.8s, flechaOut .3s ease forwards 5.4s;
+}
+@keyframes flechaIn{from{opacity:0;transform:translate(-50%,-50%) scale(.3);}to{opacity:1;transform:translate(-50%,-50%) scale(1);}}
+@keyframes flechaOut{to{opacity:0;}}
+</style>
+</head>
+<body>
+
+<div class="pizarra"></div>
+<div class="borde-izq"></div>
+<div class="borde-sup"></div>
+
+<div class="escena">
+
+  <!-- TARJETA 1 — Generalización -->
+  <div class="tarjeta oculta" id="t1">
+    <div class="tag gen">Generalización</div>
+    <div class="signo" style="color:#8B2D3F;">✗</div>
+    <div class="comilla gen">"</div>
+    <div class="texto-grande gen" style="font-size:100px;color:#3D0C11;">Siempre está<br>en su teléfono</div>
+    <div class="linea gen"></div>
+    <div class="label-inf gen">absoluta · no verificable · carga emocional</div>
+  </div>
+
+  <!-- FLECHA -->
+  <div class="flecha-central">
+    <svg width="80" height="80" viewBox="0 0 80 80" fill="none">
+      <circle cx="40" cy="40" r="36" fill="rgba(107,26,42,.12)" stroke="#E8C870" stroke-width="1.5"/>
+      <path d="M28 40h26M46 32l8 8-8 8" stroke="#E8C870" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/>
+    </svg>
+  </div>
+
+  <!-- TARJETA 2 — El Hecho -->
+  <div class="tarjeta oculta" id="t2">
+    <div class="tag hecho">El Hecho</div>
+    <div class="signo" style="color:#D4A843;">✓</div>
+    <div class="comilla hecho">"</div>
+    <div class="texto-grande hecho" style="font-size:72px;color:#2A1008;">Durante la cena de hoy<br>miró el teléfono<br>cuatro veces.</div>
+    <div class="linea hecho"></div>
+    <div class="label-inf hecho">específico · observable · verificable</div>
+  </div>
+
+</div>
+
+<script>
+var t1 = document.getElementById('t1');
+var t2 = document.getElementById('t2');
+
+setTimeout(function(){
+  t1.classList.remove('oculta');
+  t1.classList.add('entra');
+}, 600);
+
+setTimeout(function(){
+  t1.classList.remove('entra');
+  t1.classList.add('sale');
+  setTimeout(function(){
+    t1.classList.add('oculta');
+    t2.classList.remove('oculta');
+    t2.classList.add('entra');
+  }, 500);
+}, 5000);
+</script>
+</body>
+</html>

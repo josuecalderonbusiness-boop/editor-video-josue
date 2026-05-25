@@ -1,0 +1,280 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<style>body:not(.fonts-loaded) * { animation-play-state: paused !important; transition: none !important; }</style>
+<script>document.fonts.ready.then(() => { setTimeout(() => { document.body.classList.add("fonts-loaded"); }, 1500); });</script>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=1280, height=720">
+<title>Cadena frágil</title>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@900&family=Cormorant+Garamond:ital,wght@1,400;1,600&display=swap" rel="stylesheet">
+<style>
+  * { margin:0; padding:0; box-sizing:border-box; }
+  body { width:1280px; height:720px; overflow:hidden; }
+  .pizarra {
+    position:absolute; inset:0; background:#F0E8D5;
+    background-image:linear-gradient(rgba(139,100,60,.13) 1px,transparent 1px),linear-gradient(90deg,rgba(139,100,60,.13) 1px,transparent 1px);
+    background-size:56px 56px; transition:opacity 1s ease;
+  }
+  .pizarra::before { content:''; position:absolute; left:0; top:0; bottom:0; width:8px; background:linear-gradient(180deg,#3D0C11,#6B1A2A,#3D0C11); }
+  .pizarra::after  { content:''; position:absolute; top:0; left:0; right:0; height:4px; background:linear-gradient(90deg,#6B1A2A,#E8C870,#E8C870,#6B1A2A); }
+  .fondo-oscuro {
+    position:absolute; inset:0;
+    background:linear-gradient(135deg,#0F0A0B 0%,#1A0810 45%,#3D0C11 100%);
+    opacity:0; transition:opacity 1s ease; pointer-events:none;
+  }
+  .escena-pizarra {
+    position:absolute; inset:0; display:flex; flex-direction:column;
+    align-items:center; justify-content:center; gap:44px;
+    opacity:0; animation:entrar .6s ease-out .3s forwards;
+  }
+  @keyframes entrar { to{opacity:1} }
+  .texto-principal {
+    font-family:'Playfair Display',serif; font-weight:900;
+    font-size:58px; color:#3D0C11; text-align:center;
+    line-height:1.12; max-width:1020px;
+    text-shadow:2px 3px 0 rgba(61,12,17,.1);
+    opacity:0; transform:translateY(-16px);
+  }
+
+  /* ── CADENA ── */
+  /* Cada "par de eslabones" es un SVG con dos ovals entrelazados */
+  .cadena-row {
+    display:flex; align-items:center; justify-content:center;
+    gap:-8px; opacity:0;
+  }
+
+  /* Eslabón individual SVG — oval con hueco */
+  /* shape: ellipse exterior - ellipse interior = dona oval */
+  /* Usamos stroke grueso en ellipse para simular dona */
+
+  .link {
+    flex-shrink:0;
+    filter:drop-shadow(2px 3px 4px rgba(61,12,17,.2));
+  }
+
+  /* Eslabón horizontal */
+  .link-h ellipse {
+    fill:none; stroke:#6B1A2A; stroke-width:18;
+    stroke-dasharray:600; stroke-dashoffset:600;
+  }
+  /* Eslabón vertical (girado 90°) */
+  .link-v { transform:rotate(90deg); }
+  .link-v ellipse {
+    fill:none; stroke:#6B1A2A; stroke-width:18;
+    stroke-dasharray:600; stroke-dashoffset:600;
+  }
+  /* Eslabón frágil */
+  .link-fragil ellipse {
+    fill:none; stroke:#C97080; stroke-width:15;
+    stroke-dasharray:600; stroke-dashoffset:600;
+  }
+
+  .escena-oscura {
+    position:absolute; inset:0; display:flex; flex-direction:column;
+    align-items:center; justify-content:center;
+    padding:0 100px; opacity:0; pointer-events:none;
+  }
+  .bg-glow {
+    position:absolute; inset:0; pointer-events:none;
+    background:radial-gradient(ellipse at 50% 50%, rgba(107,26,42,.4) 0%, transparent 65%);
+    animation:pulseGlow 3s ease-in-out infinite; opacity:0;
+  }
+  @keyframes pulseGlow { 0%,100%{opacity:.6} 50%{opacity:1} }
+  .frase-final {
+    font-family:'Cormorant Garamond',serif; font-style:italic;
+    font-size:60px; color:#F9F3E8; text-align:center;
+    line-height:1.25; max-width:1060px; letter-spacing:.01em;
+    opacity:0; transform:translateY(20px); position:relative; z-index:2;
+  }
+  .frase-final em { color:#E8C870; }
+  .frase-linea {
+    height:2px; width:0; margin-top:28px; border-radius:2px;
+    background:linear-gradient(90deg,transparent,#E8C870,transparent);
+    position:relative; z-index:2;
+  }
+</style>
+</head>
+<body>
+<div class="pizarra" id="pizarra"></div>
+<div class="fondo-oscuro" id="fondoOscuro"></div>
+
+<div class="escena-pizarra" id="escenaPizarra">
+  <div class="texto-principal" id="textoPrincipal">
+    La mujer que depende emocionalmente<br>tiene un eslabón frágil en su sistema relacional
+  </div>
+
+  <!--
+    CADENA: pares de eslabones entrelazados
+    Cada par = un eslabón H + uno V solapados = ícono link clásico
+    Los pares se conectan entre sí con otro eslabón V compartido
+  -->
+  <div class="cadena-row" id="cadenaRow">
+
+    <!-- Par 1 -->
+    <svg class="link link-h" id="lh1" width="90" height="56" viewBox="0 0 90 56">
+      <ellipse cx="45" cy="28" rx="36" ry="19" fill="none" stroke="#6B1A2A" stroke-width="14" stroke-dasharray="360" stroke-dashoffset="360"/>
+    </svg>
+    <svg class="link link-v" id="lv1" width="56" height="90" viewBox="0 0 56 90" style="margin:-20px -8px; transform:rotate(90deg);">
+      <ellipse cx="28" cy="45" rx="36" ry="19" fill="none" stroke="#6B1A2A" stroke-width="14" stroke-dasharray="360" stroke-dashoffset="360"/>
+    </svg>
+
+    <!-- Par 2 -->
+    <svg class="link link-h" id="lh2" width="90" height="56" viewBox="0 0 90 56" style="margin:-8px 0;">
+      <ellipse cx="45" cy="28" rx="36" ry="19" fill="none" stroke="#6B1A2A" stroke-width="14" stroke-dasharray="360" stroke-dashoffset="360"/>
+    </svg>
+    <svg class="link link-v" id="lv2" width="56" height="90" viewBox="0 0 56 90" style="margin:-20px -8px; transform:rotate(90deg);">
+      <ellipse cx="28" cy="45" rx="36" ry="19" fill="none" stroke="#6B1A2A" stroke-width="14" stroke-dasharray="360" stroke-dashoffset="360"/>
+    </svg>
+
+    <!-- Par 3 -->
+    <svg class="link link-h" id="lh3" width="90" height="56" viewBox="0 0 90 56" style="margin:-8px 0;">
+      <ellipse cx="45" cy="28" rx="36" ry="19" fill="none" stroke="#6B1A2A" stroke-width="14" stroke-dasharray="360" stroke-dashoffset="360"/>
+    </svg>
+
+    <!-- ESLABÓN FRÁGIL — conector entre par 3 y par 4 -->
+    <svg class="link" id="lvFragil" width="56" height="90" viewBox="0 0 56 90" style="margin:-20px -8px; transform:rotate(90deg);">
+      <ellipse cx="28" cy="45" rx="36" ry="19" fill="none" stroke="#C97080" stroke-width="12" stroke-dasharray="4 6" stroke-dashoffset="0"/>
+    </svg>
+
+    <!-- Par 4 -->
+    <svg class="link link-h" id="lh4" width="90" height="56" viewBox="0 0 90 56" style="margin:-8px 0;">
+      <ellipse cx="45" cy="28" rx="36" ry="19" fill="none" stroke="#6B1A2A" stroke-width="14" stroke-dasharray="360" stroke-dashoffset="360"/>
+    </svg>
+    <svg class="link link-v" id="lv4" width="56" height="90" viewBox="0 0 56 90" style="margin:-20px -8px; transform:rotate(90deg);">
+      <ellipse cx="28" cy="45" rx="36" ry="19" fill="none" stroke="#6B1A2A" stroke-width="14" stroke-dasharray="360" stroke-dashoffset="360"/>
+    </svg>
+
+    <!-- Par 5 -->
+    <svg class="link link-h" id="lh5" width="90" height="56" viewBox="0 0 90 56" style="margin:-8px 0;">
+      <ellipse cx="45" cy="28" rx="36" ry="19" fill="none" stroke="#6B1A2A" stroke-width="14" stroke-dasharray="360" stroke-dashoffset="360"/>
+    </svg>
+    <svg class="link link-v" id="lv5" width="56" height="90" viewBox="0 0 56 90" style="margin:-20px -8px; transform:rotate(90deg);">
+      <ellipse cx="28" cy="45" rx="36" ry="19" fill="none" stroke="#6B1A2A" stroke-width="14" stroke-dasharray="360" stroke-dashoffset="360"/>
+    </svg>
+
+    <!-- Par 6 -->
+    <svg class="link link-h" id="lh6" width="90" height="56" viewBox="0 0 90 56" style="margin:-8px 0;">
+      <ellipse cx="45" cy="28" rx="36" ry="19" fill="none" stroke="#6B1A2A" stroke-width="14" stroke-dasharray="360" stroke-dashoffset="360"/>
+    </svg>
+
+  </div>
+</div>
+
+<!-- ESCENA 2 -->
+<div class="escena-oscura" id="escenaOscura">
+  <div class="bg-glow" id="bgGlow"></div>
+  <div class="frase-final" id="fraseOscura">
+    No puedes exigirle a alguien que te dé <em>lo que no tiene.</em><br>
+    Pero sí puedes construir un sistema de bienestar emocional<br>
+    que no dependa de <em>una sola fuente.</em>
+  </div>
+  <div class="frase-linea" id="fraseLinea"></div>
+</div>
+
+<script>
+  const DURACION_MS = 18500;
+
+  // IDs de eslabones normales (con dashoffset animable)
+  const normales = ['lh1','lv1','lh2','lv2','lh3','lh4','lv4','lh5','lv5','lh6'];
+  const izq = ['lh1','lv1','lh2','lv2','lh3'];
+  const der = ['lh4','lv4','lh5','lv5','lh6'];
+
+  // FASE 1: texto
+  setTimeout(() => {
+    const tp = document.getElementById('textoPrincipal');
+    tp.style.transition = 'opacity .7s ease, transform .7s ease';
+    tp.style.opacity = '1'; tp.style.transform = 'translateY(0)';
+  }, 600);
+
+  // FASE 2: cadena aparece y eslabones se dibujan
+  setTimeout(() => {
+    document.getElementById('cadenaRow').style.transition = 'opacity .4s ease';
+    document.getElementById('cadenaRow').style.opacity = '1';
+    normales.forEach((id, i) => {
+      setTimeout(() => {
+        const el = document.querySelector(`#${id} ellipse`);
+        if (el) {
+          el.style.transition = 'stroke-dashoffset .4s ease';
+          el.style.strokeDashoffset = '0';
+        }
+      }, i * 130);
+    });
+  }, 1600);
+
+  // FASE 3: eslabón frágil pulsa
+  setTimeout(() => {
+    const ef = document.querySelector('#lvFragil ellipse');
+    const st = document.createElement('style');
+    st.textContent = `
+      @keyframes fragP {
+        0%,100%{stroke:#C97080;stroke-width:12}
+        50%{stroke:#E8C870;stroke-width:16;filter:drop-shadow(0 0 10px rgba(232,200,112,.95))}
+      }`;
+    document.head.appendChild(st);
+    ef.style.strokeDasharray = '0';
+    ef.style.animation = 'fragP .5s ease-in-out 4';
+  }, 3800);
+
+  // FASE 4: eslabón frágil cae, cadena izq/der se separan
+  setTimeout(() => {
+    const frag = document.getElementById('lvFragil');
+    frag.style.transition = 'transform 1s cubic-bezier(.4,0,.7,1), opacity .8s ease';
+    frag.style.transform = 'rotate(90deg) translateY(220px)';
+    frag.style.opacity = '0';
+
+    setTimeout(() => {
+      // Izquierda se va a la izquierda
+      izq.forEach(id => {
+        const el = document.getElementById(id);
+        el.style.transition = 'transform 1.1s ease, opacity .9s ease';
+        el.style.transform = id.includes('lv') ? 'rotate(90deg) translateX(-180px)' : 'translateX(-180px)';
+        el.style.opacity = '0';
+      });
+      // Derecha se va a la derecha
+      der.forEach(id => {
+        const el = document.getElementById(id);
+        el.style.transition = 'transform 1.1s ease, opacity .9s ease';
+        el.style.transform = id.includes('lv') ? 'rotate(90deg) translateX(180px)' : 'translateX(180px)';
+        el.style.opacity = '0';
+      });
+    }, 350);
+  }, 5600);
+
+  // FASE 5a: texto inicial se borra
+  setTimeout(() => {
+    const tp = document.getElementById('textoPrincipal');
+    tp.style.transition = 'opacity .6s ease, transform .6s ease';
+    tp.style.opacity = '0';
+    tp.style.transform = 'translateY(-20px)';
+  }, 7000);
+
+  // FASE 5b: fondo transiciona
+  setTimeout(() => {
+    document.getElementById('pizarra').style.opacity = '0';
+    document.getElementById('fondoOscuro').style.opacity = '1';
+    document.getElementById('bgGlow').style.opacity = '1';
+    document.getElementById('escenaPizarra').style.transition = 'opacity .8s ease';
+    document.getElementById('escenaPizarra').style.opacity = '0';
+  }, 7700);
+
+  // FASE 6: frase
+  setTimeout(() => {
+    const eo = document.getElementById('escenaOscura');
+    eo.style.opacity = '1'; eo.style.pointerEvents = 'auto';
+    const fo = document.getElementById('fraseOscura');
+    fo.style.transition = 'opacity .8s ease, transform .8s ease';
+    fo.style.opacity = '1'; fo.style.transform = 'translateY(0)';
+    setTimeout(() => {
+      const fl = document.getElementById('fraseLinea');
+      fl.style.transition = 'width .8s ease';
+      fl.style.width = '600px';
+    }, 700);
+  }, 8900);
+
+  setTimeout(() => {
+    document.body.style.transition = 'opacity 1s ease';
+    document.body.style.opacity = '0';
+  }, DURACION_MS);
+</script>
+</body>
+</html>

@@ -1,0 +1,110 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<style>body:not(.fonts-loaded) * { animation-play-state: paused !important; transition: none !important; }</style>
+<script>document.fonts.ready.then(() => { setTimeout(() => { document.body.classList.add("fonts-loaded"); }, 1500); });</script>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=1280, height=720">
+<title>Franja — Mujer independiente</title>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700;900&family=Cormorant+Garamond:ital,wght@1,500;1,600&display=swap" rel="stylesheet">
+<style>
+  * { margin:0; padding:0; box-sizing:border-box; }
+  body { width:1280px; height:720px; overflow:hidden; background:#00FF00; }
+
+  .franja-wrap {
+    position:absolute; bottom:0; left:0; right:0; height:118px;
+    opacity:0; animation:franjaIn .5s ease-out .3s forwards;
+  }
+  @keyframes franjaIn { to{opacity:1} }
+
+  /* Banda superior — label */
+  .franja-top {
+    height:38px;
+    background:linear-gradient(90deg, #3D0C11 0%, #6B1A2A 60%, #3D0C11 100%);
+    display:flex; align-items:center; padding:0 20px; gap:14px;
+  }
+  .punto {
+    width:11px; height:11px; border-radius:50%; background:#E8C870;
+    flex-shrink:0; animation:pulseDot 1.1s ease-in-out infinite;
+  }
+  @keyframes pulseDot { 0%,100%{opacity:1;transform:scale(1)} 50%{opacity:.4;transform:scale(.65)} }
+  .top-label {
+    font-family:'Cormorant Garamond',serif; font-style:italic; font-weight:600;
+    font-size:22px; color:#E8C870; letter-spacing:.14em; text-transform:uppercase;
+    white-space:nowrap;
+  }
+  .top-sep { color:rgba(232,200,112,.4); font-size:18px; margin:0 6px; }
+
+  /* Banda principal */
+  .franja-main {
+    height:80px; background:rgba(15,10,11,.94);
+    display:flex; align-items:center; overflow:hidden; position:relative;
+  }
+  .franja-main::before {
+    content:''; position:absolute; top:0; left:0; right:0; height:2px;
+    background:linear-gradient(90deg,#3D0C11,#E8C870,#D4A843,#E8C870,#3D0C11);
+  }
+
+  /* Tag fijo izquierdo */
+  .tag-fijo {
+    flex-shrink:0; height:100%;
+    background:linear-gradient(90deg,#6B1A2A,#8B2D3F);
+    display:flex; align-items:center; padding:0 30px;
+    position:relative; z-index:2;
+  }
+  .tag-fijo::after {
+    content:''; position:absolute; right:-16px; top:0; bottom:0; width:32px;
+    background:linear-gradient(90deg,#8B2D3F,transparent);
+  }
+  .tag-txt {
+    font-family:'Playfair Display',serif; font-weight:900;
+    font-size:26px; color:#F9F3E8; letter-spacing:.04em; white-space:nowrap;
+  }
+
+  /* Ticker */
+  .ticker-track {
+    display:flex; align-items:center; height:100%;
+    white-space:nowrap; padding-left:52px;
+    animation:ticker 14s linear 1s infinite;
+  }
+  @keyframes ticker {
+    0%   { transform:translateX(0); }
+    100% { transform:translateX(-50%); }
+  }
+  .ticker-txt {
+    font-family:'Cormorant Garamond',serif; font-style:italic; font-weight:600;
+    font-size:50px; color:#F9F3E8; white-space:nowrap; padding-right:100px;
+  }
+  .ticker-txt em {
+    color:#E8C870; font-style:italic;
+    animation:goldFlash 3.5s ease-in-out infinite;
+  }
+  @keyframes goldFlash { 0%,100%{text-shadow:none} 50%{text-shadow:0 0 28px rgba(232,200,112,.85)} }
+  .ticker-sep {
+    font-size:36px; color:rgba(232,200,112,.5);
+    padding-right:100px;
+  }
+</style>
+</head>
+<body>
+<div class="franja-wrap">
+  <div class="franja-top">
+    <div class="punto"></div>
+    <span class="top-label">Código Soberana</span>
+    <span class="top-sep">✦</span>
+    <span class="top-label">Josué Calderón</span>
+  </div>
+  <div class="franja-main">
+    <div class="tag-fijo">
+      <span class="tag-txt">Atracción</span>
+    </div>
+    <div class="ticker-track">
+      <span class="ticker-txt">Una mujer <em>emocionalmente independiente</em> es, sin excepción, más atractiva para su pareja que una que no lo es.</span>
+      <span class="ticker-sep">✦</span>
+      <span class="ticker-txt">Una mujer <em>emocionalmente independiente</em> es, sin excepción, más atractiva para su pareja que una que no lo es.</span>
+      <span class="ticker-sep">✦</span>
+    </div>
+  </div>
+</div>
+</body>
+</html>

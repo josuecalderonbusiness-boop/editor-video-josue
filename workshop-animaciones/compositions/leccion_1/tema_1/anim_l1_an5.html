@@ -1,0 +1,136 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<style>
+  body:not(.fonts-loaded) * { animation-play-state: paused !important; transition: none !important; }
+  html, body { background:#00FF00 !important; }
+  .bg-glow { display:none !important; }
+</style>
+<script>
+  document.fonts.ready.then(() => {
+    setTimeout(() => { document.body.classList.add("fonts-loaded"); }, 200);
+  });
+</script>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=1280, height=720">
+<title>anim_l1_an5 — matrimonio de tus sueños v2</title>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@1,400;1,700&family=Cormorant+Garamond:ital,wght@1,300&display=swap" rel="stylesheet">
+<style>
+  * { margin:0; padding:0; box-sizing:border-box; }
+  body { width:1280px; height:720px; overflow:hidden; background:transparent; }
+  .scene {
+    width:1280px; height:720px; position:relative;
+    background:#00FF00;
+    display:flex; align-items:center; justify-content:center;
+    opacity:0; animation:fadeIn .6s ease-out .1s forwards;
+  }
+  @keyframes fadeIn{to{opacity:1}}
+  .scene.out { animation:fadeOut .6s ease-in forwards; }
+  @keyframes fadeOut{to{opacity:0}}
+
+  /* Partículas SVG flotantes — estrellas y nubes elegantes */
+  .floater-svg {
+    position:absolute; opacity:0;
+    animation:svgFloat linear infinite;
+  }
+  @keyframes svgFloat {
+    0%   { opacity:0; transform:translateY(0) scale(1) rotate(0deg); }
+    12%  { opacity:.55; }
+    88%  { opacity:.3; }
+    100% { opacity:0; transform:translateY(-260px) scale(.6) rotate(25deg); }
+  }
+
+  .content { text-align:center; position:relative; z-index:2; }
+
+  .label {
+    font-family:'Cormorant Garamond',Georgia,serif;
+    font-style:italic; font-size:22px; font-weight:300;
+    color:#C97080; letter-spacing:.18em; margin-bottom:20px;
+    opacity:0; animation:fadeIn .5s ease-out .8s forwards;
+  }
+
+  .main-text {
+    font-family:'Playfair Display',Georgia,serif;
+    font-style:italic; font-size:96px; font-weight:700;
+    color:#F9F3E8; line-height:1.1;
+    text-shadow:
+      0 0 50px rgba(232,200,112,.9),
+      0 0 80px rgba(220,180,60,.22),
+      0 0 140px rgba(220,180,60,.10);
+    opacity:0; transform:scale(.95);
+    animation:dreamIn .8s cubic-bezier(.2,0,.1,1) 1.0s forwards;
+  }
+  @keyframes dreamIn { to{opacity:1;transform:scale(1)} }
+
+  /* Separador ornamental */
+  .ornament {
+    margin-top:20px; opacity:0;
+    animation:fadeIn .5s ease-out 2.2s forwards;
+    display:flex; align-items:center; justify-content:center; gap:16px;
+  }
+  .orn-line {
+    width:80px; height:1px;
+    background:linear-gradient(90deg,transparent,#E8C870,transparent);
+  }
+  .orn-diamond {
+    width:8px; height:8px;
+    background:#00FF00;
+    transform:rotate(45deg);
+    box-shadow:0 0 8px rgba(220,180,60,.6);
+  }
+</style>
+</head>
+<body>
+<div class="scene" id="scene">
+  <div id="floaters"></div>
+
+  <div class="content">
+    <p class="label">…que te explica con mucha confianza cómo tener</p>
+    <h2 class="main-text">el matrimonio<br>de tus sueños</h2>
+    <div class="ornament">
+      <div class="orn-line"></div>
+      <div class="orn-diamond"></div>
+      <div class="orn-line"></div>
+    </div>
+  </div>
+</div>
+
+<script>
+  const DURACION_MS = 5500;
+
+  // SVG elegantes: estrella de 4 puntas y nube simple
+  const starSVG = (size, color) => `
+    <svg width="${size}" height="${size}" viewBox="0 0 24 24" fill="none">
+      <path d="M12 2 L13.5 10.5 L22 12 L13.5 13.5 L12 22 L10.5 13.5 L2 12 L10.5 10.5 Z"
+            stroke="${color}" stroke-width="1" fill="${color}" opacity="0.6"/>
+    </svg>`;
+
+  const cloudSVG = (w, color) => `
+    <svg width="${w}" height="${Math.round(w*.6)}" viewBox="0 0 60 36" fill="none">
+      <path d="M10 28 Q2 28 2 20 Q2 13 9 12 Q9 4 18 4 Q24 4 27 9 Q30 6 35 7 Q43 7 43 15 Q48 15 48 21 Q48 28 40 28 Z"
+            stroke="${color}" stroke-width="1.5" fill="none" opacity="0.5"/>
+    </svg>`;
+
+  const container = document.getElementById('floaters');
+  const colors = ['#E8C870','#C97080','#E8C870','#8B2D3F','#F9F3E8'];
+  const shapes = ['star','star','star','cloud','cloud','star','cloud'];
+
+  for(let i=0;i<14;i++){
+    const wrap = document.createElement('div');
+    wrap.className = 'floater-svg';
+    const color = colors[Math.floor(Math.random()*colors.length)];
+    const type  = shapes[Math.floor(Math.random()*shapes.length)];
+    const size  = 16 + Math.random()*22;
+
+    wrap.innerHTML = type === 'star' ? starSVG(size, color) : cloudSVG(size, color);
+    wrap.style.left = (6 + Math.random()*88) + '%';
+    wrap.style.top  = (15 + Math.random()*72) + '%';
+    wrap.style.animationDuration  = (4 + Math.random()*5) + 's';
+    wrap.style.animationDelay     = (Math.random()*2.5) + 's';
+    container.appendChild(wrap);
+  }
+
+  setTimeout(() => { document.getElementById('scene').classList.add('out'); }, DURACION_MS);
+</script>
+</body>
+</html>

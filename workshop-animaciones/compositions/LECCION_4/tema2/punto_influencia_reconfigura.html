@@ -1,0 +1,371 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<style>
+  body:not(.fonts-loaded) * { animation-play-state: paused !important; transition: none !important; }
+</style>
+<script>
+  document.fonts.ready.then(() => {
+    setTimeout(() => { document.body.classList.add("fonts-loaded"); }, 1500);
+  });
+</script>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=1280, height=720">
+<title>PUNTO DE INFLUENCIA — Reconfigura el sistema</title>
+<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Cormorant+Garamond:ital,wght@1,400;1,600&family=JetBrains+Mono:wght@400;700&display=swap" rel="stylesheet">
+<style>
+  * { margin:0; padding:0; box-sizing:border-box; }
+  body { width:1280px; height:720px; overflow:hidden; background:#0F0A0B; }
+
+  .scene { width:1280px; height:720px; position:relative; background:#0F0A0B; }
+  .scene.out { animation: sceneOut 1s ease-in forwards; }
+  @keyframes sceneOut { to { opacity:0; } }
+
+  /* Fondo con partículas / grid tipo código */
+  .grid-bg {
+    position:absolute; inset:0;
+    background-image:
+      linear-gradient(rgba(232,200,112,.04) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(232,200,112,.04) 1px, transparent 1px);
+    background-size:48px 48px;
+    animation: gridPulse 4s ease-in-out infinite;
+  }
+  @keyframes gridPulse { 0%,100%{opacity:.6} 50%{opacity:1} }
+
+  svg { position:absolute; top:0; left:0; width:1280px; height:720px; }
+
+  /* ── Chips normales (antes de reconfigurar) ── */
+  .chip {
+    display:inline-block;
+    background: rgba(15,10,11,0.85);
+    border: 1.8px solid rgba(201,112,128,0.5);
+    border-radius:7px;
+    padding:6px 16px;
+    font-family:'Bebas Neue', Impact, sans-serif;
+    font-size:20px;
+    letter-spacing:0.07em;
+    color:rgba(249,243,232,0.75);
+    white-space:nowrap;
+    transition: all 0.5s ease;
+    position:relative;
+  }
+
+  /* Estado: reconfigurado ✓ */
+  .chip.done {
+    background: rgba(30,20,5,0.92);
+    border-color: #E8C870;
+    color: #F9F3E8;
+    font-size:22px;
+    box-shadow: 0 0 18px rgba(232,200,112,0.7), 0 0 40px rgba(232,200,112,0.3);
+    transform: scale(1.12);
+  }
+
+  /* Checkmark SVG inline */
+  .chip .check {
+    display:none;
+    margin-left:6px;
+    vertical-align:middle;
+  }
+  .chip.done .check { display:inline; }
+
+  /* ── Label EL PUNTO DE INFLUENCIA ── */
+  #label-poi {
+    opacity:0;
+  }
+
+  /* ── Rayo de amor — línea dorada curva ── */
+  .rayo-amor {
+    stroke: #E8C870;
+    stroke-width: 3;
+    fill: none;
+    stroke-linecap: round;
+    opacity:0;
+  }
+
+  /* drift suave de chips */
+  @keyframes drift-a { 0%,100%{transform:translateY(0)}   50%{transform:translateY(-5px)} }
+  @keyframes drift-b { 0%,100%{transform:translateY(0)}   50%{transform:translateY(5px)} }
+  @keyframes drift-c { 0%,100%{transform:translateY(-3px)} 50%{transform:translateY(4px)} }
+  @keyframes drift-d { 0%,100%{transform:translateY(3px)}  50%{transform:translateY(-4px)} }
+
+  @keyframes starPulse {
+    0%,100% { opacity:1; transform:scale(1); }
+    50%     { opacity:0.75; transform:scale(1.1); }
+  }
+</style>
+</head>
+<body>
+<div class="scene" id="scene">
+  <div class="grid-bg"></div>
+
+  <svg id="svg-main" viewBox="0 0 1280 720" xmlns="http://www.w3.org/2000/svg">
+    <defs>
+      <filter id="glow-gold" x="-50%" y="-50%" width="200%" height="200%">
+        <feGaussianBlur stdDeviation="9" result="blur"/>
+        <feMerge><feMergeNode in="blur"/><feMergeNode in="SourceGraphic"/></feMerge>
+      </filter>
+      <filter id="glow-gold-lg" x="-70%" y="-70%" width="240%" height="240%">
+        <feGaussianBlur stdDeviation="16" result="blur"/>
+        <feMerge><feMergeNode in="blur"/><feMergeNode in="SourceGraphic"/></feMerge>
+      </filter>
+      <filter id="glow-cream" x="-80%" y="-80%" width="260%" height="260%">
+        <feGaussianBlur stdDeviation="12" result="blur"/>
+        <feMerge><feMergeNode in="blur"/><feMergeNode in="SourceGraphic"/></feMerge>
+      </filter>
+      <filter id="glow-wine" x="-40%" y="-40%" width="180%" height="180%">
+        <feGaussianBlur stdDeviation="7" result="blur"/>
+        <feMerge><feMergeNode in="blur"/><feMergeNode in="SourceGraphic"/></feMerge>
+      </filter>
+    </defs>
+
+    <!-- Halo exterior decorativo -->
+    <circle cx="640" cy="380" r="190" fill="none"
+      stroke="rgba(232,200,112,0.08)" stroke-width="60"/>
+
+    <!-- Círculo dorado principal -->
+    <circle id="circulo-principal" cx="640" cy="380" r="158"
+      fill="rgba(232,200,112,0.04)"
+      stroke="#E8C870" stroke-width="9"
+      filter="url(#glow-gold)"
+      stroke-dasharray="993" stroke-dashoffset="993"/>
+
+    <!-- Ella — grupo central -->
+    <g id="ella-grupo" opacity="0" style="transform-origin:640px 390px;">
+      <!-- Rayos -->
+      <line x1="640" y1="308" x2="640" y2="286" stroke="#F9F3E8" stroke-width="4" stroke-linecap="round"/>
+      <line x1="640" y1="464" x2="640" y2="486" stroke="#F9F3E8" stroke-width="4" stroke-linecap="round"/>
+      <line x1="558" y1="380" x2="536" y2="380" stroke="#F9F3E8" stroke-width="4" stroke-linecap="round"/>
+      <line x1="722" y1="380" x2="744" y2="380" stroke="#F9F3E8" stroke-width="4" stroke-linecap="round"/>
+      <line x1="616" y1="334" x2="600" y2="318" stroke="#F9F3E8" stroke-width="4" stroke-linecap="round"/>
+      <line x1="664" y1="334" x2="680" y2="318" stroke="#F9F3E8" stroke-width="4" stroke-linecap="round"/>
+      <line x1="616" y1="426" x2="600" y2="442" stroke="#F9F3E8" stroke-width="4" stroke-linecap="round"/>
+      <line x1="664" y1="426" x2="680" y2="442" stroke="#F9F3E8" stroke-width="4" stroke-linecap="round"/>
+      <!-- Estrella -->
+      <polygon
+        points="640,318 649,340 673,340 655,354 662,376 640,362 618,376 625,354 607,340 631,340"
+        fill="#F9F3E8" filter="url(#glow-cream)"
+        style="animation:starPulse 2.2s ease-in-out infinite;"/>
+      <!-- Silueta -->
+      <circle cx="640" cy="394" r="12" fill="#F9F3E8"/>
+      <line x1="640" y1="406" x2="640" y2="430" stroke="#F9F3E8" stroke-width="5" stroke-linecap="round"/>
+      <line x1="625" y1="415" x2="655" y2="415" stroke="#F9F3E8" stroke-width="4" stroke-linecap="round"/>
+      <line x1="640" y1="430" x2="630" y2="448" stroke="#F9F3E8" stroke-width="4" stroke-linecap="round"/>
+      <line x1="640" y1="430" x2="650" y2="448" stroke="#F9F3E8" stroke-width="4" stroke-linecap="round"/>
+      <!-- Halo ella -->
+      <circle cx="640" cy="394" r="44" fill="none"
+        stroke="rgba(249,243,232,0.22)" stroke-width="2.5"
+        style="animation:starPulse 2.2s ease-in-out .5s infinite;"/>
+    </g>
+
+    <!-- Label EL PUNTO DE INFLUENCIA — arriba centrado -->
+    <g id="label-poi" opacity="0">
+      <text x="640" y="50"
+        font-family="'Bebas Neue', Impact, sans-serif"
+        font-size="48" fill="#E8C870"
+        letter-spacing="0.16em" text-anchor="middle"
+        filter="url(#glow-gold-lg)">EL PUNTO DE INFLUENCIA</text>
+      <text x="640" y="78"
+        font-family="'Cormorant Garamond', serif"
+        font-style="italic" font-size="24"
+        fill="rgba(232,200,112,0.65)" text-anchor="middle">
+        el único espacio donde tienes el 100% del control
+      </text>
+      <!-- línea decorativa -->
+      <line x1="390" y1="90" x2="890" y2="90"
+        stroke="rgba(232,200,112,0.25)" stroke-width="1"/>
+    </g>
+
+    <!-- Rayos de amor (se generan con JS) -->
+
+  </svg>
+
+  <!-- ── CHIPS — posicionados absolutamente alrededor del círculo ── -->
+  <!-- Centro: 640,380. Círculo r=158. Chips en r≈240-300 exterior -->
+
+  <!-- ARRIBA -->
+  <div id="chip-wrap-0" style="position:absolute; left:440px; top:108px; animation:drift-a 5s ease-in-out infinite;">
+    <div class="chip" id="chip-0">Tus pensamientos<span class="check">✦</span></div>
+  </div>
+
+  <!-- ARRIBA DERECHA 1 -->
+  <div id="chip-wrap-1" style="position:absolute; left:780px; top:130px; animation:drift-b 6s ease-in-out infinite;">
+    <div class="chip" id="chip-1">Tu comunicación<span class="check">✦</span></div>
+  </div>
+
+  <!-- DERECHA ALTA -->
+  <div id="chip-wrap-2" style="position:absolute; left:920px; top:218px; animation:drift-c 4.5s ease-in-out infinite;">
+    <div class="chip" id="chip-2">Tus decisiones<span class="check">✦</span></div>
+  </div>
+
+  <!-- DERECHA MEDIA -->
+  <div id="chip-wrap-3" style="position:absolute; left:950px; top:345px; animation:drift-d 5.5s ease-in-out infinite;">
+    <div class="chip" id="chip-3">Tus emociones<span class="check">✦</span></div>
+  </div>
+
+  <!-- DERECHA BAJA -->
+  <div id="chip-wrap-4" style="position:absolute; left:910px; top:468px; animation:drift-a 7s ease-in-out .5s infinite;">
+    <div class="chip" id="chip-4">Tu energía<span class="check">✦</span></div>
+  </div>
+
+  <!-- ABAJO DERECHA -->
+  <div id="chip-wrap-5" style="position:absolute; left:760px; top:568px; animation:drift-b 4.8s ease-in-out 1.2s infinite;">
+    <div class="chip" id="chip-5">Tus límites<span class="check">✦</span></div>
+  </div>
+
+  <!-- ABAJO CENTRO -->
+  <div id="chip-wrap-6" style="position:absolute; left:530px; top:600px; animation:drift-c 6.2s ease-in-out .8s infinite;">
+    <div class="chip" id="chip-6">Tu respuesta<span class="check">✦</span></div>
+  </div>
+
+  <!-- ABAJO IZQUIERDA -->
+  <div id="chip-wrap-7" style="position:absolute; left:290px; top:560px; animation:drift-d 5.2s ease-in-out .3s infinite;">
+    <div class="chip" id="chip-7">Tu tiempo<span class="check">✦</span></div>
+  </div>
+
+  <!-- IZQUIERDA BAJA -->
+  <div id="chip-wrap-8" style="position:absolute; left:140px; top:450px; animation:drift-a 5.8s ease-in-out 1s infinite;">
+    <div class="chip" id="chip-8">Tu narrativa interna<span class="check">✦</span></div>
+  </div>
+
+  <!-- IZQUIERDA MEDIA -->
+  <div id="chip-wrap-9" style="position:absolute; left:90px; top:340px; animation:drift-b 6.5s ease-in-out .6s infinite;">
+    <div class="chip" id="chip-9">Tus prioridades<span class="check">✦</span></div>
+  </div>
+
+  <!-- IZQUIERDA ALTA -->
+  <div id="chip-wrap-10" style="position:absolute; left:138px; top:220px; animation:drift-c 5s ease-in-out 1.4s infinite;">
+    <div class="chip" id="chip-10">Tu cuerpo y salud<span class="check">✦</span></div>
+  </div>
+
+  <!-- ARRIBA IZQUIERDA -->
+  <div id="chip-wrap-11" style="position:absolute; left:350px; top:130px; animation:drift-d 4.6s ease-in-out .9s infinite;">
+    <div class="chip" id="chip-11">La persona que serás<span class="check">✦</span></div>
+  </div>
+
+</div>
+
+<script>
+  // Centro de ella en coordenadas SVG
+  const CX = 640, CY = 390;
+
+  // Posición central aproximada de cada chip (para el rayo)
+  // [left + anchoMitad, top + 18]
+  const chipTargets = [
+    [534, 126],   // 0 arriba
+    [868, 148],   // 1 arriba der
+    [1008, 236],  // 2 der alta
+    [1038, 363],  // 3 der media
+    [998, 486],   // 4 der baja
+    [848, 586],   // 5 abajo der
+    [618, 618],   // 6 abajo centro
+    [378, 578],   // 7 abajo izq
+    [228, 468],   // 8 izq baja
+    [178, 358],   // 9 izq media
+    [228, 238],   // 10 izq alta
+    [438, 148],   // 11 arriba izq
+  ];
+
+  const TOTAL_CHIPS    = 12;
+  const INICIO_CIRCULO = 400;
+  const INICIO_ELLA    = 1200;
+  const INICIO_LABEL   = 2000;
+  const INICIO_CHIPS   = 2800;
+  const PRIMER_RAYO    = 3800;
+  const INTERVALO_RAYO = 950;
+  const DURACION_MS    = 16000;
+
+  const svg = document.getElementById('svg-main');
+
+  // ── 1. Círculo se dibuja ─────────────────────────────────
+  setTimeout(() => {
+    const c = document.getElementById('circulo-principal');
+    c.animate(
+      [{strokeDashoffset:993},{strokeDashoffset:0}],
+      {duration:1600, fill:'forwards', easing:'cubic-bezier(.4,0,.2,1)'}
+    );
+  }, INICIO_CIRCULO);
+
+  // ── 2. Ella aparece ──────────────────────────────────────
+  setTimeout(() => {
+    document.getElementById('ella-grupo').animate(
+      [{opacity:0,transform:'scale(0.6)'},{opacity:1,transform:'scale(1)'}],
+      {duration:800, fill:'forwards', easing:'cubic-bezier(.2,0,.1,1)'}
+    );
+  }, INICIO_ELLA);
+
+  // ── 3. Label ─────────────────────────────────────────────
+  setTimeout(() => {
+    document.getElementById('label-poi').animate(
+      [{opacity:0},{opacity:1}],
+      {duration:700, fill:'forwards', easing:'ease-out'}
+    );
+  }, INICIO_LABEL);
+
+  // ── 4. Chips aparecen escalonados ────────────────────────
+  for (let i = 0; i < TOTAL_CHIPS; i++) {
+    setTimeout(() => {
+      const w = document.getElementById('chip-wrap-' + i);
+      w.animate([{opacity:0,transform:'scale(0.5)'},{opacity:1,transform:'scale(1)'}],
+        {duration:400, fill:'forwards', easing:'ease-out'});
+    }, INICIO_CHIPS + i * 100);
+  }
+
+  // ── 5. Rayos de amor + reconfiguración ──────────────────
+  for (let i = 0; i < TOTAL_CHIPS; i++) {
+    const delay = PRIMER_RAYO + i * INTERVALO_RAYO;
+    setTimeout(() => {
+
+      const [tx, ty] = chipTargets[i];
+
+      // Control point con curva suave y generosa
+      const mx = (CX + tx) / 2 + (Math.random() * 60 - 30);
+      const my = (CY + ty) / 2 + (Math.random() * 50 - 25);
+
+      // Crear rayo curvo dorado suave
+      const rayo = document.createElementNS('http://www.w3.org/2000/svg','path');
+      rayo.setAttribute('d', `M ${CX} ${CY} Q ${mx} ${my} ${tx} ${ty}`);
+      rayo.setAttribute('fill','none');
+      rayo.setAttribute('stroke','#E8C870');
+      rayo.setAttribute('stroke-width','3.5');
+      rayo.setAttribute('stroke-linecap','round');
+      rayo.setAttribute('filter','url(#glow-gold)');
+      rayo.setAttribute('opacity','0');
+      svg.appendChild(rayo);
+
+      const len = rayo.getTotalLength() || 200;
+      rayo.setAttribute('stroke-dasharray', len);
+      rayo.setAttribute('stroke-dashoffset', len);
+
+      // Rayo se dibuja suave y amoroso, luego desaparece
+      rayo.animate([
+        {strokeDashoffset:len, opacity:0},
+        {strokeDashoffset:len*0.3, opacity:0.9, offset:0.08},
+        {strokeDashoffset:0, opacity:1, offset:0.6},
+        {strokeDashoffset:0, opacity:0}
+      ], {duration:1800, fill:'forwards', easing:'ease-in-out'});
+
+      // Chip se reconfigura cuando el rayo llega (~60%)
+      setTimeout(() => {
+        const chip = document.getElementById('chip-' + i);
+        if (!chip) return;
+        chip.classList.add('done');
+
+        // Flash de luz
+        chip.animate([
+          {boxShadow:'0 0 0px rgba(232,200,112,0)'},
+          {boxShadow:'0 0 40px rgba(232,200,112,1), 0 0 80px rgba(232,200,112,0.6)'},
+          {boxShadow:'0 0 18px rgba(232,200,112,0.7), 0 0 40px rgba(232,200,112,0.3)'}
+        ], {duration:700, fill:'forwards'});
+
+      }, 1100);
+
+    }, delay);
+  }
+
+  // ── 6. Fade out ──────────────────────────────────────────
+  setTimeout(() => {
+    document.getElementById('scene').classList.add('out');
+  }, DURACION_MS);
+</script>
+</body>
+</html>

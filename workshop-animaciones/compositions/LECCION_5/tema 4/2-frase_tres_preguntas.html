@@ -1,0 +1,186 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<style>body:not(.fonts-loaded)*{animation-play-state:paused!important;}</style>
+<script>document.fonts.ready.then(function(){setTimeout(function(){document.body.classList.add("fonts-loaded");},1200);});</script>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=1280, height=720">
+<title>Sistema de Tres Preguntas</title>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,900;1,700&family=Cormorant+Garamond:ital,wght@1,400&family=Inter:wght@300&display=swap" rel="stylesheet">
+<style>
+*{margin:0;padding:0;box-sizing:border-box;}
+body{width:1280px;height:720px;overflow:hidden;background:#000;
+  opacity:0;animation:bodyIn .5s ease forwards .1s, bodyOut .7s ease forwards 7.3s;}
+@keyframes bodyIn{to{opacity:1;}}
+@keyframes bodyOut{to{opacity:0;}}
+
+.scene{position:absolute;inset:0;overflow:hidden;background:#000;}
+
+/* Glow de fondo borgoña pulsante */
+.glow-bg{
+  position:absolute;
+  left:-10%;top:50%;transform:translateY(-50%);
+  width:55%;height:90%;
+  border-radius:50%;
+  background:radial-gradient(ellipse,rgba(107,26,42,.45) 0%,rgba(61,12,17,.2) 45%,transparent 70%);
+  animation:glowPulsa 3s ease-in-out infinite;
+}
+@keyframes glowPulsa{
+  0%,100%{transform:translateY(-50%) scale(1);opacity:.7;}
+  50%{transform:translateY(-50%) scale(1.12);opacity:1;}
+}
+
+/* ── SIGNOS DE INTERROGACIÓN FLOTANTES ── */
+.q{
+  position:absolute;
+  font-family:'Playfair Display',serif;font-weight:900;
+  color:#E8C870;
+  user-select:none;pointer-events:none;
+  animation:qFlota var(--dur) ease-in-out infinite var(--delay),
+            qApareceFlota var(--dur2) ease forwards var(--delay2);
+  opacity:0;
+}
+@keyframes qFlota{
+  0%{transform:translateY(0) rotate(var(--rot0)) scale(1);}
+  33%{transform:translateY(var(--dy1)) rotate(var(--rot1)) scale(var(--sc1));}
+  66%{transform:translateY(var(--dy2)) rotate(var(--rot2)) scale(var(--sc2));}
+  100%{transform:translateY(0) rotate(var(--rot0)) scale(1);}
+}
+@keyframes qApareceFlota{
+  0%{opacity:0;transform:translateY(30px) scale(.4);}
+  40%{opacity:var(--op);transform:translateY(0) scale(1);}
+  100%{opacity:var(--op);}
+}
+
+/* ── COMILLAS APERTURA ── */
+.comilla{
+  position:absolute;left:72px;top:68px;
+  font-family:'Playfair Display',serif;font-weight:900;font-size:130px;
+  color:#E8C870;line-height:1;
+  opacity:0;
+  animation:comillaIn .6s ease forwards .6s, comillaPulsa 2.5s ease-in-out infinite 1.4s;
+}
+@keyframes comillaIn{from{opacity:0;transform:translateY(-12px);}to{opacity:1;transform:translateY(0);}}
+@keyframes comillaPulsa{
+  0%,100%{text-shadow:0 0 18px rgba(232,200,112,.5);}
+  50%{text-shadow:0 0 40px rgba(232,200,112,1),0 0 80px rgba(232,200,112,.5);}
+}
+
+/* ── TEXTO CENTRAL ── */
+.texto-wrap{
+  position:absolute;
+  left:0;right:0;top:50%;transform:translateY(-50%);
+  display:flex;flex-direction:column;align-items:center;
+  gap:0;
+  padding:0 80px;
+}
+
+.linea1{
+  font-family:'Playfair Display',serif;font-weight:900;
+  font-size:88px;line-height:1;
+  color:#F9F3E8;
+  text-align:center;
+  text-shadow:0 0 60px rgba(249,243,232,.12);
+  opacity:0;
+  animation:palabrasEntran .7s ease forwards .9s;
+}
+@keyframes palabrasEntran{
+  from{opacity:0;transform:translateY(18px) blur(8px);}
+  to{opacity:1;transform:translateY(0) blur(0);}
+}
+
+.separador{
+  width:0;height:3px;margin:18px 0 16px;
+  background:linear-gradient(90deg,transparent,#E8C870,#D4A843,transparent);
+  box-shadow:0 0 14px rgba(232,200,112,.5);
+  animation:sepCrece .8s ease forwards 1.5s;
+}
+@keyframes sepCrece{to{width:520px;}}
+
+.linea2{
+  font-family:'Playfair Display',serif;font-weight:900;font-style:italic;
+  font-size:96px;line-height:1;
+  color:#E8C870;
+  text-align:center;
+  text-shadow:
+    0 0 25px rgba(232,200,112,1),
+    0 0 60px rgba(232,200,112,.55),
+    0 0 110px rgba(184,137,42,.3);
+  opacity:0;
+  animation:palabrasEntran .7s ease forwards 1.6s, oroGlow 2.5s ease-in-out infinite 2.5s;
+}
+@keyframes oroGlow{
+  0%,100%{text-shadow:0 0 25px rgba(232,200,112,1),0 0 60px rgba(232,200,112,.55),0 0 110px rgba(184,137,42,.3);}
+  50%{text-shadow:0 0 40px rgba(255,248,180,1),0 0 90px rgba(232,200,112,.9),0 0 160px rgba(184,137,42,.55);}
+}
+
+.firma{
+  font-family:'Cormorant Garamond',serif;font-style:italic;
+  font-size:26px;color:#E8C870;letter-spacing:2px;
+  margin-top:22px;opacity:0;
+  animation:firmaIn .5s ease forwards 2.4s;
+}
+@keyframes firmaIn{from{opacity:0;transform:translateY(8px);}to{opacity:.7;transform:translateY(0);}}
+
+/* Chispa que recorre la línea dorada */
+.chispa{
+  position:absolute;
+  top:0;left:0;
+  width:12px;height:3px;
+  background:white;
+  border-radius:6px;
+  box-shadow:0 0 18px 6px rgba(255,255,220,.9);
+  opacity:0;
+  animation:chispaRun .8s ease forwards 1.5s;
+}
+@keyframes chispaRun{
+  0%{opacity:0;left:calc(50% - 260px);}
+  15%{opacity:1;}
+  85%{opacity:1;}
+  100%{opacity:0;left:calc(50% + 248px);}
+}
+</style>
+</head>
+<body>
+<div class="scene">
+  <div class="glow-bg"></div>
+
+  <!-- SIGNOS FLOTANTES — distintos tamaños, posiciones, opacidades -->
+  <!-- Izquierda -->
+  <div class="q" style="font-size:110px;left:42px;top:80px;--op:.18;--dur:5.2s;--dur2:.8s;--delay:-1s;--delay2:.4s;--dy1:-18px;--dy2:10px;--rot0:-8deg;--rot1:-14deg;--rot2:-4deg;--sc1:1.05;--sc2:.97;">?</div>
+  <div class="q" style="font-size:52px;left:120px;top:520px;--op:.12;--dur:4.4s;--dur2:.7s;--delay:-2.1s;--delay2:.7s;--dy1:14px;--dy2:-10px;--rot0:5deg;--rot1:12deg;--rot2:0deg;--sc1:.95;--sc2:1.04;">?</div>
+  <div class="q" style="font-size:78px;left:28px;top:310px;--op:.1;--dur:6.1s;--dur2:.9s;--delay:-3.5s;--delay2:.5s;--dy1:-22px;--dy2:8px;--rot0:-3deg;--rot1:-10deg;--rot2:4deg;--sc1:1.08;--sc2:.93;">?</div>
+  <div class="q" style="font-size:38px;left:185px;top:180px;--op:.14;--dur:3.8s;--dur2:.6s;--delay:-0.8s;--delay2:.9s;--dy1:10px;--dy2:-16px;--rot0:10deg;--rot1:3deg;--rot2:14deg;--sc1:1.02;--sc2:.96;">?</div>
+
+  <!-- Derecha -->
+  <div class="q" style="font-size:105px;right:48px;top:60px;--op:.18;--dur:4.9s;--dur2:.8s;--delay:-2.3s;--delay2:.3s;--dy1:-15px;--dy2:12px;--rot0:6deg;--rot1:12deg;--rot2:1deg;--sc1:1.06;--sc2:.94;">?</div>
+  <div class="q" style="font-size:60px;right:155px;top:540px;--op:.13;--dur:5.6s;--dur2:.7s;--delay:-1.4s;--delay2:.6s;--dy1:18px;--dy2:-8px;--rot0:-7deg;--rot1:-2deg;--rot2:-13deg;--sc1:.98;--sc2:1.05;">?</div>
+  <div class="q" style="font-size:82px;right:30px;top:350px;--op:.1;--dur:4.2s;--dur2:.9s;--delay:-4.1s;--delay2:.8s;--dy1:-20px;--dy2:6px;--rot0:2deg;--rot1:9deg;--rot2:-4deg;--sc1:1.04;--sc2:.95;">?</div>
+  <div class="q" style="font-size:44px;right:200px;top:200px;--op:.14;--dur:6.5s;--dur2:.6s;--delay:-0.6s;--delay2:1.0s;--dy1:12px;--dy2:-14px;--rot0:-5deg;--rot1:-12deg;--rot2:2deg;--sc1:.97;--sc2:1.06;">?</div>
+
+  <!-- Arriba centro -->
+  <div class="q" style="font-size:65px;left:540px;top:18px;--op:.11;--dur:5.0s;--dur2:.7s;--delay:-3.2s;--delay2:.5s;--dy1:14px;--dy2:-6px;--rot0:4deg;--rot1:-2deg;--rot2:10deg;--sc1:1.03;--sc2:.97;">?</div>
+  <!-- Abajo centro -->
+  <div class="q" style="font-size:70px;left:590px;bottom:22px;--op:.11;--dur:4.7s;--dur2:.8s;--delay:-1.9s;--delay2:.6s;--dy1:-16px;--dy2:8px;--rot0:-6deg;--rot1:-13deg;--rot2:0deg;--sc1:1.05;--sc2:.96;">?</div>
+
+  <!-- Extra pequeños -->
+  <div class="q" style="font-size:28px;left:310px;top:55px;--op:.09;--dur:3.5s;--dur2:.5s;--delay:-2.7s;--delay2:1.1s;--dy1:8px;--dy2:-12px;--rot0:12deg;--rot1:5deg;--rot2:18deg;--sc1:.98;--sc2:1.03;">?</div>
+  <div class="q" style="font-size:30px;right:320px;bottom:60px;--op:.09;--dur:4.0s;--dur2:.5s;--delay:-0.4s;--delay2:1.2s;--dy1:-10px;--dy2:14px;--rot0:-9deg;--rot1:-3deg;--rot2:-15deg;--sc1:1.02;--sc2:.96;">?</div>
+
+  <!-- COMILLAS -->
+  <div class="comilla">"</div>
+
+  <!-- TEXTO -->
+  <div class="texto-wrap">
+    <div class="linea1">Sistema de</div>
+    <div style="position:relative;display:flex;align-items:center;justify-content:center;width:100%;">
+      <div class="separador"></div>
+      <div class="chispa"></div>
+    </div>
+    <div class="linea2">Tres Preguntas</div>
+    <div class="firma">Protocolo 1 · La Dimensión Mental</div>
+  </div>
+
+</div>
+</body>
+</html>

@@ -1,0 +1,332 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<style>body:not(.fonts-loaded)*{animation-play-state:paused!important;}</style>
+<script>document.fonts.ready.then(function(){setTimeout(function(){document.body.classList.add("fonts-loaded");},1200);});</script>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=1280, height=720">
+<title>Pizarra — Distorsión 1: Lectura de Mente</title>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,700;0,900;1,700&family=Cormorant+Garamond:ital,wght@1,400;1,600&family=Inter:wght@300;400;500&display=swap" rel="stylesheet">
+<style>
+*{margin:0;padding:0;box-sizing:border-box;}
+body{
+  width:1280px;height:720px;overflow:hidden;
+  background:#EDE3CE;
+  opacity:0;
+  animation:bodyIn .45s ease forwards .1s, bodyOut .6s ease forwards 9.4s;
+}
+@keyframes bodyIn{to{opacity:1;}}
+@keyframes bodyOut{to{opacity:0;}}
+
+.pizarra{position:absolute;inset:0;background:#EDE3CE;}
+.pizarra::before{
+  content:'';position:absolute;inset:0;
+  background-image:
+    linear-gradient(rgba(180,160,120,.17) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(180,160,120,.17) 1px, transparent 1px);
+  background-size:44px 44px;
+}
+
+.borde-izq{
+  position:absolute;left:0;top:0;bottom:0;width:0;
+  background:linear-gradient(180deg,#6B1A2A,#3D0C11 50%,#8B2D3F);
+  animation:bordeIzqCrece .5s ease forwards .3s;
+}
+@keyframes bordeIzqCrece{to{width:8px;}}
+
+.borde-sup{
+  position:absolute;top:0;left:0;right:0;height:0;
+  background:linear-gradient(90deg,#E8C870,#D4A843 50%,#E8C870);
+  animation:bordeSupCrece .6s ease forwards .4s;
+}
+@keyframes bordeSupCrece{to{height:6px;}}
+
+/* ── LAYOUT TRES COLUMNAS ── */
+.cols{
+  position:absolute;
+  inset:0;
+  display:grid;
+  grid-template-columns:1fr 1fr 1fr;
+  gap:0;
+  padding:52px 28px 36px 36px;
+}
+
+/* Divisores verticales */
+.col{
+  position:relative;
+  display:flex;flex-direction:column;
+  align-items:center;
+  padding:0 28px;
+  gap:0;
+}
+.col:not(:last-child)::after{
+  content:'';
+  position:absolute;right:0;top:10%;bottom:10%;
+  width:1px;
+  background:linear-gradient(180deg,transparent,rgba(107,26,42,.2),rgba(107,26,42,.2),transparent);
+  opacity:0;
+  animation:divIn .4s ease forwards var(--divd);
+}
+.col:nth-child(1){--divd:1.0s;}
+.col:nth-child(2){--divd:1.2s;}
+@keyframes divIn{to{opacity:1;}}
+
+/* ── HEADER DE COLUMNA ── */
+.col-header{
+  display:flex;flex-direction:column;align-items:center;
+  gap:8px;
+  margin-bottom:20px;
+  opacity:0;
+  animation:headerIn .5s cubic-bezier(.25,.46,.45,.94) forwards var(--hd);
+}
+.col:nth-child(1) .col-header{--hd:.7s;}
+.col:nth-child(2) .col-header{--hd:.9s;}
+.col:nth-child(3) .col-header{--hd:1.1s;}
+
+@keyframes headerIn{
+  from{opacity:0;transform:translateY(-14px);}
+  to{opacity:1;transform:translateY(0);}
+}
+
+.col-numero{
+  font-family:'Inter',sans-serif;font-weight:400;font-size:11px;
+  letter-spacing:5px;text-transform:uppercase;
+  color:rgba(107,26,42,.5);
+}
+.col-titulo{
+  font-family:'Playfair Display',serif;font-weight:700;
+  font-size:20px;line-height:1.1;
+  color:#3D0C11;text-align:center;
+}
+.col-subtitulo{
+  font-family:'Inter',sans-serif;font-weight:300;
+  font-size:13px;letter-spacing:.5px;
+  color:rgba(61,12,17,.55);text-align:center;
+  font-style:italic;
+}
+.col-linea{
+  width:0;height:2px;
+  background:linear-gradient(90deg,transparent,#E8C870,transparent);
+  border-radius:1px;
+  animation:colLineaCrece .5s ease forwards var(--ld);
+}
+.col:nth-child(1) .col-linea{--ld:1.0s;}
+.col:nth-child(2) .col-linea{--ld:1.2s;}
+.col:nth-child(3) .col-linea{--ld:1.4s;}
+@keyframes colLineaCrece{to{width:160px;}}
+
+/* ── CONTENIDO DE COLUMNA ── */
+
+/* COL 1 — Distorsión: badge + nombre grande */
+.distorsion-badge{
+  font-family:'Inter',sans-serif;font-weight:500;
+  font-size:11px;letter-spacing:5px;text-transform:uppercase;
+  padding:5px 14px;border-radius:20px;
+  background:rgba(107,26,42,.1);
+  border:1px solid rgba(107,26,42,.25);
+  color:#6B1A2A;
+  margin-bottom:16px;
+  opacity:0;animation:itemIn .5s ease forwards 1.3s;
+}
+.distorsion-nombre{
+  font-family:'Playfair Display',serif;font-weight:900;
+  font-size:52px;line-height:1.05;
+  color:#3D0C11;text-align:center;
+  opacity:0;animation:itemIn .5s ease forwards 1.5s;
+}
+.distorsion-def{
+  font-family:'Cormorant Garamond',serif;font-style:italic;
+  font-size:26px;line-height:1.3;
+  color:rgba(61,12,17,.65);text-align:center;
+  margin-top:14px;
+  opacity:0;animation:itemIn .5s ease forwards 1.7s;
+}
+
+/* COL 2 — Frases típicas */
+.frase-card{
+  width:100%;
+  background:rgba(107,26,42,.07);
+  border:1px solid rgba(107,26,42,.15);
+  border-left:3px solid #8B2D3F;
+  border-radius:6px;
+  padding:16px 18px;
+  margin-bottom:14px;
+  opacity:0;animation:itemIn .5s ease forwards var(--fd);
+}
+.frase-card:nth-child(1){--fd:1.4s;}
+.frase-card:nth-child(2){--fd:1.8s;}
+
+.frase-comilla{
+  font-family:'Playfair Display',serif;font-weight:900;
+  font-size:36px;line-height:.6;
+  color:rgba(139,45,63,.3);
+  margin-bottom:6px;display:block;
+}
+.frase-texto{
+  font-family:'Cormorant Garamond',serif;font-style:italic;
+  font-size:32px;line-height:1.2;
+  color:#3D0C11;
+}
+
+/* COL 3 — Lo que produce */
+.produce-item{
+  width:100%;
+  display:flex;flex-direction:column;
+  gap:8px;
+  opacity:0;animation:itemIn .55s ease forwards var(--pid);
+}
+.produce-item:nth-child(1){--pid:1.5s;}
+.produce-item:nth-child(2){--pid:2.0s;}
+
+.produce-icono{
+  font-size:32px;text-align:center;
+}
+.produce-texto{
+  font-family:'Cormorant Garamond',serif;font-style:italic;
+  font-size:30px;line-height:1.25;
+  color:#2A1008;text-align:center;
+}
+.produce-sep{
+  width:60px;height:1px;
+  background:rgba(107,26,42,.2);
+  margin:10px auto;
+}
+
+/* NO AVANZA — tag destacado */
+.no-avanza{
+  font-family:'Playfair Display',serif;font-weight:900;
+  font-size:36px;line-height:1;
+  color:#6B1A2A;text-align:center;
+  text-decoration:underline;
+  text-decoration-color:#E8C870;
+  text-underline-offset:6px;
+  text-decoration-thickness:2px;
+  margin-top:8px;
+  opacity:0;animation:itemIn .5s ease forwards 2.5s;
+}
+
+@keyframes itemIn{
+  from{opacity:0;transform:translateY(18px);}
+  to{opacity:1;transform:translateY(0);}
+}
+
+/* ── FRASE GRANDE FINAL (wrapped) ── */
+.frase-grande-wrap{
+  position:absolute;inset:0;
+  display:flex;align-items:center;justify-content:center;
+  flex-direction:column;gap:10px;
+  background:#EDE3CE;opacity:0;
+  animation:grandeAparece .7s ease forwards 6.0s;
+  padding:0 80px;
+}
+.frase-grande-wrap::before{
+  content:'';position:absolute;inset:0;
+  background-image:
+    linear-gradient(rgba(180,160,120,.17) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(180,160,120,.17) 1px, transparent 1px);
+  background-size:44px 44px;z-index:0;
+}
+@keyframes grandeAparece{from{opacity:0;transform:scale(.96);}to{opacity:1;transform:scale(1);}}
+
+.grande-tag{
+  font-family:'Inter',sans-serif;font-weight:300;font-size:13px;
+  letter-spacing:6px;text-transform:uppercase;
+  color:rgba(107,26,42,.55);position:relative;z-index:1;
+  opacity:0;animation:tagIn .5s ease forwards 6.5s;
+}
+@keyframes tagIn{to{opacity:1;}}
+
+.grande-texto{
+  font-family:'Playfair Display',serif;font-weight:900;
+  font-size:100px;line-height:1.0;
+  color:#3D0C11;text-align:center;
+  position:relative;z-index:1;
+  opacity:0;animation:grandeIn .6s cubic-bezier(.25,.46,.45,.94) forwards 6.6s;
+}
+.grande-texto .hl{color:#6B1A2A;}
+@keyframes grandeIn{from{opacity:0;transform:translateY(20px);}to{opacity:1;transform:translateY(0);}}
+
+.grande-sub{
+  font-family:'Cormorant Garamond',serif;font-style:italic;
+  font-size:40px;color:#6B1A2A;text-align:center;
+  position:relative;z-index:1;
+  opacity:0;animation:grandeIn .5s ease forwards 7.1s;
+}
+.grande-linea{
+  width:0;height:3px;
+  background:linear-gradient(90deg,transparent,#E8C870,#D4A843,transparent);
+  border-radius:2px;position:relative;z-index:1;
+  animation:lineaCreceC .7s ease forwards 7.3s;
+}
+@keyframes lineaCreceC{to{width:700px;}}
+</style>
+</head>
+<body>
+
+<div class="pizarra"></div>
+<div class="borde-izq"></div>
+<div class="borde-sup"></div>
+
+<!-- TRES COLUMNAS -->
+<div class="cols">
+
+  <!-- COL 1 — DISTORSIÓN -->
+  <div class="col">
+    <div class="col-header">
+      <div class="col-numero">Distorsión 03</div>
+      <div class="col-titulo">Filtro negativo</div>
+      <div class="col-linea"></div>
+    </div>
+    <div class="distorsion-badge">filtro negativo</div>
+    <div class="distorsion-def">Ignorar todo lo positivo</div>
+  </div>
+
+  <!-- COL 2 — FRASE TÍPICA -->
+  <div class="col">
+    <div class="col-header">
+      <div class="col-numero">Frase típica</div>
+      <div class="col-titulo">Lo que se piensa</div>
+      <div class="col-linea"></div>
+    </div>
+    <div class="frase-card">
+      <span class="frase-comilla">"</span>
+      <div class="frase-texto">El hizo otras cosas bien<br>pero se equivocó en una</div>
+    </div>
+    <div class="frase-card">
+      <span class="frase-comilla">"</span>
+      <div class="frase-texto">lo mal que el hizo<br>define todo el dia</div>
+    </div>
+  </div>
+
+  <!-- COL 3 — LO QUE PRODUCE -->
+  <div class="col">
+    <div class="col-header">
+      <div class="col-numero">El resultado</div>
+      <div class="col-titulo">Lo que produce</div>
+      <div class="col-linea"></div>
+    </div>
+    <div class="produce-item">
+      <div class="produce-icono">↺</div>
+      <div class="produce-texto">la relación parece <br>peor de lo que es</div>
+    </div>
+    <div class="produce-sep"></div>
+    <div class="produce-item">
+      <div class="produce-texto">Desgaste constante</div>
+      <div class="no-avanza">Nada mejora</div>
+    </div>
+  </div>
+
+</div>
+
+<!-- WRAPPED FINAL -->
+<div class="frase-grande-wrap">
+  <div class="borde-izq" style="animation:bordeIzqCrece .3s ease forwards 6.0s;"></div>
+  <div class="borde-sup" style="animation:bordeSupCrece .3s ease forwards 6.1s;"></div>
+  <div class="grande-tag">Distorsión 3 · Protocolo 1 · La Dimensión Mental</div>
+  <div class="grande-texto"><span class="hl">Lectura</span><br>de mente</div>
+  <div class="grande-linea"></div>
+  <div class="grande-sub">Respondes a una intención que inventaste</div>
+</div>
+
+</body>
+</html>

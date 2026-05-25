@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<style>
+  body:not(.fonts-loaded) * { animation-play-state: paused !important; transition: none !important; }
+</style>
+<script>
+  document.fonts.ready.then(() => {
+    setTimeout(() => { document.body.classList.add("fonts-loaded"); }, 1500);
+  });
+</script>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=1280, height=720">
+<title>anim_l1_an9 — analfabeto emocional</title>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@1,300;1,500&family=Inter:wght@300&display=swap" rel="stylesheet">
+<style>
+  * { margin:0; padding:0; box-sizing:border-box; }
+  body { width:1280px; height:720px; overflow:hidden; background:#00FF00; }
+
+  .scene {
+    width:1280px; height:720px; position:relative;
+    background:#00FF00;
+    display:flex; align-items:flex-end; justify-content:center;
+    padding-bottom:80px;
+    opacity:0; animation:fadeIn .6s ease-out .1s forwards;
+  }
+  @keyframes fadeIn { to{opacity:1} }
+  .scene.out { animation:fadeOut .6s ease-in forwards; }
+  @keyframes fadeOut { to{opacity:0} }
+
+  .frase-wrap {
+    text-align:center; position:relative;
+    background:rgba(15,10,11,.75);
+    padding:20px 60px 22px;
+    border-radius:6px;
+    border-top:2px solid rgba(232,200,112,.4);
+  }
+
+  /* Línea dorada top que crece */
+  .frase-wrap::before {
+    content:'';
+    position:absolute; top:-2px; left:50%; transform:translateX(-50%);
+    width:0; height:2px;
+    background:linear-gradient(90deg, transparent, #E8C870, #D4A843, #E8C870, transparent);
+    box-shadow:0 0 10px rgba(232,200,112,.6);
+    animation:lineGrow .6s ease-out .8s forwards;
+  }
+  @keyframes lineGrow { to{width:100%} }
+
+  .frase-main {
+    font-family:'Cormorant Garamond',Georgia,serif;
+    font-style:italic; font-size:58px; font-weight:300;
+    color:#F9F3E8; line-height:1.1;
+    text-shadow:
+      0 0 30px rgba(249,243,232,.35),
+      0 0 60px rgba(249,243,232,.15);
+    opacity:0; transform:translateY(12px);
+    animation:riseIn .6s ease-out 1.0s forwards;
+  }
+
+  .frase-main strong {
+    color:#E8C870; font-weight:500;
+    text-shadow:
+      0 0 20px rgba(232,200,112,.9),
+      0 0 45px rgba(232,200,112,.5),
+      0 0 80px rgba(232,200,112,.25);
+  }
+
+  @keyframes riseIn {
+    to{opacity:1;transform:translateY(0)}
+  }
+
+  .frase-sub {
+    font-family:'Inter',sans-serif; font-size:14px; font-weight:300;
+    color:rgba(232,200,112,.6); letter-spacing:.2em; text-transform:uppercase;
+    margin-top:8px; opacity:0;
+    animation:fadeIn .4s ease-out 1.8s forwards;
+  }
+</style>
+</head>
+<body>
+<div class="scene" id="scene">
+  <div class="frase-wrap">
+    <p class="frase-main">yo era un <strong>analfabeto emocional</strong></p>
+    <p class="frase-sub">Josué Calderón</p>
+  </div>
+</div>
+<script>
+  const DURACION_MS = 5000;
+  setTimeout(() => { document.getElementById('scene').classList.add('out'); }, DURACION_MS);
+</script>
+</body>
+</html>

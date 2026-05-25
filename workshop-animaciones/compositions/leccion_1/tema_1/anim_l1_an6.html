@@ -1,0 +1,132 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<style>
+  body:not(.fonts-loaded) * { animation-play-state: paused !important; transition: none !important; }
+  html, body { background:#00FF00 !important; }
+  .bg-glow { display:none !important; }
+</style>
+<script>
+  document.fonts.ready.then(() => {
+    setTimeout(() => { document.body.classList.add("fonts-loaded"); }, 200);
+  });
+</script>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=1280, height=720">
+<title>anim_l1_an6 — Logo Código Soberana</title>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,700;0,900;1,500&family=Cormorant+Garamond:ital,wght@1,300&display=swap" rel="stylesheet">
+<style>
+  * { margin:0; padding:0; box-sizing:border-box; }
+  body { width:1280px; height:720px; overflow:hidden; background:transparent; }
+  .scene {
+    width:1280px; height:720px; position:relative;
+    background:#00FF00;
+    display:flex; align-items:center; justify-content:center;
+    opacity:0; animation:fadeIn .5s ease-out .1s forwards;
+  }
+  @keyframes fadeIn{to{opacity:1}}
+  .scene.out { animation:fadeOut .7s ease-in forwards; }
+  @keyframes fadeOut{to{opacity:0}}
+
+  /* Glow de fondo */
+  .bg-glow {
+    position:absolute; left:50%; top:50%; transform:translate(-50%,-50%);
+    width:700px; height:500px;
+    background:radial-gradient(ellipse,rgba(107,26,42,.45) 0%,transparent 65%);
+    animation:glowPulse 3s ease-in-out infinite; pointer-events:none;
+  }
+  @keyframes glowPulse{0%,100%{opacity:.7;transform:translate(-50%,-50%) scale(1)}50%{opacity:1;transform:translate(-50%,-50%) scale(1.08)}}
+
+  /* Logo que vuela desde abajo y se asienta */
+  .logo-wrap {
+    position:relative; z-index:2; text-align:center;
+    opacity:0; transform:translateY(80px) scale(.85);
+    animation:flyIn .9s cubic-bezier(.2,0,.1,1) .6s forwards;
+  }
+  @keyframes flyIn { to{opacity:1;transform:translateY(0) scale(1)} }
+
+  .logo-codigo {
+    font-family:'Playfair Display',Georgia,serif;
+    font-size:100px; font-weight:900; color:#F9F3E8; line-height:1;
+    letter-spacing:-.01em;
+    text-shadow:
+      0 0 40px rgba(255,255,255,.3),
+      0 0 80px rgba(255,255,255,.12);
+  }
+  .logo-soberana {
+    font-family:'Playfair Display',Georgia,serif;
+    font-style:italic; font-size:110px; font-weight:700;
+    color:#E8C870; line-height:.95;
+    text-shadow:
+      0 0 30px rgba(220,180,60,.7),
+      0 0 60px rgba(220,180,60,.4),
+      0 0 100px rgba(220,180,60,.2);
+    animation:goldPulse 2.5s ease-in-out 1.5s infinite;
+  }
+  @keyframes goldPulse{
+    0%,100%{text-shadow:0 0 40px rgba(232,200,112,1),0 0 80px rgba(220,180,60,.8),0 0 140px rgba(220,180,60,.4)}
+    50%{text-shadow:0 0 60px rgba(255,248,180,1),0 0 110px rgba(232,200,112,1),0 0 180px rgba(220,180,60,.6)}
+  }
+
+  /* Línea dorada bajo el logo */
+  .logo-line {
+    width:0; height:2px; margin:16px auto 0;
+    background:linear-gradient(90deg,transparent,#E8C870,#E8C870,#E8C870,transparent);
+    animation:lineGrow .6s ease-out 1.4s forwards;
+  }
+  @keyframes lineGrow{to{width:280px}}
+
+  .logo-tagline {
+    font-family:'Cormorant Garamond',Georgia,serif;
+    font-style:italic; font-size:22px; font-weight:300;
+    color:#C97080; letter-spacing:.15em; margin-top:14px;
+    opacity:0; animation:fadeIn .5s ease-out 1.8s forwards;
+  }
+
+  /* Partículas doradas */
+  .particle {
+    position:absolute; border-radius:50%;
+    background:#00FF00; opacity:0;
+    animation:particleFloat linear infinite;
+  }
+  @keyframes particleFloat{
+    0%{opacity:0;transform:translateY(0) scale(1)}
+    15%{opacity:.6}
+    85%{opacity:.3}
+    100%{opacity:0;transform:translateY(-350px) scale(.3)}
+  }
+</style>
+</head>
+<body>
+<div class="scene" id="scene">
+  <div class="bg-glow"></div>
+  <div id="particles"></div>
+
+  <div class="logo-wrap">
+    <div class="logo-codigo">Código</div>
+    <div class="logo-soberana">Soberana</div>
+    <div class="logo-line"></div>
+    <p class="logo-tagline">Sistema · Método · Transformación</p>
+  </div>
+</div>
+
+<script>
+  const DURACION_MS = 16000;
+
+  // Partículas
+  const pContainer = document.getElementById('particles');
+  for(let i=0;i<20;i++){
+    const p = document.createElement('div');
+    p.className = 'particle';
+    p.style.left  = (10+Math.random()*80)+'%';
+    p.style.top   = (30+Math.random()*60)+'%';
+    p.style.width = p.style.height = (2+Math.random()*4)+'px';
+    p.style.animationDuration = (4+Math.random()*6)+'s';
+    p.style.animationDelay   = (Math.random()*4)+'s';
+    pContainer.appendChild(p);
+  }
+
+  setTimeout(() => { document.getElementById('scene').classList.add('out'); }, DURACION_MS);
+</script>
+</body>
+</html>

@@ -1,0 +1,121 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<style>
+  body:not(.fonts-loaded) * { animation-play-state: paused !important; transition: none !important; }
+</style>
+<script>
+  document.fonts.ready.then(() => {
+    setTimeout(() => { document.body.classList.add("fonts-loaded"); }, 1500);
+  });
+</script>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=1280, height=720">
+<title>anim_l3_tema01_inicio_tema.html — INICIO TEMA</title>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@1,300;1,500&display=swap" rel="stylesheet">
+<style>
+  * { margin:0; padding:0; box-sizing:border-box; }
+  body { width:1280px; height:720px; overflow:hidden; background:#0F0A0B; }
+  .scene {
+    width:1280px; height:720px; position:relative;
+    display:flex; flex-direction:column;
+    align-items:flex-start; justify-content:center;
+    padding-left:100px; background:#0F0A0B;
+    opacity:0; animation:sceneIn .5s ease-out .1s forwards;
+  }
+  @keyframes sceneIn { to{opacity:1} }
+  .scene.out { animation:sceneOut .8s ease-in forwards; }
+  @keyframes sceneOut { to{opacity:0} }
+  .band {
+    position:absolute; left:0; top:50%; transform:translateY(-50%);
+    width:0; height:320px;
+    background:linear-gradient(90deg, rgba(61,12,17,.75) 0%, rgba(61,12,17,.50) 65%, transparent 100%);
+    animation:expandBand .55s cubic-bezier(.2,0,.1,1) .2s forwards;
+  }
+  @keyframes expandBand { to{width:1100px} }
+  .left-bar {
+    position:absolute; left:0; top:50%; transform:translateY(-50%);
+    width:7px; height:0;
+    background:linear-gradient(180deg, transparent, #E8C870, #D4A843, #E8C870, transparent);
+    box-shadow:0 0 18px rgba(232,200,112,.8), 0 0 40px rgba(232,200,112,.35);
+    animation:growBar .5s ease-out .55s forwards;
+  }
+  @keyframes growBar { to{height:320px} }
+  .content { position:relative; z-index:2; padding-left:32px; max-width:1100px; }
+  .tema-titulo {
+    font-family:'Cormorant Garamond',Georgia,serif;
+    font-style:italic; font-size:88px; font-weight:300;
+    color:#F9F3E8; line-height:1.12; letter-spacing:.01em;
+    text-shadow:0 0 50px rgba(249,243,232,.2), 0 0 100px rgba(249,243,232,.08);
+  }
+  .tema-titulo .letter { opacity:0; display:inline; transition:opacity .055s ease; }
+  .linea-2 { display:block; }
+  .cursor {
+    display:inline-block; width:5px; height:.82em;
+    background:#E8C870; margin-left:4px; vertical-align:middle;
+    animation:blink .5s step-end infinite; opacity:0;
+    box-shadow:0 0 12px rgba(232,200,112,.95);
+  }
+  @keyframes blink { 0%,100%{opacity:1} 50%{opacity:0} }
+</style>
+</head>
+<body>
+<div class="scene" id="scene">
+  <div class="band"></div>
+  <div class="left-bar"></div>
+  <div class="content">
+    <div class="tema-titulo">
+      <span id="linea1"></span><span class="linea-2"><span id="linea2"></span><span class="cursor" id="cursor"></span></span>
+    </div>
+  </div>
+</div>
+<script>
+  const linea1 = "Por qué la Soberana";
+  const linea2 = "es la meta correcta";
+  const DELAY_INICIO = 950;
+  const VELOCIDAD = 46;
+  const DURACION_VISIBLE = 3200;
+
+  function buildLetters(texto, containerId) {
+    const container = document.getElementById(containerId);
+    texto.split('').forEach(char => {
+      const span = document.createElement('span');
+      span.className = 'letter';
+      span.textContent = char === ' ' ? '\u00A0' : char;
+      container.appendChild(span);
+    });
+    return container.querySelectorAll('.letter');
+  }
+
+  const letters1 = buildLetters(linea1, 'linea1');
+  const letters2 = buildLetters(linea2, 'linea2');
+
+  // Cursor aparece antes de empezar
+  setTimeout(() => { document.getElementById('cursor').style.opacity = '1'; }, DELAY_INICIO - 200);
+
+  // Línea 1
+  let t = DELAY_INICIO;
+  letters1.forEach((l, i) => {
+    setTimeout(() => { l.style.opacity = '1'; }, t);
+    t += VELOCIDAD;
+  });
+
+  // Pequeña pausa entre líneas
+  t += 120;
+
+  // Línea 2
+  letters2.forEach((l, i) => {
+    setTimeout(() => { l.style.opacity = '1'; }, t);
+    t += VELOCIDAD;
+  });
+
+  const finEscritura = t;
+  setTimeout(() => {
+    const c = document.getElementById('cursor');
+    c.style.animation = 'none'; c.style.opacity = '0';
+  }, finEscritura + 600);
+
+  setTimeout(() => { document.getElementById('scene').classList.add('out'); }, finEscritura + DURACION_VISIBLE);
+</script>
+</body>
+</html>

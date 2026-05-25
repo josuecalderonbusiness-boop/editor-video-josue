@@ -1,0 +1,379 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<style>body:not(.fonts-loaded) * { animation-play-state: paused !important; transition: none !important; }</style>
+<script>document.fonts.ready.then(() => { setTimeout(() => { document.body.classList.add("fonts-loaded"); }, 1500); });</script>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=1280, height=720">
+<title>Tu Tiempo</title>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,900;1,400;1,900&family=Cormorant+Garamond:ital,wght@1,400;1,600&display=swap" rel="stylesheet">
+<style>
+* { margin:0; padding:0; box-sizing:border-box; }
+body { width:1280px; height:720px; overflow:hidden; }
+
+.fondo {
+  position:absolute; inset:0;
+  background:linear-gradient(135deg,#0F0A0B 0%,#1A0810 45%,#3D0C11 100%);
+}
+.particulas { position:absolute; inset:0; pointer-events:none; overflow:hidden; }
+.particula {
+  position:absolute; border-radius:50%;
+  background:rgba(232,200,112,0.05);
+  animation:flotarP linear infinite;
+}
+@keyframes flotarP {
+  0%   { transform:translateY(0); opacity:0; }
+  10%  { opacity:1; }
+  90%  { opacity:.3; }
+  100% { transform:translateY(-720px); opacity:0; }
+}
+
+.slide {
+  position:absolute; inset:0;
+  display:flex; flex-direction:column;
+  align-items:center; justify-content:center;
+  opacity:0; pointer-events:none; z-index:2;
+  padding:0 100px;
+}
+
+@keyframes cardIn  { 0%{opacity:0;transform:translateY(55px) scale(.94)} 70%{transform:translateY(-4px) scale(1.01)} 100%{opacity:1;transform:none} }
+@keyframes cardOut { 0%{opacity:1;transform:none} 100%{opacity:0;transform:translateY(-45px) scale(.95)} }
+@keyframes fadeIn  { to{opacity:1} }
+@keyframes lineGrow{ to{width:100%;opacity:1} }
+@keyframes goldGlow{ 0%,100%{text-shadow:0 0 30px rgba(232,200,112,.3)} 50%{text-shadow:0 0 90px rgba(255,245,180,1),0 0 130px rgba(232,200,112,.6)} }
+@keyframes wordPop { 0%{opacity:0;transform:translateY(24px) scale(.87)} 100%{opacity:1;transform:none} }
+@keyframes slideL  { 0%{opacity:0;transform:translateX(-60px)} 100%{opacity:1;transform:none} }
+@keyframes slideR  { 0%{opacity:0;transform:translateX(60px)} 100%{opacity:1;transform:none} }
+@keyframes slideUp { 0%{opacity:0;transform:translateY(30px)} 100%{opacity:1;transform:none} }
+@keyframes pulsoDot{ 0%,100%{opacity:.4;transform:scale(1)} 50%{opacity:1;transform:scale(1.08)} }
+@keyframes vacioPulse{ 0%,100%{opacity:.08} 50%{opacity:.22} }
+@keyframes cruzX   { 0%{width:0} 100%{width:110%} }
+
+/* ── TAG ── */
+.tag {
+  font-family:'Cormorant Garamond',serif; font-style:italic;
+  font-size:22px; letter-spacing:5px; text-transform:uppercase;
+  color:rgba(249,243,232,.35); text-align:center; margin-bottom:16px;
+  opacity:0;
+}
+
+/* ── TEXTO GRANDE ── */
+.txt-enorme {
+  font-family:'Playfair Display',serif; font-weight:900;
+  font-size:138px; line-height:.92; color:#F9F3E8; text-align:center;
+  text-shadow:0 0 50px rgba(249,243,232,.1);
+  opacity:0;
+}
+.txt-enorme em { font-style:italic; color:#E8C870; }
+
+.txt-grande {
+  font-family:'Playfair Display',serif; font-weight:900;
+  font-size:96px; line-height:.95; color:#F9F3E8; text-align:center;
+  opacity:0;
+}
+.txt-grande em { font-style:italic; color:#E8C870; }
+
+.txt-medio {
+  font-family:'Cormorant Garamond',serif; font-style:italic;
+  font-size:52px; line-height:1.4; color:rgba(249,243,232,.45); text-align:center;
+  opacity:0;
+}
+
+.txt-sub {
+  font-family:'Cormorant Garamond',serif; font-style:italic;
+  font-size:38px; line-height:1.5; color:rgba(249,243,232,.38); text-align:center;
+  opacity:0;
+}
+
+.linea-deco {
+  height:3px; border-radius:2px; margin:20px auto 0; opacity:0;
+  background:linear-gradient(90deg,transparent,rgba(249,243,232,.2),transparent);
+}
+.linea-deco.dorada {
+  background:linear-gradient(90deg,transparent,#E8C870,transparent);
+}
+
+/* ── CALENDARIOS ── */
+.cals-wrap {
+  display:flex; gap:60px; align-items:flex-start; width:100%;
+  opacity:0;
+}
+.cal-bloque { flex:1; }
+.cal-etiqueta {
+  font-family:'Cormorant Garamond',serif; font-style:italic;
+  font-size:20px; letter-spacing:4px; text-transform:uppercase;
+  margin-bottom:10px;
+}
+.cal-etiqueta.rojo   { color:rgba(201,112,128,.55); }
+.cal-etiqueta.dorado { color:rgba(232,200,112,.5); }
+.cal-numero {
+  font-family:'Playfair Display',serif; font-weight:900;
+  font-size:80px; line-height:.9; margin-bottom:12px;
+}
+.cal-numero.rojo   { color:#C97080; }
+.cal-numero.dorado { color:rgba(232,200,112,.4); font-size:64px; }
+.cal-desc {
+  font-family:'Cormorant Garamond',serif; font-style:italic;
+  font-size:24px; color:rgba(249,243,232,.38); line-height:1.4; margin-bottom:14px;
+}
+.dias-grid {
+  display:grid; gap:3px;
+  grid-template-columns:repeat(18,1fr);
+}
+.dm { aspect-ratio:1; border-radius:2px; background:rgba(249,243,232,.05); border:1px solid rgba(249,243,232,.04); }
+.dm.ocupado { background:rgba(107,26,42,.75); border-color:rgba(201,112,128,.25); }
+.dm.vacio   { animation:vacioPulse 3s ease-in-out infinite; }
+.dm.minimo  { background:rgba(232,200,112,.5); border-color:rgba(232,200,112,.4); animation:none; }
+
+/* ── PREGUNTA CENTRADA ── */
+.pregunta-centro {
+  display:flex; flex-direction:column;
+  align-items:center; justify-content:center; gap:16px;
+  text-align:center; opacity:0;
+}
+.preg-signo {
+  font-family:'Playfair Display',serif; font-weight:900; font-style:italic;
+  font-size:180px; line-height:1; color:rgba(232,200,112,.22);
+  position:relative; display:flex; align-items:center; justify-content:center;
+  animation:pulsoDot 2.8s ease-in-out infinite;
+}
+.preg-signo span {
+  position:absolute;
+  font-size:130px; color:rgba(232,200,112,.75);
+}
+.preg-titulo {
+  font-family:'Playfair Display',serif; font-weight:900;
+  font-size:88px; line-height:.95; color:#F9F3E8;
+}
+.preg-desc {
+  font-family:'Cormorant Garamond',serif; font-style:italic;
+  font-size:38px; line-height:1.5; color:rgba(249,243,232,.42);
+  max-width:800px;
+}
+</style>
+</head>
+<body>
+<div class="fondo"></div>
+<div class="particulas" id="particulas"></div>
+
+<!-- ─── S0: INTRO ─── -->
+<div class="slide" id="s0">
+  <div class="tag" id="s0tag">Ahora compara</div>
+  <div class="txt-enorme" id="s0big">cuánto tiempo<br>invertiste en <em>ti.</em></div>
+  <div class="linea-deco" id="s0lin" style="width:400px;"></div>
+</div>
+
+<!-- ─── S1: CALENDARIOS lado a lado ─── -->
+<div class="slide" id="s1" style="padding:0 60px;">
+  <div class="cals-wrap" id="calsWrap">
+    <div class="cal-bloque">
+      <div class="cal-etiqueta rojo">En él</div>
+      <div class="cal-numero rojo">730 días</div>
+      <div class="cal-desc">Tratando de cambiar<br>algo fuera de tu control.</div>
+      <div class="dias-grid" id="gridEl"></div>
+    </div>
+    <div style="width:2px;background:linear-gradient(180deg,transparent,rgba(249,243,232,.1),transparent);align-self:stretch;flex-shrink:0;margin-top:10px;"></div>
+    <div class="cal-bloque">
+      <div class="cal-etiqueta dorado">En ti</div>
+      <div class="cal-numero dorado" id="numTi">?</div>
+      <div class="cal-desc">Tus proyectos.<br>Tu mente. Tu cuerpo.</div>
+      <div class="dias-grid" id="gridTi"></div>
+    </div>
+  </div>
+</div>
+
+<!-- ─── S2: WRAPPED ─── -->
+<div class="slide" id="s2">
+  <div class="txt-medio" id="s2pre">En estos dos años...</div>
+  <div class="txt-enorme" id="s2big" style="font-size:148px;">no hubo<br>tiempo para <em>ti.</em></div>
+  <div class="linea-deco dorada" id="s2lin" style="width:480px;"></div>
+</div>
+
+<!-- ─── S3–S8: UNA PREGUNTA POR PANTALLA ─── -->
+
+<div class="slide" id="s3">
+  <div class="pregunta-centro" id="pq3">
+    <div class="preg-signo">◯<span>?</span></div>
+    <div class="preg-titulo">Tu mente</div>
+    <div class="preg-desc">¿Cuánto tiempo dedicaste<br>a crecer, a aprender,<br>a desarrollarte?</div>
+  </div>
+</div>
+
+<div class="slide" id="s4">
+  <div class="pregunta-centro" id="pq4">
+    <div class="preg-signo">◯<span>?</span></div>
+    <div class="preg-titulo">Tu cuerpo</div>
+    <div class="preg-desc">¿Cuándo fue la última vez<br>que comiste bien,<br>que te moviste, que te cuidaste?</div>
+  </div>
+</div>
+
+<div class="slide" id="s5">
+  <div class="pregunta-centro" id="pq5">
+    <div class="preg-signo">◯<span>?</span></div>
+    <div class="preg-titulo">Tus proyectos</div>
+    <div class="preg-desc">¿Dónde quedaron<br>tus planes, tus ideas,<br>lo que querías construir?</div>
+  </div>
+</div>
+
+<div class="slide" id="s6">
+  <div class="pregunta-centro" id="pq6">
+    <div class="preg-signo">◯<span>?</span></div>
+    <div class="preg-titulo">Tus metas</div>
+    <div class="preg-desc">¿Qué lograste<br>para ti misma<br>en estos dos años?</div>
+  </div>
+</div>
+
+<div class="slide" id="s7">
+  <div class="pregunta-centro" id="pq7">
+    <div class="preg-signo">◯<span>?</span></div>
+    <div class="preg-titulo">Tu progreso</div>
+    <div class="preg-desc">¿Avanzaste<br>hacia donde<br>tú querías ir?</div>
+  </div>
+</div>
+
+<div class="slide" id="s8">
+  <div class="pregunta-centro" id="pq8">
+    <div class="preg-signo">◯<span>?</span></div>
+    <div class="preg-titulo">Tus deseos</div>
+    <div class="preg-desc">¿Alguien pensó<br>en lo que tú querías?<br>¿Lo pensaste tú?</div>
+  </div>
+</div>
+
+<script>
+/* partículas */
+(function(){
+  const c=document.getElementById('particulas');
+  for(let i=0;i<16;i++){
+    const p=document.createElement('div'); p.className='particula';
+    const s=3+Math.random()*9;
+    p.style.cssText=`width:${s}px;height:${s}px;left:${Math.random()*100}%;top:${100+Math.random()*80}%;animation-duration:${9+Math.random()*13}s;animation-delay:${Math.random()*10}s;`;
+    c.appendChild(p);
+  }
+})();
+
+function wait(ms){ return new Promise(r=>setTimeout(r,ms)); }
+
+function showSlide(id){
+  document.querySelectorAll('.slide').forEach(s=>{
+    s.style.opacity='0'; s.style.pointerEvents='none'; s.style.animation='';
+  });
+  const e=document.getElementById(id);
+  e.style.opacity='1'; e.style.pointerEvents='auto';
+}
+
+function hideSlide(id,cb){
+  const e=document.getElementById(id);
+  e.style.animation='cardOut 380ms ease-in forwards';
+  setTimeout(()=>{ e.style.opacity='0'; e.style.pointerEvents='none'; e.style.animation=''; if(cb)cb(); },380);
+}
+
+function anim(el,kf,delay=0,dur=600,ease='cubic-bezier(0.16,1,0.3,1)'){
+  if(!el) return;
+  el.style.animation=`${kf} ${dur}ms ${ease} ${delay}ms forwards`;
+}
+
+/* grilla ÉL — llena roja */
+function buildGridEl(){
+  const g=document.getElementById('gridEl');
+  for(let i=0;i<108;i++){
+    const d=document.createElement('div'); d.className='dm'; g.appendChild(d);
+  }
+}
+async function animarGridEl(){
+  const dias=document.getElementById('gridEl').querySelectorAll('.dm');
+  for(let i=0;i<dias.length;i++){ dias[i].classList.add('ocupado'); await wait(16); }
+}
+
+/* grilla TI — casi vacía */
+function buildGridTi(){
+  const g=document.getElementById('gridTi');
+  for(let i=0;i<108;i++){
+    const d=document.createElement('div'); d.className='dm vacio'; g.appendChild(d);
+  }
+}
+async function animarGridTi(){
+  const dias=document.getElementById('gridTi').querySelectorAll('.dm');
+  for(let i=0;i<dias.length;i++){
+    if([10,11,55,56].includes(i)){
+      dias[i].classList.remove('vacio'); dias[i].classList.add('minimo');
+    }
+    await wait(16);
+  }
+  await wait(400);
+  const n=document.getElementById('numTi');
+  n.style.transition='all 0.7s ease';
+  n.textContent='4 días';
+  n.style.color='rgba(232,200,112,0.3)';
+}
+
+/* pregunta centrada */
+async function mostrarPregunta(slideId, pqId){
+  showSlide(slideId);
+  await wait(100);
+  const pq=document.getElementById(pqId);
+  pq.style.animation='cardIn 0.65s cubic-bezier(0.16,1,0.3,1) forwards';
+  await wait(3800);
+}
+
+async function run(){
+  await wait(200);
+
+  /* S0 */
+  showSlide('s0');
+  anim(document.getElementById('s0tag'),'fadeIn',300,500,'ease');
+  anim(document.getElementById('s0big'),'cardIn',600,700);
+  document.getElementById('s0lin').style.animation='lineGrow 0.8s ease 1.1s forwards';
+  await wait(3600);
+
+  /* S1 — calendarios */
+  hideSlide('s0', async()=>{
+    await wait(80);
+    showSlide('s1');
+    buildGridEl(); buildGridTi();
+    await wait(200);
+    const cw=document.getElementById('calsWrap');
+    cw.style.animation='cardIn 0.55s cubic-bezier(0.16,1,0.3,1) forwards';
+    await wait(700);
+    await animarGridEl();
+    await wait(400);
+    await animarGridTi();
+    await wait(3200);
+
+    /* S2 */
+    hideSlide('s1', async()=>{
+      await wait(80);
+      showSlide('s2');
+      anim(document.getElementById('s2pre'),'fadeIn',200,500,'ease');
+      anim(document.getElementById('s2big'),'wordPop',500,650);
+      document.getElementById('s2lin').style.animation='lineGrow 0.7s ease 1.1s forwards';
+      await wait(4000);
+
+      /* S3–S8: preguntas una por una */
+      const preguntas=[
+        ['s3','pq3'],['s4','pq4'],['s5','pq5'],
+        ['s6','pq6'],['s7','pq7'],['s8','pq8'],
+      ];
+
+      async function siguiente(i){
+        if(i>=preguntas.length) return;
+        const [sid,pid]=preguntas[i];
+        if(i===0){
+          hideSlide('s2',async()=>{
+            await wait(80);
+            await mostrarPregunta(sid,pid);
+            hideSlide(sid,()=>{ setTimeout(()=>siguiente(i+1),80); });
+          });
+        } else {
+          await mostrarPregunta(sid,pid);
+          hideSlide(sid,()=>{ setTimeout(()=>siguiente(i+1),80); });
+        }
+      }
+      siguiente(0);
+    });
+  });
+}
+
+document.fonts.ready.then(()=>{ setTimeout(run,1500); });
+</script>
+</body>
+</html>

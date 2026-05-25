@@ -1,0 +1,384 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<style>
+  body:not(.fonts-loaded) * { animation-play-state: paused !important; transition: none !important; }
+</style>
+<script>
+  document.fonts.ready.then(() => {
+    setTimeout(() => { document.body.classList.add("fonts-loaded"); }, 1500);
+  });
+</script>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=1280, height=720">
+<title>anim_l1_an17 — Falta de desarrollo personal</title>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@1,400;1,600&family=Playfair+Display:wght@700;900&display=swap" rel="stylesheet">
+<style>
+* { margin:0; padding:0; box-sizing:border-box; }
+body { width:1280px; height:720px; overflow:hidden; }
+
+.pizarra {
+  width:1280px; height:720px; position:relative; overflow:hidden;
+  background:#F0E8D5;
+  background-image:
+    linear-gradient(rgba(160,135,90,.18) 1px,transparent 1px),
+    linear-gradient(90deg,rgba(160,135,90,.18) 1px,transparent 1px);
+  background-size:56px 56px;
+}
+.pizarra::before {
+  content:''; position:absolute; left:0;top:0;bottom:0; width:7px;
+  background:linear-gradient(180deg,#3D0C11,#6B1A2A,#3D0C11); z-index:30;
+}
+.pizarra::after {
+  content:''; position:absolute; top:0;left:0;right:0; height:4px;
+  background:linear-gradient(90deg,#6B1A2A,#E8C870,#D4A843,#E8C870,#6B1A2A); z-index:30;
+}
+
+.slide {
+  position:absolute; inset:0;
+  display:flex; align-items:center; justify-content:center;
+  opacity:0; pointer-events:none;
+}
+
+@keyframes sShow { to{opacity:1} }
+@keyframes fadeUp { from{opacity:0;transform:translateY(12px)} to{opacity:1;transform:translateY(0)} }
+@keyframes lineGrow { to{width:680px} }
+@keyframes drawCheck { to{stroke-dashoffset:0} }
+@keyframes drawCircle { to{stroke-dashoffset:0} }
+
+/* ════ S0: Apertura ════ */
+#s0 { flex-direction:column; gap:4px; animation:sShow .01s .2s forwards; }
+
+.s0-pre {
+  font-family:'Cormorant Garamond',serif; font-style:italic;
+  font-size:36px; color:#8B2D3F;
+  opacity:0; animation:fadeUp .5s .4s forwards;
+}
+.s0-titulo {
+  font-family:'Playfair Display',serif; font-weight:900;
+  font-size:100px; color:#3D0C11; line-height:.88; text-align:center;
+  opacity:0; animation:fadeUp .6s .8s forwards;
+}
+.s0-titulo span { color:#6B1A2A; display:block; font-size:128px; }
+.s0-linea {
+  width:0; height:5px; margin-top:16px;
+  background:linear-gradient(90deg,#E8C870,#D4A843);
+  box-shadow:0 0 20px rgba(232,200,112,.7);
+  animation:lineGrow .8s ease-out 1.3s forwards;
+}
+
+/* ── Tarjeta base ── */
+.card {
+  position:absolute; border-radius:16px;
+  box-shadow:0 24px 80px rgba(61,12,17,.35), 0 6px 20px rgba(61,12,17,.15);
+  transform:translateY(820px); opacity:0;
+}
+@keyframes cardInA {
+  0%  { opacity:1; transform:translateY(820px); }
+  72% { transform:translateY(-20px); }
+  100%{ transform:translateY(0); opacity:1; }
+}
+.check {
+  position:absolute; bottom:24px; right:36px; opacity:0;
+}
+.check svg { width:52px; height:52px; }
+.check path { stroke-dasharray:80; stroke-dashoffset:80; }
+
+/* ════ S1: PILOTO AUTOMÁTICO ════ */
+#s1 { animation:sShow .01s 2.3s forwards; }
+#c1 {
+  width:1180px; height:616px;
+  background:linear-gradient(145deg,#3D0C11 0%,#1a0608 100%);
+  border:1px solid rgba(232,200,112,.15);
+  display:flex; flex-direction:row; overflow:hidden;
+  animation:cardInA .7s cubic-bezier(.2,0,.1,1) 2.3s forwards;
+}
+
+/* Panel izq: gráfico del piloto */
+.c1-grafico {
+  width:340px; display:flex; align-items:center; justify-content:center;
+  border-right:1px solid rgba(232,200,112,.12); flex-shrink:0;
+  opacity:0; animation:fadeUp .5s 3.0s forwards;
+}
+
+.c1-right {
+  flex:1; display:flex; flex-direction:column;
+  justify-content:center; padding:40px 50px;
+}
+.c1-label {
+  font-family:'Cormorant Garamond',serif; font-style:italic;
+  font-size:40px; color:#C97080; margin-bottom:8px;
+  opacity:0; animation:fadeUp .4s 2.8s forwards;
+}
+.c1-big {
+  font-family:'Playfair Display',serif; font-weight:900;
+  font-size:126px; color:#F9F3E8; line-height:.84;
+  opacity:0; animation:fadeUp .5s 3.1s forwards;
+}
+.c1-big em { color:#E8C870; font-style:normal; font-size:88px; display:block; line-height:1.1; }
+.c1-sub {
+  font-family:'Cormorant Garamond',serif; font-style:italic;
+  font-size:46px; color:rgba(249,243,232,.55); margin-top:12px;
+  opacity:0; animation:fadeUp .4s 3.6s forwards;
+}
+#c1 .check { animation:fadeUp .4s 4.1s forwards; }
+#c1 .check path { animation:drawCheck .6s ease-out 4.2s forwards; }
+
+/* ════ S2: HERIDAS ════ */
+#s2 { animation:sShow .01s 5.8s forwards; }
+#c2 {
+  width:1180px; height:616px;
+  background:linear-gradient(145deg,#2D0810 0%,#6B1A2A 100%);
+  border:1px solid rgba(232,200,112,.2);
+  display:flex; flex-direction:column;
+  align-items:center; justify-content:center; gap:14px; padding:40px 80px;
+  animation:cardInA .7s cubic-bezier(.2,0,.1,1) 5.8s forwards;
+}
+
+.c2-label {
+  font-family:'Cormorant Garamond',serif; font-style:italic;
+  font-size:40px; color:#C97080;
+  opacity:0; animation:fadeUp .4s 6.4s forwards;
+}
+.c2-big {
+  font-family:'Playfair Display',serif; font-weight:900;
+  font-size:152px; color:#F9F3E8; line-height:.82; text-align:center;
+  opacity:0; animation:fadeUp .5s 6.7s forwards;
+}
+.c2-big em { color:#C97080; font-style:normal; font-size:80px; display:block; line-height:1.1; }
+
+/* Línea de campo minado — SVG */
+.c2-mina {
+  opacity:0; animation:fadeUp .5s 7.2s forwards;
+}
+.c2-sub {
+  font-family:'Cormorant Garamond',serif; font-style:italic;
+  font-size:48px; color:rgba(249,243,232,.6); text-align:center;
+  opacity:0; animation:fadeUp .4s 7.7s forwards;
+}
+#c2 .check { animation:fadeUp .4s 8.2s forwards; }
+#c2 .check path { animation:drawCheck .6s ease-out 8.3s forwards; }
+
+/* ════ S3: UNA PIEZA CAMBIA TODO ════ */
+#s3 { animation:sShow .01s 9.8s forwards; }
+#c3 {
+  width:1180px; height:616px;
+  background:#0F0A0B;
+  border:2px solid rgba(232,200,112,.25);
+  display:flex; flex-direction:row; gap:0; overflow:hidden;
+  animation:cardInA .7s cubic-bezier(.2,0,.1,1) 9.8s forwards;
+}
+
+/* Panel izq: engranajes SVG */
+.c3-engranaje {
+  width:360px; display:flex; align-items:center; justify-content:center;
+  border-right:1px solid rgba(232,200,112,.15); flex-shrink:0;
+  opacity:0; animation:fadeUp .6s 10.5s forwards;
+}
+.engranaje-svg { animation:spinGear 8s linear infinite; transform-origin:center; }
+.engranaje-svg2 { animation:spinGearR 8s linear infinite; transform-origin:center; }
+@keyframes spinGear { to{transform:rotate(360deg)} }
+@keyframes spinGearR { to{transform:rotate(-360deg)} }
+
+.c3-right {
+  flex:1; display:flex; flex-direction:column;
+  justify-content:center; padding:40px 50px;
+}
+.c3-label {
+  font-family:'Cormorant Garamond',serif; font-style:italic;
+  font-size:40px; color:#C97080; margin-bottom:8px;
+  opacity:0; animation:fadeUp .4s 10.3s forwards;
+}
+.c3-big {
+  font-family:'Playfair Display',serif; font-weight:900;
+  font-size:118px; color:#F9F3E8; line-height:.84;
+  opacity:0; animation:fadeUp .5s 10.6s forwards;
+}
+.c3-big em { color:#E8C870; font-style:normal; font-size:78px; display:block; line-height:1.1; }
+.c3-sub {
+  font-family:'Cormorant Garamond',serif; font-style:italic;
+  font-size:46px; color:rgba(249,243,232,.6); margin-top:12px;
+  opacity:0; animation:fadeUp .4s 11.1s forwards;
+}
+#c3 .check { animation:fadeUp .4s 11.6s forwards; }
+#c3 .check path { animation:drawCheck .6s ease-out 11.7s forwards; }
+
+/* ════ S4: FÍSICA BÁSICA — conclusión ════ */
+#s4 { animation:sShow .01s 13.2s forwards; }
+#c4 {
+  width:1180px; height:616px;
+  background:linear-gradient(145deg,#3D0C11 0%,#6B1A2A 60%,#3D0C11 100%);
+  border:1px solid rgba(232,200,112,.3);
+  display:flex; flex-direction:column;
+  align-items:center; justify-content:center; gap:10px; padding:40px 80px; text-align:center;
+  animation:cardInA .7s cubic-bezier(.2,0,.1,1) 13.2s forwards;
+}
+
+.c4-label {
+  font-family:'Cormorant Garamond',serif; font-style:italic;
+  font-size:42px; color:#C97080;
+  opacity:0; animation:fadeUp .4s 13.8s forwards;
+}
+.c4-big {
+  font-family:'Playfair Display',serif; font-weight:900;
+  font-size:130px; color:#F9F3E8; line-height:.85;
+  opacity:0; animation:fadeUp .5s 14.1s forwards;
+}
+.c4-big em { color:#E8C870; font-style:normal; font-size:100px; display:block; }
+.c4-linea {
+  width:0; height:4px;
+  background:linear-gradient(90deg,#E8C870,#D4A843);
+  box-shadow:0 0 16px rgba(232,200,112,.6);
+  animation:lineGrow2 .7s ease-out 14.7s forwards;
+}
+@keyframes lineGrow2 { to{width:480px} }
+.c4-sub {
+  font-family:'Cormorant Garamond',serif; font-style:italic;
+  font-size:50px; color:rgba(249,243,232,.75);
+  opacity:0; animation:fadeUp .4s 14.9s forwards;
+}
+.c4-sub span { color:#E8C870; }
+</style>
+</head>
+<body>
+<div class="pizarra">
+
+  <!-- ── S0: Apertura ── -->
+  <div class="slide" id="s0">
+    <span class="s0-pre">Lo que era en realidad, en casi todos los casos →</span>
+    <p class="s0-titulo">FALTA DE<span>DESARROLLO</span></p>
+    <div class="s0-linea"></div>
+  </div>
+
+  <!-- ── S1: Piloto automático ── -->
+  <div class="slide" id="s1">
+    <div class="card" id="c1">
+      <div class="c1-grafico">
+        <!-- SVG: persona en modo automático / robot -->
+        <svg width="240" height="280" viewBox="0 0 240 280">
+          <!-- Cabeza -->
+          <rect x="70" y="20" width="100" height="80" rx="12" fill="none" stroke="#C97080" stroke-width="2.5" stroke-dasharray="360" stroke-dashoffset="360" style="animation:drawCheck .8s ease-out 3.1s forwards"/>
+          <!-- Ojos LED -->
+          <circle cx="98" cy="58" r="10" fill="rgba(201,112,128,.3)" stroke="#C97080" stroke-width="2" opacity="0" style="animation:fadeUp .3s 3.5s forwards"/>
+          <circle cx="142" cy="58" r="10" fill="rgba(201,112,128,.3)" stroke="#C97080" stroke-width="2" opacity="0" style="animation:fadeUp .3s 3.5s forwards"/>
+          <!-- Cuerpo -->
+          <rect x="55" y="115" width="130" height="100" rx="8" fill="none" stroke="rgba(201,112,128,.6)" stroke-width="2" stroke-dasharray="460" stroke-dashoffset="460" style="animation:drawCheck .8s ease-out 3.3s forwards"/>
+          <!-- Piernas -->
+          <line x1="88" y1="215" x2="88" y2="265" stroke="rgba(201,112,128,.5)" stroke-width="2.5" opacity="0" style="animation:fadeUp .3s 3.6s forwards"/>
+          <line x1="152" y1="215" x2="152" y2="265" stroke="rgba(201,112,128,.5)" stroke-width="2.5" opacity="0" style="animation:fadeUp .3s 3.6s forwards"/>
+          <!-- Panel automático -->
+          <rect x="78" y="130" width="85" height="50" rx="4" fill="rgba(232,200,112,.08)" stroke="rgba(232,200,112,.3)" stroke-width="1.5" opacity="0" style="animation:fadeUp .4s 3.7s forwards"/>
+          <text x="120" y="162" font-family="Georgia" font-size="14" fill="#E8C870" text-anchor="middle" opacity="0" style="animation:fadeUp .3s 3.9s forwards">AUTO</text>
+          <!-- Cuello -->
+          <line x1="120" y1="100" x2="120" y2="115" stroke="rgba(201,112,128,.4)" stroke-width="3" opacity="0" style="animation:fadeUp .2s 3.3s forwards"/>
+        </svg>
+      </div>
+      <div class="c1-right">
+        <p class="c1-label">el origen real</p>
+        <p class="c1-big">PILOTO<em>AUTOMÁTICO</em></p>
+        <p class="c1-sub">Patrones de la infancia.<br>Sin elegirlos.</p>
+      </div>
+      <div class="check">
+        <svg viewBox="0 0 52 52"><path d="M12 26 L22 38 L40 16" stroke="#E8C870" stroke-width="4" stroke-linecap="round" stroke-linejoin="round" fill="none"/></svg>
+      </div>
+    </div>
+  </div>
+
+  <!-- ── S2: Heridas ── -->
+  <div class="slide" id="s2">
+    <div class="card" id="c2">
+      <p class="c2-label">cada conflicto se convertía en</p>
+      <p class="c2-big">HERIDAS<em>que el otro no podía ver</em></p>
+
+      <!-- Campo minado visual -->
+      <div class="c2-mina">
+        <svg width="640" height="40" viewBox="0 0 640 40">
+          <!-- Línea de suelo -->
+          <line x1="0" y1="30" x2="640" y2="30" stroke="rgba(201,112,128,.3)" stroke-width="1.5"/>
+          <!-- Minas (circulos con lineas) -->
+          <g opacity="0" style="animation:fadeUp .3s 7.4s forwards">
+            <circle cx="80" cy="26" r="12" fill="rgba(201,112,128,.15)" stroke="#C97080" stroke-width="1.5"/>
+            <line x1="80" y1="14" x2="80" y2="8" stroke="#C97080" stroke-width="1.5"/>
+          </g>
+          <g opacity="0" style="animation:fadeUp .3s 7.5s forwards">
+            <circle cx="200" cy="26" r="12" fill="rgba(201,112,128,.15)" stroke="#C97080" stroke-width="1.5"/>
+            <line x1="200" y1="14" x2="200" y2="8" stroke="#C97080" stroke-width="1.5"/>
+          </g>
+          <g opacity="0" style="animation:fadeUp .3s 7.6s forwards">
+            <circle cx="340" cy="26" r="12" fill="rgba(201,112,128,.15)" stroke="#C97080" stroke-width="1.5"/>
+            <line x1="340" y1="14" x2="340" y2="8" stroke="#C97080" stroke-width="1.5"/>
+          </g>
+          <g opacity="0" style="animation:fadeUp .3s 7.7s forwards">
+            <circle cx="460" cy="26" r="12" fill="rgba(201,112,128,.15)" stroke="#C97080" stroke-width="1.5"/>
+            <line x1="460" y1="14" x2="460" y2="8" stroke="#C97080" stroke-width="1.5"/>
+          </g>
+          <g opacity="0" style="animation:fadeUp .3s 7.8s forwards">
+            <circle cx="580" cy="26" r="12" fill="rgba(201,112,128,.15)" stroke="#C97080" stroke-width="1.5"/>
+            <line x1="580" y1="14" x2="580" y2="8" stroke="#C97080" stroke-width="1.5"/>
+          </g>
+        </svg>
+      </div>
+
+      <p class="c2-sub">Nadie las puso ahí a propósito.</p>
+      <div class="check">
+        <svg viewBox="0 0 52 52"><path d="M12 26 L22 38 L40 16" stroke="#E8C870" stroke-width="4" stroke-linecap="round" stroke-linejoin="round" fill="none"/></svg>
+      </div>
+    </div>
+  </div>
+
+  <!-- ── S3: Una pieza cambia el sistema ── -->
+  <div class="slide" id="s3">
+    <div class="card" id="c3">
+      <div class="c3-engranaje">
+        <svg width="280" height="280" viewBox="0 0 280 280">
+          <!-- Engranaje grande (ella) -->
+          <g class="engranaje-svg" transform-origin="100 140">
+            <circle cx="100" cy="140" r="54" fill="none" stroke="#E8C870" stroke-width="3"/>
+            <circle cx="100" cy="140" r="18" fill="none" stroke="#E8C870" stroke-width="2"/>
+            <rect x="94" y="78" width="12" height="20" rx="4" fill="#E8C870"/>
+            <rect x="94" y="184" width="12" height="20" rx="4" fill="#E8C870"/>
+            <rect x="38" y="134" width="20" height="12" rx="4" fill="#E8C870"/>
+            <rect x="144" y="134" width="20" height="12" rx="4" fill="#E8C870"/>
+            <rect x="55" y="97" width="12" height="20" rx="4" fill="#E8C870" transform="rotate(45 61 107)"/>
+            <rect x="126" y="163" width="12" height="20" rx="4" fill="#E8C870" transform="rotate(45 132 173)"/>
+            <rect x="55" y="163" width="12" height="20" rx="4" fill="#E8C870" transform="rotate(-45 61 173)"/>
+            <rect x="126" y="97" width="12" height="20" rx="4" fill="#E8C870" transform="rotate(-45 132 107)"/>
+          </g>
+          <!-- Engranaje pequeño (él) — engrana -->
+          <g class="engranaje-svg2" transform-origin="195 105">
+            <circle cx="195" cy="105" r="34" fill="none" stroke="rgba(201,112,128,.7)" stroke-width="2.5"/>
+            <circle cx="195" cy="105" r="11" fill="none" stroke="rgba(201,112,128,.7)" stroke-width="2"/>
+            <rect x="190" y="63" width="10" height="14" rx="3" fill="rgba(201,112,128,.7)"/>
+            <rect x="190" y="134" width="10" height="14" rx="3" fill="rgba(201,112,128,.7)"/>
+            <rect x="153" y="100" width="14" height="10" rx="3" fill="rgba(201,112,128,.7)"/>
+            <rect x="224" y="100" width="14" height="10" rx="3" fill="rgba(201,112,128,.7)"/>
+          </g>
+          <!-- Flecha indicadora de movimiento -->
+          <path d="M140 220 Q200 240 220 200" stroke="#E8C870" stroke-width="2" fill="none" stroke-dasharray="80" stroke-dashoffset="80" style="animation:drawCheck .6s ease-out 11.0s forwards"/>
+          <text x="200" y="248" font-family="Georgia" font-style="italic" font-size="18" fill="rgba(232,200,112,.7)" text-anchor="middle" opacity="0" style="animation:fadeUp .3s 11.4s forwards">se mueve</text>
+        </svg>
+      </div>
+      <div class="c3-right">
+        <p class="c3-label">cuando una persona crece</p>
+        <p class="c3-big">EL SISTEMA<em>SE MUEVE</em></p>
+        <p class="c3-sub">Sin que la otra persona<br>haya hecho nada.</p>
+      </div>
+      <div class="check">
+        <svg viewBox="0 0 52 52"><path d="M12 26 L22 38 L40 16" stroke="#E8C870" stroke-width="4" stroke-linecap="round" stroke-linejoin="round" fill="none"/></svg>
+      </div>
+    </div>
+  </div>
+
+  <!-- ── S4: Física básica ── -->
+  <div class="slide" id="s4">
+    <div class="card" id="c4">
+      <p class="c4-label">no es filosofía</p>
+      <p class="c4-big">FÍSICA<em>BÁSICA</em></p>
+      <div class="c4-linea"></div>
+      <p class="c4-sub">Cuando una pieza se mueve,<br>el sistema <span>se reorganiza.</span></p>
+    </div>
+  </div>
+
+</div>
+</body>
+</html>

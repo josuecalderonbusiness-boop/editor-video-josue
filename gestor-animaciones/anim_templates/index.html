@@ -1,0 +1,595 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<link rel="icon" type="image/x-icon" href="/favicon.ico">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Gestor de Animaciones</title>
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Mono:wght@300;400;500&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg:#0a0a0f; --surface:#13131a; --border:#1e1e2e;
+    --accent:#7c6af7; --accent2:#f76a8a; --text:#e8e8f0;
+    --muted:#5a5a7a; --success:#4af7a0; --warning:#f7c74a; --drive:#4a90f7;
+  }
+  * { box-sizing:border-box; margin:0; padding:0; }
+  body { background:var(--bg); color:var(--text); font-family:'DM Mono',monospace; min-height:100vh; padding:20px; }
+  body::before {
+    content:''; position:fixed; top:-50%; left:-50%; width:200%; height:200%;
+    background:radial-gradient(ellipse at 30% 20%,rgba(124,106,247,.08) 0%,transparent 50%),
+               radial-gradient(ellipse at 70% 80%,rgba(247,106,138,.06) 0%,transparent 50%);
+    pointer-events:none; z-index:0;
+  }
+  .container { width:100%; max-width:700px; margin:0 auto; position:relative; z-index:1; }
+  .header { margin-bottom:32px; text-align:center; }
+  .header h1 {
+    font-family:'Syne',sans-serif; font-weight:800;
+    font-size:clamp(1.8rem,5vw,2.6rem); letter-spacing:-0.03em;
+    background:linear-gradient(135deg,var(--accent) 0%,var(--accent2) 100%);
+    -webkit-background-clip:text; -webkit-text-fill-color:transparent; background-clip:text;
+  }
+  .header p { color:var(--muted); font-size:.75rem; margin-top:8px; letter-spacing:.1em; text-transform:uppercase; }
+
+  .tabs { display:flex; gap:4px; margin-bottom:16px; background:var(--surface); border:1px solid var(--border); border-radius:12px; padding:4px; }
+  .tab-btn { flex:1; padding:10px 8px; border:none; border-radius:9px; background:transparent; color:var(--muted); cursor:pointer; font-family:'Syne',sans-serif; font-weight:700; font-size:.75rem; letter-spacing:.05em; text-transform:uppercase; transition:all .2s; }
+  .tab-btn.active { background:linear-gradient(135deg,rgba(124,106,247,.2),rgba(247,106,138,.15)); color:var(--text); border:1px solid rgba(124,106,247,.3); }
+
+  .tab-panel { display:none; }
+  .tab-panel.active { display:block; }
+
+  .card { background:var(--surface); border:1px solid var(--border); border-radius:16px; padding:24px; margin-bottom:14px; }
+  .section-label { font-size:.68rem; letter-spacing:.15em; text-transform:uppercase; color:var(--muted); margin-bottom:12px; font-family:'Syne',sans-serif; font-weight:600; }
+
+  /* Drop zone HTMLs */
+  .drop-html {
+    border:2px dashed var(--border); border-radius:12px;
+    padding:32px 20px; text-align:center; cursor:pointer;
+    transition:all .2s; position:relative; overflow:hidden;
+  }
+  .drop-html:hover, .drop-html.drag { border-color:var(--accent); background:rgba(124,106,247,.05); }
+  .drop-html input { position:absolute; inset:0; opacity:0; cursor:pointer; width:100%; }
+  .drop-html .dh-icon { font-size:2rem; margin-bottom:10px; }
+  .drop-html .dh-label { font-family:'Syne',sans-serif; font-weight:700; font-size:.9rem; }
+  .drop-html .dh-hint { font-size:.7rem; color:var(--muted); margin-top:6px; }
+  .drop-html.tiene-archivos { border-color:rgba(124,106,247,.5); background:rgba(124,106,247,.04); }
+
+  /* Lista animaciones */
+  .anim-list { max-height:300px; overflow-y:auto; margin-top:4px; }
+  .anim-item { display:flex; align-items:center; gap:10px; padding:10px 12px; border:1px solid var(--border); border-radius:9px; margin-bottom:6px; cursor:pointer; transition:all .2s; background:#080810; }
+  .anim-item:hover { border-color:rgba(124,106,247,.3); }
+  .anim-item.sel { border-color:var(--accent); background:rgba(124,106,247,.08); }
+  .anim-item.sel.has-mp4 { border-color:var(--success); background:rgba(74,247,160,.06); }
+  .anim-check { width:18px; height:18px; border-radius:4px; border:1px solid var(--border); background:#13131a; flex-shrink:0; display:flex; align-items:center; justify-content:center; transition:all .2s; font-size:10px; }
+  .anim-item.sel .anim-check { background:var(--accent); border-color:var(--accent); color:white; }
+  .anim-nombre { flex:1; font-size:.72rem; color:var(--text); }
+  .anim-nombre small { display:block; font-size:.62rem; color:var(--muted); margin-top:1px; }
+  .anim-dur { font-size:.68rem; color:var(--muted); white-space:nowrap; }
+  .anim-dot { width:7px; height:7px; border-radius:50%; flex-shrink:0; }
+  .dot-ok { background:var(--success); }
+  .dot-no { background:var(--accent2); opacity:.6; }
+
+  .list-header { display:flex; align-items:center; gap:10px; margin-bottom:10px; }
+  .list-header h3 { font-family:'Syne',sans-serif; font-weight:700; font-size:.82rem; flex:1; }
+  .btn-selall { font-family:'DM Mono',monospace; font-size:.62rem; letter-spacing:.08em; background:none; border:1px solid var(--border); color:var(--muted); padding:5px 10px; border-radius:6px; cursor:pointer; transition:all .2s; }
+  .btn-selall:hover { border-color:var(--accent); color:var(--text); }
+  .btn-limpiar { font-family:'DM Mono',monospace; font-size:.62rem; background:none; border:1px solid var(--border); color:var(--muted); padding:5px 10px; border-radius:6px; cursor:pointer; transition:all .2s; }
+  .btn-limpiar:hover { border-color:var(--accent2); color:var(--accent2); }
+  .stats { display:flex; gap:16px; font-size:.65rem; color:var(--muted); margin-bottom:10px; }
+
+  /* Opciones */
+  .opts-grid { display:grid; grid-template-columns:1fr 1fr; gap:8px; }
+  .toggle-btn { border:1px solid var(--border); background:transparent; color:var(--muted); border-radius:8px; padding:11px 12px; cursor:pointer; transition:all .2s; font-family:'DM Mono',monospace; font-size:.7rem; display:flex; align-items:center; gap:8px; }
+  .toggle-btn .dot { width:6px; height:6px; border-radius:50%; background:var(--muted); flex-shrink:0; transition:background .2s; }
+  .toggle-btn.active { border-color:var(--success); color:var(--text); background:rgba(74,247,160,.08); }
+  .toggle-btn.active .dot { background:var(--success); }
+  .toggle-btn.active-drive { border-color:var(--drive); color:var(--text); background:rgba(74,144,247,.08); }
+  .toggle-btn.active-drive .dot { background:var(--drive); }
+
+  .field { margin-bottom:12px; }
+  .field label { display:block; font-size:.65rem; letter-spacing:.12em; text-transform:uppercase; color:var(--muted); margin-bottom:6px; }
+  .field input { width:100%; background:#080810; border:1px solid var(--border); border-radius:10px; padding:12px 14px; color:var(--text); font-family:'DM Mono',monospace; font-size:.78rem; outline:none; transition:border-color .2s; }
+  .field input:focus { border-color:var(--accent); }
+  .field input::placeholder { color:var(--muted); }
+
+  .btn-main { width:100%; padding:16px; border-radius:12px; border:none; color:white; font-family:'Syne',sans-serif; font-weight:800; font-size:.9rem; letter-spacing:.05em; cursor:pointer; transition:all .2s; text-transform:uppercase; margin-bottom:8px; }
+  .btn-render { background:linear-gradient(135deg,var(--accent),var(--accent2)); }
+  .btn-render:hover { transform:translateY(-2px); box-shadow:0 8px 30px rgba(124,106,247,.3); }
+  .btn-drive-up { background:linear-gradient(135deg,#1a5276,#2980b9); }
+  .btn-drive-up:hover { transform:translateY(-2px); box-shadow:0 8px 30px rgba(74,144,247,.25); }
+  .btn-srt { background:linear-gradient(135deg,#1a6b3c,#27ae60); }
+  .btn-srt:hover { transform:translateY(-2px); box-shadow:0 8px 30px rgba(74,247,160,.2); }
+  .btn-download { width:100%; padding:13px; border-radius:10px; border:1px solid var(--success); background:rgba(74,247,160,.08); color:var(--success); font-family:'Syne',sans-serif; font-weight:700; font-size:.82rem; cursor:pointer; transition:all .2s; text-transform:uppercase; letter-spacing:.05em; }
+  .btn-download:hover { background:rgba(74,247,160,.15); }
+  .btn-main:disabled, .btn-download:disabled { opacity:.35; cursor:not-allowed; transform:none !important; }
+
+  .log-box { background:#080810; border:1px solid var(--border); border-radius:10px; padding:14px; font-size:.68rem; line-height:1.9; max-height:220px; overflow-y:auto; color:#5a5a7a; }
+  .log-box .l-ok    { color:var(--success); }
+  .log-box .l-err   { color:var(--accent2); }
+  .log-box .l-info  { color:var(--warning); }
+  .log-box .l-drive { color:var(--drive); }
+  .log-box .l-new   { color:var(--text); }
+
+  .status-bar { display:flex; align-items:center; gap:10px; padding:12px 14px; background:#080810; border:1px solid var(--border); border-radius:10px; margin-bottom:8px; }
+  .status-dot { width:8px; height:8px; border-radius:50%; background:var(--muted); flex-shrink:0; }
+  .status-dot.proc { background:var(--warning); animation:blink .8s infinite; }
+  .status-dot.ok   { background:var(--success); }
+  .status-dot.err  { background:var(--accent2); }
+  .status-text { font-size:.72rem; color:var(--muted); }
+  @keyframes blink { 0%,100%{opacity:1} 50%{opacity:.3} }
+  .progreso-bar { height:3px; background:var(--border); border-radius:2px; margin-top:8px; overflow:hidden; }
+  .progreso-fill { height:100%; width:0%; background:linear-gradient(90deg,var(--accent),var(--accent2)); border-radius:2px; transition:width .5s ease; }
+
+  .upload-zone { border:1px dashed var(--border); border-radius:10px; padding:20px; text-align:center; cursor:pointer; transition:all .2s; position:relative; overflow:hidden; }
+  .upload-zone:hover, .upload-zone.drag { border-color:var(--accent); background:rgba(124,106,247,.05); }
+  .upload-zone input { position:absolute; inset:0; opacity:0; cursor:pointer; width:100%; }
+  .upload-zone .uz-icon { font-size:1.6rem; margin-bottom:6px; }
+  .upload-zone .uz-label { font-family:'Syne',sans-serif; font-weight:600; font-size:.82rem; }
+  .upload-zone .uz-hint { font-size:.68rem; color:var(--muted); margin-top:4px; }
+  .upload-zone .uz-file { font-size:.72rem; color:var(--success); margin-top:6px; }
+
+  .salida-info { font-size:.68rem; color:var(--muted); margin-top:10px; padding:10px 12px; background:#080810; border-radius:8px; border:1px solid var(--border); }
+  .salida-info span { color:var(--drive); }
+
+  .anim-dur-wrap { display:flex; align-items:center; gap:4px; }
+  .btn-edit-dur {
+    background:none; border:none; color:var(--muted); cursor:pointer;
+    font-size:11px; padding:2px 4px; border-radius:4px; transition:color .2s;
+    line-height:1;
+  }
+  .btn-edit-dur:hover { color:var(--accent); }
+  .hidden { display:none !important; }
+  ::-webkit-scrollbar { width:4px; }
+  ::-webkit-scrollbar-track { background:transparent; }
+  ::-webkit-scrollbar-thumb { background:var(--border); border-radius:2px; }
+</style>
+</head>
+<body>
+<div class="container">
+
+  <div class="header">
+    <h1>Gestor de Animaciones</h1>
+    <p>Código Soberana · Render · 4K · Drive · SRT</p>
+  </div>
+
+  <div class="tabs">
+    <button class="tab-btn active" onclick="setTab('animaciones')">🎬 Animaciones</button>
+    <button class="tab-btn" onclick="setTab('srt')">📝 Generar SRT</button>
+  </div>
+
+  <!-- ════ TAB ANIMACIONES ════ -->
+  <div id="tab-animaciones" class="tab-panel active">
+
+    <!-- Drop zone HTMLs -->
+    <div class="card">
+      <div class="section-label">Archivos HTML</div>
+      <div class="drop-html" id="drop-html"
+           ondrop="dropHTMLs(event)" ondragover="dragOverHTML(event)" ondragleave="dragLeaveHTML(event)"
+           onclick="document.getElementById('input-htmls').click()">
+        <input type="file" id="input-htmls" multiple accept=".html" onchange="cargarHTMLs(this.files)">
+        <div class="dh-icon">🎬</div>
+        <div class="dh-label">Arrastra los HTMLs aquí</div>
+        <div class="dh-hint">Selecciona uno o varios · Se calculan las duraciones automáticamente</div>
+      </div>
+      <div class="salida-info">
+        MP4 guardados en: <span>workshop-animaciones / animaciones /</span>
+      </div>
+    </div>
+
+    <!-- Lista -->
+    <div class="card" id="card-lista" style="display:none">
+      <div class="list-header">
+        <h3>Archivos cargados</h3>
+        <button class="btn-selall" onclick="selTodos()">Seleccionar todo</button>
+        <button class="btn-limpiar" onclick="limpiarLista()">✕ Limpiar</button>
+      </div>
+      <div class="stats">
+        <span><span class="anim-dot dot-ok"></span><span id="st-mp4">0</span> con MP4</span>
+        <span><span class="anim-dot dot-no"></span><span id="st-sin">0</span> sin MP4</span>
+        <span style="color:var(--accent)">✓ <span id="st-sel">0</span> seleccionados</span>
+      </div>
+      <div class="anim-list" id="anim-list"></div>
+    </div>
+
+    <!-- Opciones -->
+    <div class="card">
+      <div class="section-label">Opciones</div>
+      <div class="opts-grid">
+        <button class="toggle-btn" id="tog-4k" onclick="togOpt('escalar_4k','tog-4k')">
+          <span class="dot"></span> ⬆ Escalar a 4K
+        </button>
+        <button class="toggle-btn" id="tog-drive" onclick="togOpt('subir_drive','tog-drive','active-drive'); toggleDriveCfg()">
+          <span class="dot"></span> ☁️ Subir a Drive
+        </button>
+        <button class="toggle-btn" id="tog-4k-drive" onclick="togOpt('subir_4k','tog-4k-drive','active-drive')" style="display:none">
+          <span class="dot"></span> 📦 Subir versión 4K
+        </button>
+      </div>
+      <div id="drive-cfg" class="hidden" style="margin-top:14px;">
+        <div class="field">
+          <label>ID carpeta Drive destino</label>
+          <input type="text" id="inp-drive-id" placeholder="1WwDw5l8qmaH9pmmEya...">
+        </div>
+      </div>
+    </div>
+
+    <button class="btn-main btn-render" id="btn-render" onclick="iniciarRender()" disabled>▶ Renderizar selección</button>
+    <button class="btn-main btn-drive-up hidden" id="btn-subir" onclick="iniciarSubida()">☁ Subir a Drive</button>
+
+    <div id="sec-anim-proceso" class="hidden">
+      <div class="status-bar">
+        <div class="status-dot proc" id="anim-dot"></div>
+        <div class="status-text" id="anim-status">Procesando...</div>
+        <button id="btn-cancelar" onclick="cancelarRenderizado()" style="margin-left:auto;background:none;border:1px solid var(--accent2);color:var(--accent2);border-radius:6px;padding:4px 10px;font-family:'DM Mono',monospace;font-size:0.65rem;cursor:pointer;display:none;">✕ Cancelar</button>
+      </div>
+      <div class="progreso-bar"><div class="progreso-fill" id="anim-prog"></div></div>
+      <div class="log-box" id="anim-log" style="margin-top:10px;"></div>
+    </div>
+
+  </div>
+
+  <!-- ════ TAB SRT ════ -->
+  <div id="tab-srt" class="tab-panel">
+
+    <div class="card">
+      <div class="section-label">Video para transcribir</div>
+      <!-- Selector de modo -->
+      <div style="display:flex;gap:8px;margin-bottom:14px;">
+        <button class="toggle-btn active" id="srt-modo-local" onclick="setSRTModo('local')" style="flex:1">
+          <span class="dot" style="background:var(--success)"></span> Subir desde PC
+        </button>
+        <button class="toggle-btn" id="srt-modo-drive" onclick="setSRTModo('drive')" style="flex:1">
+          <span class="dot"></span> Desde Drive
+        </button>
+      </div>
+      <!-- Upload local -->
+      <div id="srt-local">
+        <div class="upload-zone" id="zone-srt"
+             ondrop="dropSRT(event)" ondragover="dragOverSRT(event)" ondragleave="dragLeaveSRT(event)">
+          <input type="file" id="input-srt-video" accept="video/*,.mp4,.mov,.MP4" onchange="setSRTFile(this)">
+          <div class="uz-icon">🎥</div>
+          <div class="uz-label">Arrastra el video aquí</div>
+          <div class="uz-hint">MP4 o MOV · Whisper API genera el SRT</div>
+          <div class="uz-file" id="srt-filename"></div>
+        </div>
+      </div>
+      <!-- Drive ID -->
+      <div id="srt-drive" style="display:none">
+        <div class="field">
+          <label>ID del video en Drive</label>
+          <input type="text" id="inp-srt-drive-id" placeholder="1abc2XYZ..." oninput="checkSRTDrive()">
+        </div>
+        <div class="field">
+          <label>Nombre del archivo (opcional)</label>
+          <input type="text" id="inp-srt-nombre" placeholder="leccion_1_workshop.mp4">
+        </div>
+        <div style="font-size:.68rem;color:var(--muted);margin-top:4px;">
+          El video se descarga directo desde Drive · No ocupa espacio en tu PC
+        </div>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="section-label">Información</div>
+      <div style="font-size:.72rem;color:var(--muted);line-height:1.9;">
+        <div>· Usa OpenAI Whisper para transcribir</div>
+        <div>· Genera timestamps por palabra (grupos de 3)</div>
+        <div>· Ideal para sincronizar animaciones al guion</div>
+        <div>· El SRT se descarga directo al terminar</div>
+      </div>
+    </div>
+
+    <button class="btn-main btn-srt" id="btn-srt" onclick="iniciarSRT()" disabled>📝 Generar SRT</button>
+
+    <div id="sec-srt-proceso" class="hidden">
+      <div class="status-bar">
+        <div class="status-dot proc" id="srt-dot"></div>
+        <div class="status-text" id="srt-status">Procesando...</div>
+      </div>
+      <div class="log-box" id="srt-log" style="margin-top:10px;"></div>
+      <div style="margin-top:10px;">
+        <button class="btn-download hidden" id="btn-dl-srt" onclick="descargarSRT()">⬇ Descargar SRT</button>
+      </div>
+    </div>
+
+  </div>
+
+</div>
+
+<script>
+let animaciones  = [];
+let seleccionados = new Set();
+let opts = { escalar_4k:false, subir_drive:false, subir_4k:false };
+let jobAnim = null, jobSRT = null, subiendoYa = false;
+let pollingAnim = null, pollingSRT = null;
+let logAnimIdx = 0, logSRTIdx = 0;
+let srtJobId = null;
+
+function setTab(t) {
+  document.querySelectorAll('.tab-btn').forEach((b,i) => b.classList.toggle('active',['animaciones','srt'][i]===t));
+  document.querySelectorAll('.tab-panel').forEach(p => p.classList.remove('active'));
+  document.getElementById('tab-'+t).classList.add('active');
+}
+
+// ── Drop HTMLs ───────────────────────────────────────────────────
+function dragOverHTML(e) { e.preventDefault(); document.getElementById('drop-html').classList.add('drag'); }
+function dragLeaveHTML(e) { document.getElementById('drop-html').classList.remove('drag'); }
+function dropHTMLs(e) {
+  e.preventDefault();
+  document.getElementById('drop-html').classList.remove('drag');
+  cargarHTMLs(e.dataTransfer.files);
+}
+
+async function cargarHTMLs(files) {
+  const htmlFiles = [...files].filter(f => f.name.endsWith('.html'));
+  if (!htmlFiles.length) return;
+  document.getElementById('drop-html').classList.add('tiene-archivos');
+  const fd = new FormData();
+  htmlFiles.forEach(f => fd.append('htmls', f));
+  try {
+    const r = await fetch('/api/cargar-htmls', { method:'POST', body:fd });
+    const nuevos = await r.json();
+    // Agregar sin duplicar
+    nuevos.forEach(n => { if (!animaciones.find(a => a.nombre === n.nombre)) animaciones.push(n); });
+    renderLista();
+    document.getElementById('card-lista').style.display = 'block';
+  } catch(e) { console.error(e); }
+}
+
+function renderLista() {
+  const container = document.getElementById('anim-list');
+  const conMP4 = animaciones.filter(a => a.tiene_mp4).length;
+  document.getElementById('st-mp4').textContent = conMP4;
+  document.getElementById('st-sin').textContent = animaciones.length - conMP4;
+  container.innerHTML = animaciones.map(a => `
+    <div class="anim-item ${seleccionados.has(a.nombre)?'sel':''} ${a.tiene_mp4?'has-mp4':''}"
+         onclick="toggleSel('${a.nombre}')" data-n="${a.nombre}">
+      <div class="anim-check">${seleccionados.has(a.nombre)?'✓':''}</div>
+      <div class="anim-nombre">${a.nombre}<small>${a.tiene_mp4?'✓ MP4 listo':'Sin renderizar'}</small></div>
+      <div class="anim-dur-wrap" onclick="event.stopPropagation()">
+        <span class="anim-dur" id="dur-label-${a.nombre.replace(/[^a-z0-9]/gi,'_')}">${a.duracion_s}s</span>
+        <button class="btn-edit-dur" onclick="editarDuracion('${a.nombre}')" title="Editar duración">✎</button>
+      </div>
+      <div class="anim-dot ${a.tiene_mp4?'dot-ok':'dot-no'}"></div>
+    </div>`).join('');
+  actualizarUI();
+}
+
+function toggleSel(nombre) {
+  if (seleccionados.has(nombre)) seleccionados.delete(nombre);
+  else seleccionados.add(nombre);
+  const el = document.querySelector(`[data-n="${nombre}"]`);
+  if (el) { el.classList.toggle('sel'); el.querySelector('.anim-check').textContent = seleccionados.has(nombre)?'✓':''; }
+  actualizarUI();
+}
+
+function selTodos() {
+  const todos = animaciones.map(a => a.nombre);
+  const yaAll = todos.every(n => seleccionados.has(n));
+  seleccionados.clear();
+  if (!yaAll) todos.forEach(n => seleccionados.add(n));
+  renderLista();
+}
+
+function limpiarLista() {
+  animaciones = []; seleccionados.clear();
+  document.getElementById('card-lista').style.display = 'none';
+  document.getElementById('drop-html').classList.remove('tiene-archivos');
+  actualizarUI();
+}
+
+let duracionesEditadas = {};
+
+function editarDuracion(nombre) {
+  const key = nombre.replace(/[^a-z0-9]/gi,'_');
+  const anim = animaciones.find(a => a.nombre === nombre);
+  const actual = duracionesEditadas[nombre] || anim.duracion_s;
+  const nueva = prompt('Duración en segundos para ' + nombre + ':', actual);
+  if (nueva !== null && !isNaN(parseFloat(nueva))) {
+    const val = parseFloat(nueva);
+    duracionesEditadas[nombre] = val;
+    anim.duracion_s = val;
+    const label = document.getElementById('dur-label-' + key);
+    if (label) label.textContent = val + 's ✓';
+  }
+}
+
+function actualizarUI() {
+  const n = seleccionados.size;
+  document.getElementById('st-sel').textContent = n;
+  document.getElementById('btn-render').disabled = n === 0 || jobAnim !== null;
+  const btnSubir = document.getElementById('btn-subir');
+  if (opts.subir_drive && n > 0 && jobAnim === null) btnSubir.classList.remove('hidden');
+  else btnSubir.classList.add('hidden');
+}
+
+function togOpt(key, btnId, activeClass) {
+  opts[key] = !opts[key];
+  const btn = document.getElementById(btnId);
+  const cls = activeClass || 'active';
+  btn.classList.toggle(cls, opts[key]);
+  btn.querySelector('.dot').style.background = opts[key] ? (cls==='active-drive'?'var(--drive)':'var(--success)') : 'var(--muted)';
+}
+function toggleDriveCfg() {
+  document.getElementById('drive-cfg').classList.toggle('hidden', !opts.subir_drive);
+  document.getElementById('tog-4k-drive').style.display = opts.subir_drive ? '' : 'none';
+  actualizarUI();
+}
+
+// ── Renderizar ───────────────────────────────────────────────────
+async function iniciarRender() {
+  if (!seleccionados.size) return;
+  limpiarLogAnim();
+  addAnimLog(`Iniciando renderizado de ${seleccionados.size} animaciones...`, 'l-info');
+  document.getElementById('sec-anim-proceso').classList.remove('hidden');
+  document.getElementById('btn-render').disabled = true;
+  document.getElementById('btn-cancelar').style.display = 'block';
+  subiendoYa = false;
+  try {
+    const r = await fetch('/api/renderizar', {
+      method:'POST', headers:{'Content-Type':'application/json'},
+      body: JSON.stringify({ archivos:[...seleccionados], escalar_4k:opts.escalar_4k, duraciones_ms: Object.fromEntries(Object.entries(duracionesEditadas).map(([k,v]) => [k, Math.round(v*1000)])) })
+    });
+    const { job_id } = await r.json();
+    jobAnim = job_id; logAnimIdx = 0;
+    setAnimDot('proc');
+    pollingAnim = setInterval(pollAnim, 1200);
+  } catch(e) { addAnimLog('Error al iniciar.','l-err'); }
+}
+
+async function pollAnim() {
+  try {
+    const r = await fetch('/api/status/'+jobAnim);
+    const d = await r.json();
+    d.log.slice(logAnimIdx).forEach(l => addAnimLog(l, clsLog(l)));
+    logAnimIdx = d.log.length;
+    if (d.total > 0) {
+      document.getElementById('anim-prog').style.width = Math.round((d.ok/d.total)*100)+'%';
+      document.getElementById('anim-status').textContent = `${d.status} — ${d.ok}/${d.total}`;
+    }
+    if (d.status==='listo' || d.status==='error') {
+      clearInterval(pollingAnim); pollingAnim = null; jobAnim = null;
+      document.getElementById('btn-cancelar').style.display = 'none';
+      setAnimDot(d.status==='listo'?'ok':'err');
+      const terminoRender = d.log.some(l => l.startsWith('Terminado:'));
+      const terminoSubida = d.log.some(l => l.startsWith('Subidos:'));
+      document.getElementById('anim-status').textContent = d.status==='listo'?'✅ Completado':'❌ Error';
+      actualizarUI();
+      animaciones.forEach(a => { a.tiene_mp4 = d.log.some(l => l.includes('OK: '+a.nombre)); });
+      renderLista();
+      if (terminoRender && !terminoSubida && opts.subir_drive && !subiendoYa) {
+        subiendoYa = true;
+        setTimeout(iniciarSubida, 800);
+      }
+    }
+  } catch(e) {}
+}
+
+// ── Subir a Drive ────────────────────────────────────────────────
+async function iniciarSubida() {
+  const driveId = document.getElementById('inp-drive-id').value.trim();
+  if (!driveId) { addAnimLog('Ingresa el ID de la carpeta Drive.','l-err'); return; }
+  if (!seleccionados.size) return;
+  addAnimLog(`Subiendo ${seleccionados.size} archivos a Drive...`,'l-drive');
+  try {
+    const r = await fetch('/api/subir', {
+      method:'POST', headers:{'Content-Type':'application/json'},
+      body: JSON.stringify({ archivos:[...seleccionados], carpeta_drive_id:driveId, usar_4k:opts.subir_4k })
+    });
+    const { job_id } = await r.json();
+    jobAnim = job_id; logAnimIdx = 0;
+    setAnimDot('proc');
+    pollingAnim = setInterval(pollAnim, 1200);
+  } catch(e) { addAnimLog('Error al iniciar subida.','l-err'); }
+}
+
+// ── SRT ──────────────────────────────────────────────────────────
+let srtModo = 'local';
+function setSRTModo(m) {
+  srtModo = m;
+  document.getElementById('srt-modo-local').classList.toggle('active', m==='local');
+  document.getElementById('srt-modo-drive').classList.toggle('active', m==='drive');
+  document.getElementById('srt-modo-local').querySelector('.dot').style.background = m==='local'?'var(--success)':'var(--muted)';
+  document.getElementById('srt-modo-drive').querySelector('.dot').style.background = m==='drive'?'var(--drive)':'var(--muted)';
+  document.getElementById('srt-local').style.display = m==='local'?'':'none';
+  document.getElementById('srt-drive').style.display  = m==='drive'?'':'none';
+  document.getElementById('btn-srt').disabled = m==='local';
+}
+function checkSRTDrive() {
+  const val = document.getElementById('inp-srt-drive-id').value.trim();
+  document.getElementById('btn-srt').disabled = !val;
+}
+function setSRTFile(input) {
+  const name = input.files[0]?.name||'';
+  document.getElementById('srt-filename').textContent = name;
+  document.getElementById('zone-srt').style.borderColor = name?'var(--success)':'';
+  document.getElementById('btn-srt').disabled = !name;
+}
+function dragOverSRT(e)  { e.preventDefault(); document.getElementById('zone-srt').classList.add('drag'); }
+function dragLeaveSRT(e) { document.getElementById('zone-srt').classList.remove('drag'); }
+function dropSRT(e) {
+  e.preventDefault();
+  document.getElementById('zone-srt').classList.remove('drag');
+  const file = e.dataTransfer.files[0];
+  if (file) { const dt=new DataTransfer(); dt.items.add(file); document.getElementById('input-srt-video').files=dt.files; setSRTFile(document.getElementById('input-srt-video')); }
+}
+
+async function iniciarSRT() {
+  document.getElementById('sec-srt-proceso').classList.remove('hidden');
+  document.getElementById('btn-srt').disabled = true;
+  document.getElementById('btn-dl-srt').classList.add('hidden');
+  document.getElementById('srt-log').innerHTML = '';
+  document.getElementById('srt-status').textContent = 'Procesando...';
+  setSRTDot('proc');
+
+  try {
+    let r;
+    if (srtModo === 'drive') {
+      let driveId = document.getElementById('inp-srt-drive-id').value.trim();
+      const match = driveId.match(/\/d\/([a-zA-Z0-9_-]+)/);
+      if (match) driveId = match[1];
+      const nombre = document.getElementById('inp-srt-nombre').value.trim() || 'video_drive.mp4';
+      addSRTLog('Iniciando descarga desde Drive...','l-drive');
+      r = await fetch('/api/generar-srt', {
+        method:'POST', headers:{'Content-Type':'application/json'},
+        body: JSON.stringify({ drive_id: driveId, nombre })
+      });
+    } else {
+      const input = document.getElementById('input-srt-video');
+      if (!input.files[0]) return;
+      addSRTLog('Subiendo video...','l-info');
+      const fd = new FormData();
+      fd.append('video', input.files[0]);
+      r = await fetch('/api/generar-srt',{method:'POST',body:fd});
+    }
+    const {job_id} = await r.json();
+    srtJobId = job_id; logSRTIdx = 0;
+    pollingSRT = setInterval(pollSRT, 1500);
+  } catch(e) { addSRTLog('Error al iniciar.','l-err'); }
+}
+
+async function pollSRT() {
+  try {
+    const r = await fetch('/api/status/'+srtJobId);
+    const d = await r.json();
+    d.log.slice(logSRTIdx).forEach(l => addSRTLog(l, clsLog(l)));
+    logSRTIdx = d.log.length;
+    document.getElementById('srt-status').textContent = d.status;
+    if (d.status==='listo'||d.status==='error') {
+      clearInterval(pollingSRT);
+      setSRTDot(d.status==='listo'?'ok':'err');
+      document.getElementById('srt-status').textContent = d.status==='listo'?'✅ SRT listo':'❌ Error';
+      document.getElementById('btn-srt').disabled = false;
+      if (d.status==='listo') document.getElementById('btn-dl-srt').classList.remove('hidden');
+    }
+  } catch(e) {}
+}
+function descargarSRT() { if (srtJobId) window.location.href='/api/descargar-srt/'+srtJobId; }
+
+// ── Helpers ──────────────────────────────────────────────────────
+async function cancelarRenderizado() {
+  clearInterval(pollingAnim); pollingAnim = null; jobAnim = null;
+  document.getElementById('btn-cancelar').style.display = 'none';
+  document.getElementById('btn-render').disabled = false;
+  setAnimDot('err');
+  document.getElementById('anim-status').textContent = 'Cancelado';
+  addAnimLog('Cancelado — limpiando procesos...', 'l-err');
+  try {
+    await fetch('/api/cancelar', { method: 'POST' });
+  } catch(e) {}
+}
+
+function clsLog(l) {
+  if (l.startsWith('OK')||l.includes('listo')||l.includes('Listo')) return 'l-ok';
+  if (l.startsWith('ERROR')||l.startsWith('FALTA')||l.includes('Error')) return 'l-err';
+  if (l.includes('Drive')||l.includes('Subiendo')) return 'l-drive';
+  if (l.includes('Renderizando')||l.includes('Escalando')||l.includes('Transcribiendo')||l.includes('Generando')) return 'l-info';
+  return 'l-new';
+}
+function addAnimLog(txt,cls){const b=document.getElementById('anim-log');const d=document.createElement('div');d.className=cls;d.textContent=txt;b.appendChild(d);b.scrollTop=b.scrollHeight;}
+function addSRTLog(txt,cls){const b=document.getElementById('srt-log');const d=document.createElement('div');d.className=cls;d.textContent=txt;b.appendChild(d);b.scrollTop=b.scrollHeight;}
+function limpiarLogAnim(){document.getElementById('anim-log').innerHTML='';document.getElementById('anim-prog').style.width='0%';}
+function setAnimDot(e){document.getElementById('anim-dot').className='status-dot '+e;}
+function setSRTDot(e){document.getElementById('srt-dot').className='status-dot '+e;}
+</script>
+</body>
+</html>

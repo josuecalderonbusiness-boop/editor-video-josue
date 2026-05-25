@@ -1,0 +1,318 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<style>
+  body:not(.fonts-loaded) * { animation-play-state: paused !important; transition: none !important; }
+</style>
+<script>
+  document.fonts.ready.then(() => {
+    setTimeout(() => { document.body.classList.add("fonts-loaded"); }, 1500);
+  });
+</script>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=1280, height=720">
+<title>anim_l1_an12 — Camino 1-2-3</title>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,900;1,700&family=Cormorant+Garamond:ital,wght@1,400;1,600&display=swap" rel="stylesheet">
+<style>
+  * { margin:0; padding:0; box-sizing:border-box; }
+  body { width:1280px; height:720px; overflow:hidden; background:#0F0A0B; }
+
+  /* ── Fondo base ── */
+  .bg {
+    position:absolute; inset:0;
+    background:linear-gradient(135deg, #0F0A0B 0%, #1C1114 100%);
+  }
+
+  /* ── Barra de progreso del camino ── */
+  .camino {
+    position:absolute; bottom:90px; left:80px; right:80px;
+    height:6px; background:rgba(255,255,255,.06); border-radius:3px;
+    overflow:hidden; z-index:5;
+    opacity:0; animation:fadeIn .5s ease-out .5s forwards;
+  }
+  .camino-fill {
+    height:100%; width:0; border-radius:3px;
+    background:linear-gradient(90deg, #3D0C11, #6B1A2A, #B8892A, #E8C870);
+    box-shadow:0 0 12px rgba(232,200,112,.4);
+    transition:width 1s ease-in-out;
+  }
+
+  /* Puntos del camino */
+  .camino-puntos {
+    position:absolute; bottom:80px; left:80px; right:80px;
+    height:26px; z-index:6;
+    opacity:0; animation:fadeIn .5s ease-out .5s forwards;
+  }
+  .punto {
+    position:absolute; width:26px; height:26px; border-radius:50%;
+    background:#1C1114; border:2px solid rgba(232,200,112,.3);
+    top:50%; transform:translate(-50%,-50%);
+    transition:all .4s ease;
+  }
+  .punto.activo {
+    background:#E8C870; border-color:#E8C870;
+    box-shadow:0 0 16px rgba(232,200,112,.8);
+  }
+  .punto:nth-child(1) { left:0%; }
+  .punto:nth-child(2) { left:50%; }
+  .punto:nth-child(3) { left:100%; }
+
+  @keyframes fadeIn { to { opacity:1; } }
+  @keyframes wordIn {
+    0%   { opacity:0; transform:translateY(40px); filter:blur(8px); }
+    100% { opacity:1; transform:translateY(0); filter:blur(0); }
+  }
+  @keyframes slideInLeft {
+    0%   { opacity:0; transform:translateX(-60px); }
+    100% { opacity:1; transform:translateX(0); }
+  }
+  @keyframes lineGrow {
+    0%   { width:0; }
+    100% { width:360px; }
+  }
+  @keyframes scaleIn {
+    0%   { opacity:0; transform:scale(0) rotate(-15deg); }
+    70%  { transform:scale(1.15) rotate(5deg); }
+    100% { opacity:1; transform:scale(1) rotate(0deg); }
+  }
+  @keyframes goldPulse {
+    0%,100%{text-shadow:0 0 40px rgba(232,200,112,1),0 0 80px rgba(220,180,60,.7)}
+    50%    {text-shadow:0 0 70px rgba(255,248,180,1),0 0 130px rgba(232,200,112,.9)}
+  }
+
+  /* ── SLIDES ── */
+  .slide {
+    position:absolute; inset:0;
+    display:flex; align-items:center;
+    padding:0 80px 80px;
+    opacity:0; pointer-events:none; z-index:3;
+  }
+  .slide.show { opacity:1; pointer-events:auto; }
+
+  /* Número gigante izquierda */
+  .num-grande {
+    font-family:'Playfair Display',serif; font-weight:900;
+    font-size:340px; line-height:1;
+    color:transparent;
+    -webkit-text-stroke:3px rgba(232,200,112,.25);
+    flex-shrink:0; width:320px; text-align:center;
+    margin-right:40px; margin-top:-40px;
+    opacity:0;
+  }
+
+  /* Texto derecho */
+  .slide-texto { flex:1; }
+  .slide-label {
+    font-family:'Cormorant Garamond',serif; font-style:italic;
+    font-size:28px; color:#C97080; letter-spacing:.08em;
+    margin-bottom:14px;
+    opacity:0;
+  }
+  .slide-titulo {
+    font-family:'Playfair Display',serif; font-weight:900;
+    font-size:100px; color:#F9F3E8; line-height:.9;
+    opacity:0;
+  }
+  .slide-titulo .gold { color:#E8C870; display:block; }
+  .slide-linea {
+    height:4px; width:0;
+    background:linear-gradient(90deg, #E8C870, #B8892A, transparent);
+    border-radius:2px; margin-top:24px;
+    animation:none;
+  }
+
+  /* Animaciones por slide */
+  #s1.show .num-grande { animation:slideInLeft .5s ease-out .2s forwards; }
+  #s1.show .slide-label { animation:wordIn .4s ease-out .4s forwards; }
+  #s1.show .slide-titulo { animation:wordIn .5s ease-out .5s forwards; }
+  #s1.show .slide-linea { animation:lineGrow .5s ease-out .9s forwards; }
+
+  #s2.show .num-grande { animation:slideInLeft .5s ease-out .2s forwards; }
+  #s2.show .slide-label { animation:wordIn .4s ease-out .4s forwards; }
+  #s2.show .slide-titulo { animation:wordIn .5s ease-out .5s forwards; }
+  #s2.show .slide-linea { animation:lineGrow .5s ease-out .9s forwards; }
+
+  #s3.show .num-grande { animation:slideInLeft .5s ease-out .2s forwards; }
+  #s3.show .slide-label { animation:wordIn .4s ease-out .4s forwards; }
+  #s3.show .slide-titulo { animation:wordIn .5s ease-out .5s forwards; }
+  #s3.show .slide-linea { animation:lineGrow .5s ease-out .9s forwards; }
+
+  /* ── SLIDE FINAL: Logo ── */
+  #sfinal {
+    flex-direction:column; justify-content:center;
+    align-items:center; padding:0;
+  }
+  .gema {
+    width:80px; height:80px; margin-bottom:24px;
+    opacity:0;
+  }
+  #sfinal.show .gema { animation:scaleIn .6s cubic-bezier(.2,0,.1,1) .2s forwards; }
+
+  .logo-codigo {
+    font-family:'Playfair Display',serif; font-weight:900;
+    font-size:96px; color:#F9F3E8; line-height:1;
+    opacity:0;
+  }
+  .logo-soberana {
+    font-family:'Playfair Display',serif; font-style:italic; font-weight:700;
+    font-size:110px; color:#E8C870; line-height:.9;
+    opacity:0;
+  }
+  #sfinal.show .logo-codigo  { animation:wordIn .5s ease-out .7s forwards; }
+  #sfinal.show .logo-soberana { animation:wordIn .5s ease-out 1.0s forwards; animation-fill-mode:forwards; }
+
+  .logo-line {
+    height:3px; width:0;
+    background:linear-gradient(90deg, transparent, #E8C870, transparent);
+    border-radius:2px; margin-top:20px;
+    animation:none;
+  }
+  #sfinal.show .logo-line { animation:lineGrow .6s ease-out 1.4s forwards; }
+
+  .logo-sub {
+    font-family:'Cormorant Garamond',serif; font-style:italic;
+    font-size:36px; color:#C97080; margin-top:14px;
+    opacity:0;
+  }
+  #sfinal.show .logo-sub { animation:fadeIn .5s ease-out 1.8s forwards; }
+  #sfinal.show .logo-soberana.pulse { animation:wordIn .5s ease-out 1.0s forwards, goldPulse 2.5s ease-in-out 2s infinite; }
+</style>
+</head>
+<body>
+
+<div class="bg"></div>
+
+<!-- Barra de progreso -->
+<div class="camino">
+  <div class="camino-fill" id="fill"></div>
+</div>
+<div class="camino-puntos">
+  <div class="punto" id="p1"></div>
+  <div class="punto" id="p2"></div>
+  <div class="punto" id="p3"></div>
+</div>
+
+<!-- SLIDE 1 -->
+<div class="slide" id="s1">
+  <div class="num-grande">1</div>
+  <div class="slide-texto">
+    <p class="slide-label">primero</p>
+    <p class="slide-titulo">CONSEJERÍA<span class="gold">DE PAREJAS</span></p>
+    <div class="slide-linea"></div>
+  </div>
+</div>
+
+<!-- SLIDE 2 -->
+<div class="slide" id="s2">
+  <div class="num-grande">2</div>
+  <div class="slide-texto">
+    <p class="slide-label">segundo</p>
+    <p class="slide-titulo">DESARROLLO<span class="gold">DE MI ESPOSA</span></p>
+    <div class="slide-linea"></div>
+  </div>
+</div>
+
+<!-- SLIDE 3 -->
+<div class="slide" id="s3">
+  <div class="num-grande">3</div>
+  <div class="slide-texto">
+    <p class="slide-label">tercero</p>
+    <p class="slide-titulo">MI PROPIO<span class="gold">DESARROLLO</span></p>
+    <div class="slide-linea"></div>
+  </div>
+</div>
+
+<!-- SLIDE FINAL: Logo -->
+<div class="slide" id="sfinal">
+  <svg class="gema" viewBox="0 0 80 80" xmlns="http://www.w3.org/2000/svg">
+    <polygon points="40,6 72,24 72,56 40,74 8,56 8,24"
+      fill="rgba(232,200,112,.12)" stroke="#E8C870" stroke-width="1.5"
+      style="filter:drop-shadow(0 0 8px rgba(232,200,112,.8))"/>
+    <polygon points="40,16 62,28 62,52 40,64 18,52 18,28"
+      fill="rgba(232,200,112,.08)" stroke="#D4A843" stroke-width="1"/>
+    <line x1="40" y1="6"  x2="40" y2="74" stroke="#E8C870" stroke-width=".8" opacity=".3"/>
+    <line x1="8"  y1="24" x2="72" y2="56" stroke="#E8C870" stroke-width=".8" opacity=".3"/>
+    <line x1="8"  y1="56" x2="72" y2="24" stroke="#E8C870" stroke-width=".8" opacity=".3"/>
+    <circle cx="40" cy="40" r="5" fill="#E8C870"
+      style="filter:drop-shadow(0 0 6px rgba(232,200,112,1))"/>
+  </svg>
+  <p class="logo-codigo">Código</p>
+  <p class="logo-soberana pulse">Soberana</p>
+  <div class="logo-line" style="width:300px;"></div>
+  <p class="logo-sub">Un sistema. Desde adentro.</p>
+</div>
+
+<script>
+  // 7:28 → 7:58 = 30 segundos
+  // s1: 7:28 → 4s
+  // s2: 7:32 → 5s
+  // s3: 7:37 → 6s
+  // sfinal: 7:43 → hasta 7:58
+
+  const DURACION_MS = 30000;
+  const TRANS = 400;
+
+  function show(id) {
+    const el = document.getElementById(id);
+    el.classList.add('show');
+    el.style.opacity = '1';
+    el.style.pointerEvents = 'auto';
+  }
+  function hide(id) {
+    const el = document.getElementById(id);
+    el.style.transition = `opacity ${TRANS}ms ease`;
+    el.style.opacity = '0';
+    setTimeout(() => {
+      el.classList.remove('show');
+      el.style.transition = '';
+    }, TRANS);
+  }
+
+  function setProg(pct, puntos) {
+    document.getElementById('fill').style.width = pct + '%';
+    ['p1','p2','p3'].forEach((id,i) => {
+      document.getElementById(id).classList.toggle('activo', puntos.includes(i));
+    });
+  }
+
+  // Slide 1
+  show('s1');
+  setProg(0, [0]);
+
+  // Slide 2
+  setTimeout(() => {
+    hide('s1');
+    setTimeout(() => {
+      show('s2');
+      setProg(50, [0,1]);
+    }, TRANS);
+  }, 4000);
+
+  // Slide 3
+  setTimeout(() => {
+    hide('s2');
+    setTimeout(() => {
+      show('s3');
+      setProg(100, [0,1,2]);
+    }, TRANS);
+  }, 9000);
+
+  // Logo final
+  setTimeout(() => {
+    hide('s3');
+    setTimeout(() => {
+      show('sfinal');
+    }, TRANS);
+  }, 15000);
+
+  // Fade out total
+  setTimeout(() => {
+    ['s1','s2','s3','sfinal'].forEach(id => {
+      const el = document.getElementById(id);
+      el.style.transition = `opacity 700ms ease`;
+      el.style.opacity = '0';
+    });
+  }, DURACION_MS - 700);
+</script>
+</body>
+</html>

@@ -1,0 +1,380 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<style>
+  body:not(.fonts-loaded) * { animation-play-state: paused !important; transition: none !important; }
+</style>
+<script>
+  document.fonts.ready.then(() => {
+    setTimeout(() => { document.body.classList.add("fonts-loaded"); }, 1500);
+  });
+</script>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=1280, height=720">
+<title>anim_l1_an4 — NO ES v3</title>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,900;1,900&family=Cormorant+Garamond:ital,wght@1,400;1,600&display=swap" rel="stylesheet">
+<style>
+  * { margin:0; padding:0; box-sizing:border-box; }
+  body { width:1280px; height:720px; overflow:hidden; background:#0F0A0B; }
+
+  .bg {
+    position:absolute; inset:0;
+    background:linear-gradient(160deg, #0F0A0B 0%, #1A0D10 50%, #0F0A0B 100%);
+  }
+  .bg-glow {
+    position:absolute; left:-150px; top:-100px;
+    width:600px; height:600px; border-radius:50%;
+    background:radial-gradient(ellipse, rgba(107,26,42,.15) 0%, transparent 70%);
+    animation:bgPulse 5s ease-in-out infinite; pointer-events:none;
+  }
+  @keyframes bgPulse { 0%,100%{transform:scale(1);opacity:.6} 50%{transform:scale(1.15);opacity:1} }
+
+  /* ── Keyframes ── */
+  @keyframes fadeIn   { to{opacity:1} }
+  @keyframes blurIn   { 0%{opacity:0;filter:blur(16px);transform:scale(.94) translateY(20px)} 100%{opacity:1;filter:blur(0);transform:scale(1) translateY(0)} }
+  @keyframes floatIn  { 0%{opacity:0;transform:translateY(18px) rotate(var(--r,0deg))} 100%{opacity:var(--op,.9);transform:translateY(0) rotate(var(--r,0deg))} }
+  @keyframes drift    { 0%,100%{transform:translateY(0) rotate(var(--r,0deg))} 50%{transform:translateY(-10px) rotate(var(--r,0deg))} }
+  @keyframes glowIron { 0%,100%{text-shadow:0 0 12px rgba(201,112,128,.4),0 0 30px rgba(201,112,128,.2)} 50%{text-shadow:0 0 25px rgba(201,112,128,.9),0 0 60px rgba(201,112,128,.5),0 0 100px rgba(201,112,128,.2)} }
+  @keyframes xSlam    { 0%{opacity:0;transform:translate(-50%,-50%) scale(0) rotate(-20deg)} 55%{transform:translate(-50%,-50%) scale(1.2) rotate(6deg)} 100%{opacity:1;transform:translate(-50%,-50%) scale(1) rotate(0deg)} }
+  @keyframes lineSlam { 0%{width:0;opacity:0} 100%{width:110%;opacity:1} }
+  @keyframes tagIn    { 0%{opacity:0;transform:translateY(10px) rotate(var(--r,0deg))} 100%{opacity:1;transform:translateY(0) rotate(var(--r,0deg))} }
+  @keyframes svgDraw  { to{stroke-dashoffset:0} }
+
+  /* ── Cabecera ── */
+  .header {
+    position:absolute; top:0; left:0; right:0; height:108px; z-index:20;
+    display:flex; align-items:center; justify-content:center; gap:16px;
+    opacity:0; animation:fadeIn .5s ease-out .3s forwards;
+  }
+  .hdr-label {
+    font-family:'Cormorant Garamond',serif; font-style:italic;
+    font-size:30px; color:#C97080; letter-spacing:.06em;
+  }
+  .hdr-main {
+    font-family:'Playfair Display',serif; font-weight:900;
+    font-size:58px; color:#F9F3E8;
+  }
+  .hdr-no {
+    font-family:'Playfair Display',serif; font-weight:900;
+    font-size:58px; color:#C97080;
+    text-shadow:0 0 20px rgba(201,112,128,.5);
+  }
+  .hdr-sep {
+    position:absolute; bottom:0; left:80px; right:80px; height:1px;
+    background:linear-gradient(90deg, transparent, rgba(107,26,42,.6), transparent);
+  }
+
+  /* ── Slides ── */
+  .slide {
+    position:absolute; inset:0;
+    display:flex; flex-direction:column;
+    align-items:center; justify-content:center;
+    padding-top:90px;
+    opacity:0; pointer-events:none; z-index:5;
+  }
+
+  /* Texto principal */
+  .item-txt {
+    font-family:'Playfair Display',serif; font-style:italic; font-weight:900;
+    color:#F9F3E8; line-height:.88; text-align:center;
+    position:relative; z-index:3; opacity:0;
+  }
+
+  /* Línea tachadora */
+  .strike {
+    position:absolute; left:-5%; top:50%; transform:translateY(-50%);
+    height:7px; width:0; opacity:0; border-radius:4px;
+    background:linear-gradient(90deg, transparent 0%, #C97080 5%, #C97080 95%, transparent 100%);
+    box-shadow:0 0 18px rgba(201,112,128,.9), 0 0 40px rgba(201,112,128,.4);
+    transform-origin:left center;
+  }
+
+  /* X */
+  .big-x {
+    position:absolute; left:50%; top:calc(50% + 45px);
+    transform:translate(-50%,-50%) scale(0);
+    font-family:'Playfair Display',serif; font-weight:900;
+    font-size:260px; color:rgba(201,112,128,.7); line-height:1;
+    text-shadow:0 0 60px rgba(201,112,128,.7), 0 0 120px rgba(201,112,128,.3);
+    opacity:0; z-index:10; pointer-events:none;
+  }
+
+  /* Flotantes */
+  .flotantes { position:absolute; inset:0; pointer-events:none; z-index:2; }
+
+  .tag {
+    position:absolute;
+    font-family:'Cormorant Garamond',serif; font-style:italic;
+    font-size:30px; color:rgba(201,112,128,.75);
+    background:rgba(201,112,128,.06);
+    border:1px solid rgba(201,112,128,.2);
+    padding:7px 18px; border-radius:24px;
+    opacity:0; white-space:nowrap;
+    animation:glowIron 2.5s ease-in-out infinite;
+  }
+
+  .svgico { position:absolute; opacity:0; }
+
+  /* Contador */
+  .dots {
+    position:absolute; bottom:26px; left:50%; transform:translateX(-50%);
+    display:flex; gap:12px; z-index:20;
+    opacity:0; animation:fadeIn .4s ease-out .8s forwards;
+  }
+  .dot {
+    width:10px; height:10px; border-radius:50%;
+    background:rgba(255,255,255,.12); transition:all .3s;
+  }
+  .dot.on { background:#C97080; box-shadow:0 0 8px rgba(201,112,128,.7); }
+</style>
+</head>
+<body>
+
+<div class="bg"></div>
+<div class="bg-glow"></div>
+
+<!-- Cabecera -->
+<div class="header">
+  <span class="hdr-label">Código Soberana</span>
+  <span class="hdr-main">NO&nbsp;</span>
+  <span class="hdr-no">ES:</span>
+  <div class="hdr-sep"></div>
+</div>
+
+<!-- Contador -->
+<div class="dots">
+  <div class="dot on" id="d1"></div>
+  <div class="dot" id="d2"></div>
+  <div class="dot" id="d3"></div>
+  <div class="dot" id="d4"></div>
+</div>
+
+<!-- ══ S1: TALLER PROMEDIO ══ -->
+<div class="slide" id="s1">
+  <div class="flotantes">
+    <!-- Nota musical SVG -->
+    <svg class="svgico" id="sv1a" style="top:18%;left:9%;width:44px;height:56px;" viewBox="0 0 44 56">
+      <path d="M16 44V12l20-6v26" stroke="#C97080" stroke-width="1.8" stroke-linecap="round" fill="none" stroke-dasharray="120" stroke-dashoffset="120"/>
+      <circle cx="12" cy="44" r="7" stroke="#C97080" stroke-width="1.8" fill="rgba(201,112,128,.1)" stroke-dasharray="60" stroke-dashoffset="60"/>
+      <circle cx="32" cy="38" r="7" stroke="#C97080" stroke-width="1.8" fill="rgba(201,112,128,.1)" stroke-dasharray="60" stroke-dashoffset="60"/>
+    </svg>
+    <!-- Nota musical 2 -->
+    <svg class="svgico" id="sv1b" style="top:22%;right:11%;width:36px;height:48px;" viewBox="0 0 36 48">
+      <path d="M12 38V10l16-4v22" stroke="#8B2D3F" stroke-width="1.8" stroke-linecap="round" fill="none" stroke-dasharray="100" stroke-dashoffset="100"/>
+      <circle cx="9" cy="38" r="6" stroke="#8B2D3F" stroke-width="1.8" fill="rgba(139,45,63,.1)" stroke-dasharray="50" stroke-dashoffset="50"/>
+      <circle cx="25" cy="32" r="6" stroke="#8B2D3F" stroke-width="1.8" fill="rgba(139,45,63,.1)" stroke-dasharray="50" stroke-dashoffset="50"/>
+    </svg>
+    <!-- Tags flotantes -->
+    <span class="tag" style="top:18%;left:26%;--r:-3deg;animation-delay:0s;">Tú puedes lograrlo ✨</span>
+    <span class="tag" style="bottom:24%;right:10%;--r:4deg;animation-delay:.2s;">Visualiza lo que quieres</span>
+    <span class="tag" style="bottom:18%;left:12%;--r:-5deg;animation-delay:.4s;">¡Activa tu mejor versión!</span>
+    <span class="tag" style="top:21%;right:26%;--r:2deg;animation-delay:.6s;">¡Rompe tus límites!</span>
+  </div>
+  <p class="item-txt" id="t1" style="font-size:152px;">
+    TALLER<br>PROMEDIO
+    <span class="strike" id="sl1"></span>
+  </p>
+  <div class="big-x" id="x1">✕</div>
+</div>
+
+<!-- ══ S2: MASTERCLASS GENÉRICA ══ -->
+<div class="slide" id="s2">
+  <div class="flotantes">
+    <!-- Libro SVG x3 -->
+    <svg class="svgico" id="sv2a" style="top:20%;left:8%;width:36px;height:48px;" viewBox="0 0 36 48">
+      <rect x="3" y="2" width="30" height="44" rx="3" stroke="#C97080" stroke-width="1.8" fill="rgba(201,112,128,.06)" stroke-dasharray="160" stroke-dashoffset="160"/>
+      <line x1="11" y1="2" x2="11" y2="46" stroke="#C97080" stroke-width="1.5" stroke-dasharray="50" stroke-dashoffset="50"/>
+      <line x1="16" y1="10" x2="30" y2="10" stroke="#C97080" stroke-width="1" opacity=".5"/>
+      <line x1="16" y1="16" x2="30" y2="16" stroke="#C97080" stroke-width="1" opacity=".5"/>
+    </svg>
+    <svg class="svgico" id="sv2b" style="top:20%;left:16%;width:36px;height:48px;" viewBox="0 0 36 48">
+      <rect x="3" y="2" width="30" height="44" rx="3" stroke="#8B2D3F" stroke-width="1.8" fill="rgba(139,45,63,.06)" stroke-dasharray="160" stroke-dashoffset="160"/>
+      <line x1="11" y1="2" x2="11" y2="46" stroke="#8B2D3F" stroke-width="1.5" stroke-dasharray="50" stroke-dashoffset="50"/>
+      <line x1="16" y1="10" x2="30" y2="10" stroke="#8B2D3F" stroke-width="1" opacity=".5"/>
+      <line x1="16" y1="16" x2="30" y2="16" stroke="#8B2D3F" stroke-width="1" opacity=".5"/>
+    </svg>
+    <svg class="svgico" id="sv2c" style="top:20%;left:24%;width:36px;height:48px;" viewBox="0 0 36 48">
+      <rect x="3" y="2" width="30" height="44" rx="3" stroke="#E8C870" stroke-width="1.8" fill="rgba(232,200,112,.06)" stroke-dasharray="160" stroke-dashoffset="160"/>
+      <line x1="11" y1="2" x2="11" y2="46" stroke="#E8C870" stroke-width="1.5" stroke-dasharray="50" stroke-dashoffset="50"/>
+      <line x1="16" y1="10" x2="30" y2="10" stroke="#E8C870" stroke-width="1" opacity=".5"/>
+      <line x1="16" y1="16" x2="30" y2="16" stroke="#E8C870" stroke-width="1" opacity=".5"/>
+    </svg>
+    <!-- Calendario SVG -->
+    <svg class="svgico" id="sv2d" style="top:20%;right:10%;width:56px;height:60px;" viewBox="0 0 56 60">
+      <rect x="2" y="10" width="52" height="48" rx="4" stroke="#E8C870" stroke-width="1.8" fill="rgba(232,200,112,.06)" stroke-dasharray="200" stroke-dashoffset="200"/>
+      <line x1="2" y1="24" x2="54" y2="24" stroke="#E8C870" stroke-width="1.5" stroke-dasharray="60" stroke-dashoffset="60"/>
+      <line x1="18" y1="2" x2="18" y2="18" stroke="#E8C870" stroke-width="2" stroke-linecap="round" stroke-dasharray="20" stroke-dashoffset="20"/>
+      <line x1="38" y1="2" x2="38" y2="18" stroke="#E8C870" stroke-width="2" stroke-linecap="round" stroke-dasharray="20" stroke-dashoffset="20"/>
+      <text x="28" y="46" text-anchor="middle" font-family="serif" font-size="14" fill="#E8C870" opacity=".8">3 sem.</text>
+    </svg>
+    <span class="tag" style="bottom:24%;left:10%;--r:-2deg;">Paso 1 → 2 → 3 → 4 → 5</span>
+    <span class="tag" style="bottom:18%;right:12%;--r:3deg;animation-delay:.3s;">Solo 5 pasos fáciles</span>
+  </div>
+  <p class="item-txt" id="t2" style="font-size:122px;">
+    MASTERCLASS<br>GENÉRICA
+    <span class="strike" id="sl2"></span>
+  </p>
+  <div class="big-x" id="x2">✕</div>
+</div>
+
+<!-- ══ S3: CURSO MOTIVACIONAL ══ -->
+<div class="slide" id="s3">
+  <div class="flotantes">
+    <!-- Rayo SVG -->
+    <svg class="svgico" id="sv3a" style="top:18%;left:10%;width:40px;height:60px;" viewBox="0 0 40 60">
+      <polyline points="28,2 12,32 22,32 10,58" stroke="#C97080" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" fill="none" stroke-dasharray="120" stroke-dashoffset="120"/>
+    </svg>
+    <!-- Puño SVG -->
+    <svg class="svgico" id="sv3b" style="top:20%;right:12%;width:46px;height:52px;" viewBox="0 0 46 52">
+      <rect x="8" y="20" width="30" height="26" rx="4" stroke="#8B2D3F" stroke-width="1.8" fill="rgba(139,45,63,.06)" stroke-dasharray="120" stroke-dashoffset="120"/>
+      <rect x="12" y="10" width="8" height="14" rx="2" stroke="#8B2D3F" stroke-width="1.5" fill="none" stroke-dasharray="50" stroke-dashoffset="50"/>
+      <rect x="22" y="8" width="8" height="16" rx="2" stroke="#8B2D3F" stroke-width="1.5" fill="none" stroke-dasharray="50" stroke-dashoffset="50"/>
+      <rect x="32" y="12" width="7" height="12" rx="2" stroke="#8B2D3F" stroke-width="1.5" fill="none" stroke-dasharray="50" stroke-dashoffset="50"/>
+    </svg>
+    <span class="tag" style="top:20%;left:28%;--r:-4deg;">¡Despierta tu potencial!</span>
+    <span class="tag" style="bottom:26%;right:10%;--r:3deg;animation-delay:.25s;">Sé imparable</span>
+    <span class="tag" style="bottom:20%;left:14%;--r:-3deg;animation-delay:.5s;">¡Toma acción HOY!</span>
+    <span class="tag" style="top:23%;right:22%;--r:2deg;animation-delay:.35s;">Sal de tu zona de confort</span>
+  </div>
+  <p class="item-txt" id="t3" style="font-size:148px;">
+    CURSO<br>MOTIVACIONAL
+    <span class="strike" id="sl3"></span>
+  </p>
+  <div class="big-x" id="x3">✕</div>
+</div>
+
+<!-- ══ S4: TRUCOS / MANIPULACIÓN ══ -->
+<div class="slide" id="s4">
+  <div class="flotantes">
+    <!-- Tubo de ensayo SVG -->
+    <svg class="svgico" id="sv4a" style="top:17%;left:9%;width:40px;height:64px;" viewBox="0 0 40 64">
+      <path d="M14 4h12v36l-8 18a2 2 0 01-4 0L6 40V4" stroke="#C97080" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" fill="rgba(201,112,128,.06)" stroke-dasharray="160" stroke-dashoffset="160"/>
+      <line x1="6" y1="14" x2="34" y2="14" stroke="#C97080" stroke-width="1" opacity=".5" stroke-dasharray="30" stroke-dashoffset="30"/>
+      <circle cx="18" cy="50" r="3" fill="#C97080" opacity=".4"/>
+    </svg>
+    <!-- Ojo SVG -->
+    <svg class="svgico" id="sv4b" style="top:21%;right:11%;width:58px;height:32px;" viewBox="0 0 58 32">
+      <path d="M3 16C3 16 12 3 29 3s26 13 26 13-9 13-26 13S3 16 3 16z" stroke="#8B2D3F" stroke-width="1.8" fill="none" stroke-dasharray="140" stroke-dashoffset="140"/>
+      <circle cx="29" cy="16" r="7" stroke="#8B2D3F" stroke-width="1.8" fill="rgba(139,45,63,.1)" stroke-dasharray="50" stroke-dashoffset="50"/>
+      <circle cx="29" cy="16" r="3" fill="#8B2D3F" opacity=".6"/>
+    </svg>
+    <!-- Engranaje SVG -->
+    <svg class="svgico" id="sv4c" style="bottom:28%;left:11%;width:50px;height:50px;" viewBox="0 0 50 50">
+      <circle cx="25" cy="25" r="10" stroke="#C97080" stroke-width="1.8" fill="none" stroke-dasharray="70" stroke-dashoffset="70"/>
+      <circle cx="25" cy="25" r="4" fill="#C97080" opacity=".3"/>
+      <path d="M25 4v8M25 38v8M4 25h8M38 25h8M10 10l6 6M34 34l6 6M10 40l6-6M34 16l6-6" stroke="#C97080" stroke-width="1.8" stroke-linecap="round" stroke-dasharray="200" stroke-dashoffset="200"/>
+    </svg>
+    <span class="tag" style="top:20%;left:24%;--r:-3deg;">Psicología inversa</span>
+    <span class="tag" style="bottom:26%;right:10%;--r:4deg;animation-delay:.3s;">Él lo detecta en 48 horas</span>
+    <span class="tag" style="bottom:20%;left:28%;--r:-2deg;animation-delay:.5s;">Técnicas de control mental</span>
+  </div>
+  <p class="item-txt" id="t4" style="font-size:128px;">
+    TRUCOS PARA<br>MANIPULAR
+    <span class="strike" id="sl4"></span>
+  </p>
+  <div class="big-x" id="x4">✕</div>
+</div>
+
+<script>
+  // 1:03 → 1:31 = 28 segundos
+  const TRANS = 380;
+
+  function activarSVGs(ids, baseDelay) {
+    ids.forEach((id, i) => {
+      const el = document.getElementById(id);
+      if (!el) return;
+      const delay = baseDelay + i * 150;
+      el.style.opacity = '0';
+      setTimeout(() => {
+        el.style.opacity = '1';
+        el.style.animation = `floatIn .5s ease-out forwards, drift ${3.5 + i*.3}s ease-in-out ${500}ms infinite`;
+        // Animar stroke-dashoffset de los paths dentro
+        el.querySelectorAll('[stroke-dashoffset]').forEach(path => {
+          path.style.animation = `svgDraw .6s ease-out ${delay}ms forwards`;
+        });
+      }, delay);
+    });
+  }
+
+  function activarTags(slideId, baseDelay) {
+    const slide = document.getElementById(slideId);
+    slide.querySelectorAll('.tag').forEach((el, i) => {
+      const delay = baseDelay + i * 180;
+      setTimeout(() => {
+        el.style.animation = `tagIn .5s ease-out forwards, glowIron 2.5s ease-in-out ${500}ms infinite`;
+        el.style.opacity = '1';
+      }, delay);
+    });
+  }
+
+  function mostrar(sId, tId, svgIds, delay) {
+    setTimeout(() => {
+      const slide = document.getElementById(sId);
+      slide.style.opacity = '1';
+      slide.style.pointerEvents = 'auto';
+
+      const txt = document.getElementById(tId);
+      txt.style.animation = 'blurIn .55s ease-out forwards';
+
+      activarSVGs(svgIds, 300);
+      activarTags(sId, 350);
+
+      // Dot
+      document.querySelectorAll('.dot').forEach(d => d.classList.remove('on'));
+      const dotNum = sId.replace('s','');
+      document.getElementById('d' + dotNum).classList.add('on');
+
+    }, delay);
+  }
+
+  function tachar(slId, xId, delay) {
+    setTimeout(() => {
+      const sl = document.getElementById(slId);
+      sl.style.animation = 'lineSlam .4s ease-out forwards';
+
+      const x = document.getElementById(xId);
+      x.style.animation = 'xSlam .5s cubic-bezier(.2,0,.1,1) forwards';
+    }, delay);
+  }
+
+  function ocultar(sId, delay) {
+    setTimeout(() => {
+      const slide = document.getElementById(sId);
+      slide.style.transition = `opacity ${TRANS}ms ease`;
+      slide.style.opacity = '0';
+      setTimeout(() => {
+        slide.style.pointerEvents = 'none';
+        slide.style.transition = '';
+      }, TRANS);
+    }, delay);
+  }
+
+  // S1: 0 → 6500ms
+  mostrar('s1', 't1', ['sv1a','sv1b'], 300);
+  tachar('sl1', 'x1', 3000);
+  ocultar('s1', 5200);
+
+  // S2: 5500 → 12000ms
+  mostrar('s2', 't2', ['sv2a','sv2b','sv2c','sv2d'], 5500);
+  tachar('sl2', 'x2', 8500);
+  ocultar('s2', 10800);
+
+  // S3: 11000 → 17500ms
+  mostrar('s3', 't3', ['sv3a','sv3b'], 11000);
+  tachar('sl3', 'x3', 13800);
+  ocultar('s3', 16500);
+
+  // S4: 16800 → 28000ms
+  mostrar('s4', 't4', ['sv4a','sv4b','sv4c'], 16800);
+  tachar('sl4', 'x4', 19800);
+
+  // Fade out total
+  setTimeout(() => {
+    document.querySelectorAll('.slide,.header,.dots').forEach(el => {
+      el.style.transition = 'opacity 700ms ease';
+      el.style.opacity = '0';
+    });
+  }, 27300);
+</script>
+</body>
+</html>

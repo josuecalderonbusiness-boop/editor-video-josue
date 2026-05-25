@@ -1,0 +1,152 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<style>
+  body:not(.fonts-loaded) * { animation-play-state: paused !important; transition: none !important; }
+</style>
+<script>
+  document.fonts.ready.then(() => {
+    setTimeout(() => { document.body.classList.add("fonts-loaded"); }, 1500);
+  });
+</script>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=1280, height=720">
+<title>anim_l1_an7 — INICIO TEMA</title>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@1,300;1,500&family=Inter:wght@300;400&display=swap" rel="stylesheet">
+<style>
+  * { margin:0; padding:0; box-sizing:border-box; }
+  body { width:1280px; height:720px; overflow:hidden; background:#0F0A0B; }
+
+  .scene {
+    width:1280px; height:720px; position:relative;
+    display:flex; flex-direction:column;
+    align-items:flex-start; justify-content:center;
+    padding-left:100px;
+    background:#0F0A0B;
+    opacity:0; animation:sceneIn .5s ease-out .1s forwards;
+  }
+  @keyframes sceneIn { to{opacity:1} }
+  .scene.out { animation:sceneOut .7s ease-in forwards; }
+  @keyframes sceneOut { to{opacity:0} }
+
+  /* Banda más alta para 2 líneas */
+  .band {
+    position:absolute; left:0; top:50%; transform:translateY(-50%);
+    width:0; height:300px;
+    background:linear-gradient(90deg, rgba(61,12,17,.75) 0%, rgba(61,12,17,.5) 65%, transparent 100%);
+    animation:expandBand .5s cubic-bezier(.2,0,.1,1) .2s forwards;
+  }
+  @keyframes expandBand { to{width:1200px} }
+
+  /* Barra izquierda dorada — más alta */
+  .left-bar {
+    position:absolute; left:0; top:50%; transform:translateY(-50%);
+    width:6px; height:0;
+    background:linear-gradient(180deg, transparent, #E8C870, #D4A843, #E8C870, transparent);
+    box-shadow:0 0 16px rgba(232,200,112,.7), 0 0 35px rgba(232,200,112,.3);
+    animation:growBar .5s ease-out .5s forwards;
+  }
+  @keyframes growBar { to{height:300px} }
+
+  .content { position:relative; z-index:2; padding-left:28px; }
+
+  /* Dos líneas de título */
+  .tema-titulo {
+    font-family:'Cormorant Garamond',Georgia,serif;
+    font-style:italic; font-size:92px; font-weight:300;
+    color:#F9F3E8; line-height:1.15; letter-spacing:.01em;
+    text-shadow:
+      0 0 40px rgba(249,243,232,.2),
+      0 0 80px rgba(249,243,232,.08);
+    display:flex; flex-direction:column; gap:0;
+  }
+
+  .linea { display:block; white-space:nowrap; }
+
+  .tema-titulo .letter {
+    opacity:0; display:inline;
+    transition:opacity .06s ease;
+  }
+
+  /* Cursor */
+  .cursor {
+    display:inline-block; width:4px; height:.82em;
+    background:#E8C870; margin-left:3px; vertical-align:middle;
+    animation:blink .5s step-end infinite; opacity:0;
+    box-shadow:0 0 10px rgba(232,200,112,.9);
+  }
+  @keyframes blink { 0%,100%{opacity:1} 50%{opacity:0} }
+</style>
+</head>
+<body>
+<div class="scene" id="scene">
+  <div class="band"></div>
+  <div class="left-bar"></div>
+  <div class="content">
+    <div class="tema-titulo">
+      <span class="linea" id="linea1"></span>
+      <span class="linea" id="linea2"><span class="cursor" id="cursor"></span></span>
+    </div>
+  </div>
+</div>
+
+<script>
+  const linea1txt = "¿Quién soy";
+  const linea2txt = "y por qué puedo hablar de esto?";
+  const DELAY_INICIO  = 900;
+  const VELOCIDAD     = 52;
+  const DURACION_VISIBLE = 3500;
+
+  function buildLetters(text, containerId) {
+    const container = document.getElementById(containerId);
+    const spans = [];
+    text.split('').forEach(char => {
+      const span = document.createElement('span');
+      span.className = 'letter';
+      span.textContent = char === ' ' ? '\u00A0' : char;
+      // insertar antes del cursor si existe en linea2
+      if (containerId === 'linea2') {
+        container.insertBefore(span, document.getElementById('cursor'));
+      } else {
+        container.appendChild(span);
+      }
+      spans.push(span);
+    });
+    return spans;
+  }
+
+  const l1 = buildLetters(linea1txt, 'linea1');
+  const l2 = buildLetters(linea2txt, 'linea2');
+
+  // Cursor aparece antes de empezar
+  setTimeout(() => {
+    document.getElementById('cursor').style.opacity = '1';
+  }, DELAY_INICIO - 200);
+
+  // Escribir línea 1
+  l1.forEach((span, i) => {
+    setTimeout(() => { span.style.opacity = '1'; }, DELAY_INICIO + i * VELOCIDAD);
+  });
+
+  // Línea 2 arranca cuando termina la línea 1
+  const finL1 = DELAY_INICIO + l1.length * VELOCIDAD + 80; // 80ms pausa entre líneas
+  l2.forEach((span, i) => {
+    setTimeout(() => { span.style.opacity = '1'; }, finL1 + i * VELOCIDAD);
+  });
+
+  const finEscritura = finL1 + l2.length * VELOCIDAD;
+
+  // Apagar cursor
+  setTimeout(() => {
+    const c = document.getElementById('cursor');
+    c.style.animation = 'none';
+    c.style.opacity = '0';
+  }, finEscritura + 500);
+
+  // Fade out
+  setTimeout(() => {
+    document.getElementById('scene').classList.add('out');
+  }, finEscritura + DURACION_VISIBLE);
+</script>
+</body>
+</html>

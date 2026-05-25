@@ -1,0 +1,299 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<style>
+  body:not(.fonts-loaded) * { animation-play-state: paused !important; transition: none !important; }
+</style>
+<script>
+  document.fonts.ready.then(() => {
+    setTimeout(() => { document.body.classList.add("fonts-loaded"); }, 1500);
+  });
+</script>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=1280, height=720">
+<title>anim_l1_an16 — Lo que parecía falta de comunicación</title>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@1,400;1,600&family=Playfair+Display:wght@700;900&display=swap" rel="stylesheet">
+<style>
+* { margin:0; padding:0; box-sizing:border-box; }
+body { width:1280px; height:720px; overflow:hidden; }
+
+.pizarra {
+  width:1280px; height:720px; position:relative; overflow:hidden;
+  background:#F0E8D5;
+  background-image:
+    linear-gradient(rgba(160,135,90,.18) 1px,transparent 1px),
+    linear-gradient(90deg,rgba(160,135,90,.18) 1px,transparent 1px);
+  background-size:56px 56px;
+}
+.pizarra::before {
+  content:''; position:absolute; left:0;top:0;bottom:0; width:7px;
+  background:linear-gradient(180deg,#3D0C11,#6B1A2A,#3D0C11); z-index:30;
+}
+.pizarra::after {
+  content:''; position:absolute; top:0;left:0;right:0; height:4px;
+  background:linear-gradient(90deg,#6B1A2A,#E8C870,#D4A843,#E8C870,#6B1A2A); z-index:30;
+}
+
+.slide {
+  position:absolute; inset:0;
+  display:flex; align-items:center; justify-content:center;
+  opacity:0; pointer-events:none;
+}
+
+/* ════ S0: Apertura ════ */
+#s0 { flex-direction:column; animation:sShow .01s .2s forwards; }
+@keyframes sShow { to{opacity:1} }
+
+.s0-label {
+  font-family:'Cormorant Garamond',serif; font-style:italic;
+  font-size:38px; color:#8B2D3F;
+  opacity:0; animation:fadeUp .5s .4s forwards;
+}
+.s0-titulo {
+  font-family:'Playfair Display',serif; font-weight:900;
+  font-size:92px; color:#3D0C11; line-height:.9; text-align:center;
+  opacity:0; animation:fadeUp .6s .8s forwards;
+}
+.s0-titulo span { color:#6B1A2A; display:block; font-size:76px; }
+.s0-linea {
+  width:0; height:5px; margin-top:18px;
+  background:linear-gradient(90deg,#E8C870,#D4A843);
+  box-shadow:0 0 20px rgba(232,200,112,.7);
+  animation:lineGrow .8s ease-out 1.3s forwards;
+}
+@keyframes lineGrow { to{width:720px} }
+@keyframes fadeUp { to{opacity:1;transform:translateY(0)} }
+
+/* ── Tarjeta genérica ── */
+.card {
+  position:absolute;
+  border-radius:16px;
+  box-shadow:0 24px 80px rgba(61,12,17,.35), 0 6px 20px rgba(61,12,17,.15);
+  transform:translateY(820px); opacity:0;
+}
+
+/* ════ S1: SE ESCUCHABAN — pero no se entendían ════ */
+#s1 { animation:sShow .01s 2.3s forwards; }
+#c1 {
+  width:1180px; height:600px;
+  background:linear-gradient(145deg,#3D0C11 0%,#1a0608 100%);
+  border:1px solid rgba(232,200,112,.15);
+  display:flex; align-items:center; justify-content:center;
+  flex-direction:column; gap:10px; padding:40px 70px; text-align:center;
+  animation:cardIn .7s cubic-bezier(.2,0,.1,1) 2.3s forwards;
+}
+@keyframes cardIn {
+  0%  { opacity:1; transform:translateY(820px); }
+  70% { transform:translateY(-18px); }
+  100%{ transform:translateY(0); opacity:1; }
+}
+.c1-label {
+  font-family:'Cormorant Garamond',serif; font-style:italic;
+  font-size:44px; color:#C97080;
+  opacity:0; animation:fadeUp .4s 2.9s forwards;
+}
+.c1-big {
+  font-family:'Playfair Display',serif; font-weight:900;
+  font-size:168px; color:#F9F3E8; line-height:.82;
+  opacity:0; animation:fadeUp .5s 3.2s forwards;
+}
+.c1-big span { color:#C97080; font-size:80px; display:block; line-height:1.1; }
+.c1-sub {
+  font-family:'Cormorant Garamond',serif; font-style:italic;
+  font-size:50px; color:rgba(249,243,232,.55); margin-top:8px;
+  opacity:0; animation:fadeUp .4s 3.7s forwards;
+}
+/* Check */
+.check {
+  position:absolute; bottom:24px; right:36px;
+  opacity:0;
+}
+.check svg { width:52px; height:52px; }
+.check path { stroke-dasharray:80; stroke-dashoffset:80; }
+#c1 .check { animation:fadeUp .4s 4.2s forwards; }
+#c1 .check path { animation:drawCheck .6s ease-out 4.3s forwards; }
+@keyframes drawCheck { to{stroke-dashoffset:0} }
+
+/* ════ S2: DOS DICCIONARIOS ════ */
+#s2 { animation:sShow .01s 5.8s forwards; }
+#c2 {
+  width:1180px; height:620px;
+  background:linear-gradient(145deg,#2D0810 0%,#6B1A2A 100%);
+  border:1px solid rgba(232,200,112,.2);
+  display:flex; flex-direction:row; overflow:hidden;
+  animation:cardIn2 .7s cubic-bezier(.2,0,.1,1) 5.8s forwards;
+}
+@keyframes cardIn2 {
+  0%  { opacity:1; transform:translateY(820px); }
+  70% { transform:translateY(-18px); }
+  100%{ transform:translateY(0); opacity:1; }
+}
+
+/* Libro izquierda */
+.libro {
+  width:300px; display:flex; align-items:center; justify-content:center;
+  border-right:2px solid rgba(232,200,112,.2); flex-shrink:0;
+  opacity:0; animation:fadeUp .5s 6.4s forwards;
+}
+.libro svg { width:180px; height:220px; }
+
+.c2-content {
+  flex:1; display:flex; flex-direction:column;
+  align-items:flex-start; justify-content:center; padding:40px 50px;
+}
+.c2-label {
+  font-family:'Cormorant Garamond',serif; font-style:italic;
+  font-size:42px; color:#C97080; margin-bottom:8px;
+  opacity:0; animation:fadeUp .4s 6.2s forwards;
+}
+.c2-big {
+  font-family:'Playfair Display',serif; font-weight:900;
+  font-size:136px; color:#F9F3E8; line-height:.85;
+  opacity:0; animation:fadeUp .5s 6.5s forwards;
+}
+.c2-big em { color:#E8C870; font-style:normal; font-size:96px; display:block; }
+.c2-sub {
+  font-family:'Cormorant Garamond',serif; font-style:italic;
+  font-size:48px; color:rgba(249,243,232,.6); margin-top:12px;
+  opacity:0; animation:fadeUp .4s 7.0s forwards;
+}
+#c2 .check { animation:fadeUp .4s 7.5s forwards; }
+#c2 .check path { animation:drawCheck .6s ease-out 7.6s forwards; }
+
+/* ════ S3: PALABRAS IGUALES / SIGNIFICADOS DISTINTOS ════ */
+#s3 { animation:sShow .01s 9.2s forwards; }
+#c3 {
+  width:1180px; height:620px;
+  background:#0F0A0B;
+  border:2px solid rgba(232,200,112,.2);
+  display:flex; flex-direction:column;
+  align-items:center; justify-content:center; gap:0; padding:36px 60px;
+  animation:cardIn3 .7s cubic-bezier(.2,0,.1,1) 9.2s forwards;
+}
+@keyframes cardIn3 {
+  0%  { opacity:1; transform:translateY(820px); }
+  70% { transform:translateY(-18px); }
+  100%{ transform:translateY(0); opacity:1; }
+}
+
+.c3-label {
+  font-family:'Cormorant Garamond',serif; font-style:italic;
+  font-size:40px; color:#C97080; margin-bottom:14px;
+  opacity:0; animation:fadeUp .4s 9.8s forwards;
+}
+
+/* Fila de palabra con sus dos versiones */
+.palabra-row {
+  display:flex; align-items:center; gap:0; width:100%; margin-bottom:16px;
+  opacity:0;
+}
+.palabra-row:nth-child(2) { animation:fadeUp .4s 10.1s forwards; }
+.palabra-row:nth-child(3) { animation:fadeUp .4s 10.7s forwards; }
+.palabra-row:nth-child(4) { animation:fadeUp .4s 11.3s forwards; }
+
+.pw-centro {
+  font-family:'Playfair Display',serif; font-weight:900;
+  font-size:100px; color:#F9F3E8; line-height:1; flex-shrink:0; width:480px;
+  text-align:center;
+}
+.pw-el, .pw-ella {
+  flex:1; font-family:'Cormorant Garamond',serif; font-style:italic;
+  font-size:40px; line-height:1.25;
+}
+.pw-el { color:#C97080; text-align:right; padding-right:28px; }
+.pw-ella { color:#E8C870; text-align:left; padding-left:28px; }
+
+.sep-v {
+  width:1px; height:100%; background:rgba(232,200,112,.2);
+  margin:0 4px; align-self:stretch; flex-shrink:0;
+}
+
+#c3 .check { animation:fadeUp .4s 11.9s forwards; }
+#c3 .check path { animation:drawCheck .6s ease-out 12.0s forwards; }
+</style>
+</head>
+<body>
+<div class="pizarra">
+
+  <!-- ── S0: Apertura ── -->
+  <div class="slide" id="s0">
+    <span class="s0-label">Lo que parecía →</span>
+    <p class="s0-titulo">FALTA DE<span>COMUNICACIÓN</span></p>
+    <div class="s0-linea"></div>
+  </div>
+
+  <!-- ── S1: Se escuchaban ── -->
+  <div class="slide" id="s1">
+    <div class="card" id="c1">
+      <p class="c1-label">la realidad</p>
+      <p class="c1-big">SE ESCUCHABAN<span>No se entendían.</span></p>
+      <p class="c1-sub">No porque no quisieran.</p>
+      <div class="check">
+        <svg viewBox="0 0 52 52"><path d="M12 26 L22 38 L40 16" stroke="#E8C870" stroke-width="4" stroke-linecap="round" stroke-linejoin="round" fill="none"/></svg>
+      </div>
+    </div>
+  </div>
+
+  <!-- ── S2: Dos diccionarios ── -->
+  <div class="slide" id="s2">
+    <div class="card" id="c2">
+      <div class="libro">
+        <!-- Ícono dos libros / cerebros / diccionarios -->
+        <svg viewBox="0 0 180 220">
+          <!-- Libro 1 (él) -->
+          <rect x="10" y="30" width="70" height="90" rx="5" fill="none" stroke="#C97080" stroke-width="2.5" stroke-dasharray="320" stroke-dashoffset="320" style="animation:drawCheck .8s ease-out 6.6s forwards"/>
+          <line x1="10" y1="30" x2="10" y2="120" stroke="#C97080" stroke-width="6" stroke-linecap="round" opacity="0" style="animation:fadeUp .3s 6.8s forwards"/>
+          <text x="45" y="82" font-family="Georgia" font-size="28" fill="#C97080" text-anchor="middle" opacity="0" style="animation:fadeUp .3s 7.0s forwards">él</text>
+
+          <!-- Libro 2 (ella) -->
+          <rect x="100" y="100" width="70" height="90" rx="5" fill="none" stroke="#E8C870" stroke-width="2.5" stroke-dasharray="320" stroke-dashoffset="320" style="animation:drawCheck .8s ease-out 6.9s forwards"/>
+          <line x1="170" y1="100" x2="170" y2="190" stroke="#E8C870" stroke-width="6" stroke-linecap="round" opacity="0" style="animation:fadeUp .3s 7.1s forwards"/>
+          <text x="135" y="152" font-family="Georgia" font-size="28" fill="#E8C870" text-anchor="middle" opacity="0" style="animation:fadeUp .3s 7.3s forwards">ella</text>
+
+          <!-- Flecha de desconexión -->
+          <path d="M82 90 Q95 90 95 105 Q95 118 110 118" stroke="rgba(201,112,128,.5)" stroke-width="2" fill="none" stroke-dasharray="50" stroke-dashoffset="50" style="animation:drawCheck .5s ease-out 7.4s forwards"/>
+          <line x1="104" y1="112" x2="115" y2="118" stroke="rgba(201,112,128,.5)" stroke-width="2" opacity="0" style="animation:fadeUp .2s 7.9s forwards"/>
+          <line x1="104" y1="124" x2="115" y2="118" stroke="rgba(201,112,128,.5)" stroke-width="2" opacity="0" style="animation:fadeUp .2s 7.9s forwards"/>
+        </svg>
+      </div>
+      <div class="c2-content">
+        <p class="c2-label">el problema era</p>
+        <p class="c2-big">DOS<em>DICCIONARIOS</em></p>
+        <p class="c2-sub">Mismo vocabulario.<br>Distinto significado.</p>
+      </div>
+      <div class="check">
+        <svg viewBox="0 0 52 52"><path d="M12 26 L22 38 L40 16" stroke="#E8C870" stroke-width="4" stroke-linecap="round" stroke-linejoin="round" fill="none"/></svg>
+      </div>
+    </div>
+  </div>
+
+  <!-- ── S3: Palabras iguales / significados distintos ── -->
+  <div class="slide" id="s3">
+    <div class="card" id="c3">
+      <p class="c3-label">La misma palabra — dos mundos distintos</p>
+
+      <div class="palabra-row">
+        <span class="pw-el">autonomía,<br>no molestarme</span>
+        <div class="sep-v"></div>
+        <span class="pw-centro">RESPETO</span>
+        <div class="sep-v"></div>
+        <span class="pw-ella">reconocimiento,<br>que me vean</span>
+      </div>
+
+      <div class="palabra-row">
+        <span class="pw-el">resolver<br>el problema</span>
+        <div class="sep-v"></div>
+        <span class="pw-centro">APOYO</span>
+        <div class="sep-v"></div>
+        <span class="pw-ella">que me<br>escuches</span>
+      </div>
+
+      <div class="check">
+        <svg viewBox="0 0 52 52"><path d="M12 26 L22 38 L40 16" stroke="#E8C870" stroke-width="4" stroke-linecap="round" stroke-linejoin="round" fill="none"/></svg>
+      </div>
+    </div>
+  </div>
+
+</div>
+</body>
+</html>

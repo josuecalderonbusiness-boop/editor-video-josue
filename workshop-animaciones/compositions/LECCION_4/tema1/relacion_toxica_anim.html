@@ -1,0 +1,233 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=1280, height=720">
+<title>Relación tóxica</title>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,700;0,900;1,400;1,900&family=Cormorant+Garamond:ital,wght@1,300;1,400&display=swap" rel="stylesheet">
+<style>
+* { margin:0; padding:0; box-sizing:border-box; }
+body { width:1280px; height:720px; overflow:hidden; background:#0B0808; }
+
+.scene {
+  width:1280px; height:720px;
+  position:relative; display:flex; flex-direction:column;
+  align-items:center; justify-content:center;
+  opacity:0; animation:sceneIn .8s ease-out .2s forwards;
+}
+@keyframes sceneIn { to{opacity:1} }
+
+.bg-glow {
+  position:absolute; inset:0; pointer-events:none;
+  background:radial-gradient(ellipse at 50% 50%, rgba(130,20,20,.55) 0%, rgba(70,8,8,.3) 35%, transparent 65%);
+  animation:pulseGlow 3.2s ease-in-out infinite;
+}
+@keyframes pulseGlow { 0%,100%{opacity:.7;transform:scale(1)} 50%{opacity:1;transform:scale(1.05)} }
+
+.main-word {
+  font-family:'Playfair Display',serif;
+  font-weight:900;
+  font-size:168px;
+  line-height:.92;
+  text-align:center;
+  color:#D94040;
+  position:relative;
+  z-index:2;
+  text-shadow:
+    0 0 20px rgba(220,50,50,1),
+    0 0 60px rgba(200,30,30,.9),
+    0 0 120px rgba(180,20,20,.6);
+  animation:toxicPulse 2.2s ease-in-out infinite;
+  letter-spacing:-0.02em;
+}
+.comillas-open {
+  font-size:90px; vertical-align:top; line-height:1;
+  opacity:.7; margin-right:4px;
+}
+.comillas-close {
+  font-size:90px; vertical-align:bottom; line-height:0;
+  opacity:.7; margin-left:4px;
+}
+@keyframes toxicPulse {
+  0%,100%{text-shadow:0 0 20px rgba(220,50,50,1),0 0 60px rgba(200,30,30,.9),0 0 120px rgba(180,20,20,.6)}
+  50%{text-shadow:0 0 40px rgba(255,80,80,1),0 0 100px rgba(220,50,50,1),0 0 200px rgba(200,30,30,.7)}
+}
+
+.word-wrap {
+  position:relative;
+  display:inline-block;
+}
+
+.tacho-svg {
+  position:absolute;
+  top:50%; left:-10px;
+  transform:translateY(-50%);
+  width:calc(100% + 20px);
+  height:60px;
+  pointer-events:none;
+  z-index:10;
+  opacity:0;
+}
+.tacho-path {
+  stroke:#1a0a0a;
+  stroke-width:52;
+  stroke-linecap:round;
+  fill:none;
+  stroke-dasharray:1200;
+  stroke-dashoffset:1200;
+}
+
+.phrase-wrap {
+  position:absolute;
+  top:0; left:0; right:0; bottom:0;
+  display:flex;
+  flex-direction:column;
+  align-items:center;
+  justify-content:center;
+  z-index:5;
+  opacity:0;
+}
+
+.phrase-line1 {
+  font-family:'Cormorant Garamond',serif;
+  font-style:italic;
+  font-size:64px;
+  font-weight:400;
+  color:rgba(249,243,232,.85);
+  line-height:1.1;
+  text-align:center;
+  letter-spacing:.02em;
+}
+
+.phrase-line2 {
+  font-family:'Playfair Display',serif;
+  font-weight:900;
+  font-style:italic;
+  font-size:140px;
+  color:#E8C870;
+  line-height:.92;
+  text-align:center;
+  opacity:0;
+  transform:scale(.85);
+  text-shadow:0 0 30px rgba(232,200,112,.6),0 0 70px rgba(232,200,112,.3);
+  animation:none;
+}
+
+.char { display:inline; opacity:0; }
+
+@keyframes goldPulse {
+  0%,100%{text-shadow:0 0 30px rgba(232,200,112,.6),0 0 70px rgba(232,200,112,.3)}
+  50%{text-shadow:0 0 60px rgba(255,248,160,1),0 0 130px rgba(232,200,112,.9),0 0 200px rgba(220,180,60,.5)}
+}
+
+.bg-glow2 {
+  position:absolute; inset:0; pointer-events:none;
+  background:radial-gradient(ellipse at 50% 50%, rgba(50,35,5,.6) 0%, rgba(25,18,3,.3) 38%, transparent 65%);
+  opacity:0;
+  animation:none;
+}
+@keyframes glowIn { to{opacity:1} }
+@keyframes glowPulse2 { 0%,100%{opacity:.7;transform:scale(1)} 50%{opacity:1;transform:scale(1.05)} }
+</style>
+</head>
+<body>
+<div class="scene" id="scene">
+  <div class="bg-glow" id="bgGlow1"></div>
+  <div class="bg-glow2" id="bgGlow2"></div>
+
+  <div id="toxicBlock" style="position:relative;z-index:2;text-align:center;">
+    <div class="main-word">
+      <span class="comillas-open">&#8220;</span><span class="word-wrap" id="wrapLine1">relación</span><br>
+      <span class="word-wrap" id="wrapLine2">tóxica<span class="comillas-close">&#8221;</span></span>
+    </div>
+    <svg class="tacho-svg" id="tacho1" viewBox="0 0 900 60" preserveAspectRatio="none" xmlns="http://www.w3.org/2000/svg">
+      <path class="tacho-path" id="tachoPath1" d="M8 38 Q225 20 450 32 Q675 44 892 22"/>
+    </svg>
+    <svg class="tacho-svg" id="tacho2" viewBox="0 0 900 60" preserveAspectRatio="none" xmlns="http://www.w3.org/2000/svg">
+      <path class="tacho-path" id="tachoPath2" d="M8 22 Q225 44 450 28 Q675 12 892 38"/>
+    </svg>
+  </div>
+
+  <div class="phrase-wrap" id="phraseWrap">
+    <p class="phrase-line1" id="phraseLine1"></p>
+    <p class="phrase-line2" id="phraseLine2">fuerza</p>
+  </div>
+</div>
+
+<script>
+const DURACION = 16000;
+
+function drawTacho(pathEl, svgEl, delay, dur) {
+  setTimeout(() => {
+    svgEl.style.opacity = '1';
+    pathEl.style.transition = `stroke-dashoffset ${dur}ms cubic-bezier(.4,0,.2,1)`;
+    pathEl.style.strokeDashoffset = '0';
+  }, delay);
+}
+
+function fadeToxic(delay) {
+  setTimeout(() => {
+    const block = document.getElementById('toxicBlock');
+    block.style.transition = 'opacity 1.1s ease-out';
+    block.style.opacity = '0';
+    const bg1 = document.getElementById('bgGlow1');
+    bg1.style.transition = 'opacity 1.1s ease-out';
+    bg1.style.opacity = '0';
+  }, delay);
+}
+
+function buildPhrase(delay) {
+  const line1text = "dónde se está poniendo la";
+  const l1 = document.getElementById('phraseLine1');
+  l1.innerHTML = '';
+  [...line1text].forEach(ch => {
+    const s = document.createElement('span');
+    s.className = 'char';
+    s.textContent = ch;
+    l1.appendChild(s);
+  });
+  const chars = l1.querySelectorAll('.char');
+
+  setTimeout(() => {
+    const bg2 = document.getElementById('bgGlow2');
+    bg2.style.animation = 'glowIn .9s ease-out forwards, glowPulse2 3s ease-in-out 1s infinite';
+
+    const wrap = document.getElementById('phraseWrap');
+    wrap.style.transition = 'opacity .01s';
+    wrap.style.opacity = '1';
+
+    let t = 0;
+    const MS = 62;
+    chars.forEach((ch, i) => {
+      setTimeout(() => {
+        ch.style.transition = 'opacity .18s ease';
+        ch.style.opacity = '1';
+      }, t);
+      t += MS;
+    });
+
+    setTimeout(() => {
+      const l2 = document.getElementById('phraseLine2');
+      l2.style.transition = 'opacity .55s cubic-bezier(.2,0,.1,1), transform .55s cubic-bezier(.2,0,.1,1.4)';
+      l2.style.opacity = '1';
+      l2.style.transform = 'scale(1)';
+      setTimeout(() => {
+        l2.style.animation = 'goldPulse 2.2s ease-in-out infinite';
+      }, 600);
+    }, t + 200);
+
+  }, delay);
+}
+
+drawTacho(document.getElementById('tachoPath1'), document.getElementById('tacho1'), 2200, 600);
+drawTacho(document.getElementById('tachoPath2'), document.getElementById('tacho2'), 2700, 550);
+fadeToxic(3600);
+buildPhrase(4500);
+
+setTimeout(() => {
+  document.getElementById('scene').style.transition = 'opacity .9s ease-in';
+  document.getElementById('scene').style.opacity = '0';
+}, DURACION);
+</script>
+</body>
+</html>

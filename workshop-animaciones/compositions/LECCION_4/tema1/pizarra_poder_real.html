@@ -1,0 +1,369 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<style>
+  body:not(.fonts-loaded) * { animation-play-state: paused !important; transition: none !important; }
+</style>
+<script>
+  document.fonts.ready.then(() => {
+    setTimeout(() => { document.body.classList.add("fonts-loaded"); }, 1500);
+  });
+</script>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=1280, height=720">
+<title>PIZARRA — Mi verdadero poder</title>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,700;1,400;1,600;1,700&family=Playfair+Display:ital,wght@0,900;1,700&display=swap" rel="stylesheet">
+<style>
+  * { margin:0; padding:0; box-sizing:border-box; }
+  body { width:1280px; height:720px; overflow:hidden; }
+
+  /* ── Pizarra beige base ── */
+  .pizarra {
+    position:absolute; inset:0;
+    background:#F0E8D5;
+    background-image:
+      linear-gradient(rgba(139,100,60,.12) 1px, transparent 1px),
+      linear-gradient(90deg,rgba(139,100,60,.12) 1px, transparent 1px);
+    background-size:56px 56px;
+  }
+  /* barra izquierda borgoña */
+  .pizarra::before {
+    content:''; position:absolute; left:0; top:0; bottom:0;
+    width:8px;
+    background:linear-gradient(180deg,#3D0C11,#6B1A2A,#3D0C11);
+  }
+  /* barra superior dorada/borgoña */
+  .pizarra::after {
+    content:''; position:absolute; top:0; left:0; right:0; height:4px;
+    background:linear-gradient(90deg,#6B1A2A,#E8C870,#E8C870,#6B1A2A);
+  }
+
+  /* ── Layout principal ── */
+  .layout {
+    position:absolute; inset:0;
+    display:flex; align-items:center;
+    padding:40px 48px 40px 60px;
+    gap:0;
+  }
+
+  /* ── Columna izquierda: texto ── */
+  .col-texto {
+    flex:1;
+    display:flex; flex-direction:column;
+    justify-content:center;
+    padding-right:40px;
+    border-right: 2px solid rgba(107,26,42,.18);
+  }
+
+  /* Líneas de texto */
+  .linea {
+    font-family: 'Cormorant Garamond', Georgia, serif;
+    font-style: italic;
+    font-size: 46px;
+    color: #3D0C11;
+    line-height: 1.22;
+    margin-bottom: 6px;
+    min-height: 56px;
+  }
+  /* palabras en mayúscula con énfasis */
+  .linea .enfasis {
+    font-family: 'Cormorant Garamond', Georgia, serif;
+    font-style: italic;
+    font-weight: 700;
+    color: #6B1A2A;
+  }
+  /* remate — frase final grande dorada */
+  .linea-remate {
+    font-family: 'Playfair Display', Georgia, serif;
+    font-weight: 900;
+    font-style: italic;
+    font-size: 52px;
+    color: #B8892A;
+    line-height: 1.15;
+    margin-top: 10px;
+    text-shadow: 0 2px 12px rgba(184,137,42,.25);
+  }
+
+  /* cursor tipo máquina de escribir */
+  .cursor-blink {
+    display:inline-block;
+    width:3px; height:.85em;
+    background:#6B1A2A;
+    vertical-align:middle;
+    margin-left:2px;
+    animation:cursorBlink .55s step-end infinite;
+  }
+  @keyframes cursorBlink { 0%,100%{opacity:1} 50%{opacity:0} }
+
+  /* ── Columna derecha: círculo con ella ── */
+  .col-circulo {
+    width:380px;
+    display:flex; flex-direction:column;
+    align-items:center; justify-content:center;
+    padding-left:30px;
+    opacity:0;
+  }
+
+  /* título encima del círculo */
+  .circulo-label {
+    font-family:'Cormorant Garamond', Georgia, serif;
+    font-style:italic; font-weight:700;
+    font-size:28px; color:#B8892A;
+    letter-spacing:0.06em;
+    text-align:center;
+    margin-bottom:14px;
+    text-shadow:0 0 20px rgba(184,137,42,.4);
+    opacity:0;
+  }
+
+  /* Fade in genérico */
+  @keyframes fadeIn { from{opacity:0} to{opacity:1} }
+  @keyframes sceneOut { to{opacity:0} }
+  .scene.out { animation:sceneOut 1s ease-in forwards; }
+</style>
+</head>
+<body>
+<div class="pizarra"></div>
+
+<div class="layout" id="scene">
+
+  <!-- ── COLUMNA IZQUIERDA: texto aparece letra a letra ── -->
+  <div class="col-texto">
+    <div class="linea" id="l1"></div>
+    <div class="linea" id="l2"></div>
+    <div class="linea" id="l3"></div>
+    <div class="linea" id="l4"></div>
+    <div class="linea-remate" id="l5" style="opacity:0;"></div>
+  </div>
+
+  <!-- ── COLUMNA DERECHA: círculo dorado con ella ── -->
+  <div class="col-circulo" id="col-circulo">
+    <div class="circulo-label" id="circulo-label">MI PUNTO DE<br>INFLUENCIA REAL</div>
+    <svg width="300" height="300" viewBox="0 0 300 300" xmlns="http://www.w3.org/2000/svg">
+      <defs>
+        <filter id="glow-gold-piz" x="-50%" y="-50%" width="200%" height="200%">
+          <feGaussianBlur stdDeviation="8" result="blur"/>
+          <feMerge><feMergeNode in="blur"/><feMergeNode in="SourceGraphic"/></feMerge>
+        </filter>
+        <filter id="glow-cream-piz" x="-80%" y="-80%" width="260%" height="260%">
+          <feGaussianBlur stdDeviation="10" result="blur"/>
+          <feMerge><feMergeNode in="blur"/><feMergeNode in="SourceGraphic"/></feMerge>
+        </filter>
+      </defs>
+
+      <!-- Círculo dorado — se dibuja -->
+      <circle id="circulo-svg" cx="150" cy="150" r="128"
+        fill="rgba(232,200,112,0.06)"
+        stroke="#E8C870" stroke-width="8"
+        filter="url(#glow-gold-piz)"
+        stroke-dasharray="804" stroke-dashoffset="804"/>
+
+      <!-- Halo pulsante interior -->
+      <circle cx="150" cy="150" r="108"
+        fill="none" stroke="rgba(232,200,112,0.18)" stroke-width="2"
+        id="halo-inner" opacity="0"/>
+
+      <!-- Rayos de la estrella -->
+      <g id="rayos-ella" opacity="0">
+        <line x1="150" y1="92"  x2="150" y2="72"  stroke="#3D0C11" stroke-width="3.5" stroke-linecap="round"/>
+        <line x1="150" y1="200" x2="150" y2="220" stroke="#3D0C11" stroke-width="3.5" stroke-linecap="round"/>
+        <line x1="92"  y1="150" x2="72"  y2="150" stroke="#3D0C11" stroke-width="3.5" stroke-linecap="round"/>
+        <line x1="208" y1="150" x2="228" y2="150" stroke="#3D0C11" stroke-width="3.5" stroke-linecap="round"/>
+        <line x1="109" y1="109" x2="95"  y2="95"  stroke="#3D0C11" stroke-width="3.5" stroke-linecap="round"/>
+        <line x1="191" y1="109" x2="205" y2="95"  stroke="#3D0C11" stroke-width="3.5" stroke-linecap="round"/>
+        <line x1="109" y1="191" x2="95"  y2="205" stroke="#3D0C11" stroke-width="3.5" stroke-linecap="round"/>
+        <line x1="191" y1="191" x2="205" y2="205" stroke="#3D0C11" stroke-width="3.5" stroke-linecap="round"/>
+      </g>
+
+      <!-- Estrella -->
+      <polygon id="estrella" opacity="0"
+        points="150,102 158,122 180,122 164,134 170,154 150,142 130,154 136,134 120,122 142,122"
+        fill="#3D0C11" filter="url(#glow-cream-piz)"/>
+
+      <!-- Silueta femenina -->
+      <g id="silueta" opacity="0">
+        <circle cx="150" cy="168" r="10" fill="#3D0C11"/>
+        <line x1="150" y1="178" x2="150" y2="196" stroke="#3D0C11" stroke-width="4.5" stroke-linecap="round"/>
+        <line x1="137" y1="185" x2="163" y2="185" stroke="#3D0C11" stroke-width="3.5" stroke-linecap="round"/>
+        <line x1="150" y1="196" x2="142" y2="210" stroke="#3D0C11" stroke-width="3.5" stroke-linecap="round"/>
+        <line x1="150" y1="196" x2="158" y2="210" stroke="#3D0C11" stroke-width="3.5" stroke-linecap="round"/>
+      </g>
+
+      <!-- Halo alrededor de ella pulsante -->
+      <circle cx="150" cy="178" r="38" fill="none"
+        stroke="rgba(61,12,17,0.20)" stroke-width="2"
+        id="halo-ella" opacity="0"/>
+    </svg>
+  </div>
+
+</div>
+
+<script>
+// ── Contenido de las líneas ─────────────────────────────────────────
+// Formato: array de segmentos { texto, esEnfasis }
+// Las palabras en mayúscula van con la clase .enfasis
+const LINEAS = [
+  // línea 1
+  [
+    {t:"Si no ", e:false},
+    {t:"TENGO", e:true},
+    {t:" el poder de cambiarlo a él,", e:false},
+  ],
+  // línea 2
+  [
+    {t:"tampoco ", e:false},
+    {t:"TENGO", e:true},
+    {t:" esa responsabilidad.", e:false},
+  ],
+  // línea 3
+  [
+    {t:"Y si no la ", e:false},
+    {t:"TENGO", e:true},
+    {t:"... ¿qué ", e:false},
+    {t:"ME", e:true},
+    {t:" queda?", e:false},
+  ],
+  // línea 4
+  [
+    {t:"MI", e:true},
+    {t:" verdadero poder.", e:false},
+  ],
+];
+
+const REMATE = "MI punto de influencia real.";
+
+// ── Velocidades ─────────────────────────────────────────────────────
+const VEL_NORMAL  = 38;   // ms por carácter — normal
+const VEL_ENFASIS = 55;   // más lento en palabras con énfasis
+const PAUSA_LINEA = 280;  // pausa entre líneas
+const PAUSA_REMATE = 500; // pausa antes del remate
+const INICIO_CIRCULO = 0; // el círculo empieza con la animación
+
+// ── Construye el HTML de una línea con spans por carácter ────────────
+function buildLineaHTML(segmentos) {
+  let html = '';
+  segmentos.forEach(seg => {
+    const cls = seg.e ? 'enfasis' : '';
+    seg.t.split('').forEach(ch => {
+      const char = ch === ' ' ? '\u00A0' : ch;
+      html += `<span class="${cls}" style="opacity:0">${char}</span>`;
+    });
+  });
+  return html;
+}
+
+// ── Escribe los caracteres con animación ─────────────────────────────
+function escribirLinea(el, segmentos, onDone) {
+  el.innerHTML = buildLineaHTML(segmentos);
+  const spans = el.querySelectorAll('span');
+  let t = 0;
+  spans.forEach(span => {
+    const vel = span.classList.contains('enfasis') ? VEL_ENFASIS : VEL_NORMAL;
+    setTimeout(() => { span.style.opacity = '1'; }, t);
+    t += vel;
+  });
+  setTimeout(onDone, t);
+}
+
+// ── Secuencia principal ──────────────────────────────────────────────
+let t = 600; // delay inicial
+
+LINEAS.forEach((segs, i) => {
+  setTimeout(() => {
+    const el = document.getElementById('l' + (i+1));
+    escribirLinea(el, segs, () => {});
+  }, t);
+  // calcular duración de esta línea para el siguiente delay
+  let chars = segs.reduce((acc, s) => acc + s.t.length, 0);
+  let longEnfasis = segs.filter(s=>s.e).reduce((acc,s)=>acc+s.t.length,0);
+  let durLinea = (chars - longEnfasis) * VEL_NORMAL + longEnfasis * VEL_ENFASIS;
+  t += durLinea + PAUSA_LINEA;
+});
+
+// ── Remate ───────────────────────────────────────────────────────────
+setTimeout(() => {
+  const el = document.getElementById('l5');
+  el.style.opacity = '1';
+  el.innerHTML = '';
+  let spans = REMATE.split('').map(ch => {
+    const sp = document.createElement('span');
+    sp.textContent = ch === ' ' ? '\u00A0' : ch;
+    sp.style.opacity = '0';
+    el.appendChild(sp);
+    return sp;
+  });
+  spans.forEach((sp, i) => {
+    setTimeout(() => { sp.style.opacity = '1'; }, i * VEL_NORMAL);
+  });
+}, t + PAUSA_REMATE);
+
+// ── Circulo aparece a los 2.5s ───────────────────────────────────────
+setTimeout(() => {
+  const col = document.getElementById('col-circulo');
+  col.animate([{opacity:0},{opacity:1}], {duration:700, fill:'forwards', easing:'ease-out'});
+
+  // label
+  setTimeout(() => {
+    const lbl = document.getElementById('circulo-label');
+    lbl.animate([{opacity:0},{opacity:1}], {duration:600, fill:'forwards'});
+  }, 200);
+
+  // círculo se dibuja
+  const circ = document.getElementById('circulo-svg');
+  circ.animate(
+    [{strokeDashoffset:804},{strokeDashoffset:0}],
+    {duration:1400, fill:'forwards', easing:'cubic-bezier(.4,0,.2,1)', delay:300}
+  );
+
+  // halo interior
+  setTimeout(() => {
+    document.getElementById('halo-inner').animate(
+      [{opacity:0},{opacity:1}], {duration:600, fill:'forwards'}
+    );
+  }, 800);
+
+  // rayos
+  setTimeout(() => {
+    document.getElementById('rayos-ella').animate(
+      [{opacity:0},{opacity:1}], {duration:400, fill:'forwards'}
+    );
+  }, 1100);
+
+  // estrella
+  setTimeout(() => {
+    document.getElementById('estrella').animate(
+      [{opacity:0},{opacity:1}], {duration:400, fill:'forwards'}
+    );
+  }, 1200);
+
+  // silueta
+  setTimeout(() => {
+    document.getElementById('silueta').animate(
+      [{opacity:0},{opacity:1}], {duration:400, fill:'forwards'}
+    );
+  }, 1350);
+
+  // halo pulsante de ella
+  setTimeout(() => {
+    const h = document.getElementById('halo-ella');
+    h.animate([{opacity:0},{opacity:1}], {duration:400, fill:'forwards'});
+    // pulso continuo
+    setInterval(() => {
+      h.animate([
+        {opacity:1, transform:'scale(1)'},
+        {opacity:0.3, transform:'scale(1.18)'},
+        {opacity:1, transform:'scale(1)'}
+      ], {duration:2200, easing:'ease-in-out'});
+    }, 2200);
+  }, 1500);
+
+}, 2500);
+
+// ── Fade out ─────────────────────────────────────────────────────────
+const DURACION_MS = 13000;
+setTimeout(() => {
+  document.getElementById('scene').classList.add('out');
+}, DURACION_MS);
+</script>
+</body>
+</html>

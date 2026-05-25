@@ -1,0 +1,10 @@
+﻿flask==3.0.3
+openai==2.33.0
+moviepy>=2.0.0
+numpy
+pillow
+python-dotenv
+google-auth
+google-auth-oauthlib
+google-api-python-client
+pyannote.audio

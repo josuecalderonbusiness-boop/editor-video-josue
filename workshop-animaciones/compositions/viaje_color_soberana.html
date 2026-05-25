@@ -1,0 +1,385 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<title>Viaje del Color — Código Soberana Workshop</title>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,700;0,900;1,700&family=Inter:wght@300;400;500&family=Cormorant+Garamond:ital,wght@1,400&display=swap" rel="stylesheet">
+<style>
+* { margin:0; padding:0; box-sizing:border-box; }
+body {
+  background: #0F0A0B;
+  min-height: 100vh;
+  padding: 60px 80px;
+  font-family: 'Inter', sans-serif;
+}
+
+h1 {
+  font-family: 'Playfair Display', serif;
+  font-weight: 900;
+  font-size: 28px;
+  color: #F9F3E8;
+  margin-bottom: 6px;
+  letter-spacing: 0.5px;
+}
+.subtitle {
+  font-family: 'Cormorant Garamond', serif;
+  font-style: italic;
+  font-size: 18px;
+  color: #E8C870;
+  margin-bottom: 50px;
+  letter-spacing: 1px;
+}
+
+/* Fases */
+.fase-label {
+  font-family: 'Inter', sans-serif;
+  font-weight: 300;
+  font-size: 11px;
+  letter-spacing: 5px;
+  text-transform: uppercase;
+  color: #4A3038;
+  margin-bottom: 16px;
+  padding-left: 4px;
+}
+
+.lecciones { display: flex; flex-direction: column; gap: 0; }
+
+.leccion-row {
+  display: flex;
+  align-items: stretch;
+  gap: 0;
+  margin-bottom: 3px;
+  border-radius: 6px;
+  overflow: hidden;
+}
+
+/* Bloque de color izquierdo */
+.color-block {
+  width: 220px;
+  flex-shrink: 0;
+  padding: 20px 24px;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  gap: 6px;
+  position: relative;
+}
+
+.color-block::after {
+  content: '';
+  position: absolute;
+  right: 0; top: 20%; bottom: 20%;
+  width: 1px;
+  background: rgba(255,255,255,0.08);
+}
+
+.l-num {
+  font-family: 'Inter', sans-serif;
+  font-weight: 300;
+  font-size: 11px;
+  letter-spacing: 4px;
+  text-transform: uppercase;
+  opacity: 0.6;
+}
+
+.l-hex {
+  font-family: 'Inter', sans-serif;
+  font-weight: 400;
+  font-size: 15px;
+  letter-spacing: 1px;
+  font-variant-numeric: tabular-nums;
+}
+
+.l-nombre-color {
+  font-family: 'Inter', sans-serif;
+  font-weight: 300;
+  font-size: 11px;
+  opacity: 0.55;
+  margin-top: 2px;
+}
+
+/* Info derecha */
+.info-block {
+  flex: 1;
+  padding: 20px 28px;
+  background: rgba(255,255,255,0.03);
+  border: 0.5px solid rgba(255,255,255,0.06);
+  border-left: none;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  gap: 4px;
+}
+
+.l-titulo {
+  font-family: 'Playfair Display', serif;
+  font-weight: 700;
+  font-size: 17px;
+  color: #F9F3E8;
+  line-height: 1.3;
+}
+
+.l-descripcion {
+  font-family: 'Inter', sans-serif;
+  font-weight: 300;
+  font-size: 12px;
+  color: rgba(249,243,232,0.4);
+  letter-spacing: 0.3px;
+}
+
+/* Flecha conectora */
+.arrow-row {
+  display: flex;
+  align-items: center;
+  padding: 0 0 0 106px;
+  height: 14px;
+  margin-bottom: 0;
+}
+.arrow-line {
+  width: 1px;
+  height: 14px;
+  background: rgba(255,255,255,0.1);
+}
+
+/* Separador de fase */
+.fase-sep {
+  margin: 28px 0 16px 0;
+  display: flex;
+  align-items: center;
+  gap: 14px;
+}
+.fase-sep-line {
+  flex: 1;
+  height: 1px;
+  background: rgba(255,255,255,0.06);
+}
+
+/* Leyenda inferior */
+.leyenda {
+  display: flex;
+  gap: 36px;
+  margin-top: 44px;
+  padding-top: 24px;
+  border-top: 0.5px solid rgba(255,255,255,0.08);
+  flex-wrap: wrap;
+}
+.ley-item {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+.ley-dot {
+  width: 28px;
+  height: 4px;
+  border-radius: 2px;
+  flex-shrink: 0;
+}
+.ley-texto {
+  font-family: 'Inter', sans-serif;
+  font-weight: 300;
+  font-size: 12px;
+  color: rgba(249,243,232,0.45);
+  letter-spacing: 0.3px;
+}
+
+/* Texto upsell especial en L9 */
+.upsell-badge {
+  display: inline-block;
+  font-family: 'Inter', sans-serif;
+  font-size: 10px;
+  font-weight: 500;
+  letter-spacing: 3px;
+  text-transform: uppercase;
+  padding: 3px 10px;
+  border-radius: 20px;
+  background: rgba(93,202,165,0.12);
+  color: #5DCAA5;
+  border: 0.5px solid rgba(93,202,165,0.25);
+  margin-top: 4px;
+  align-self: flex-start;
+}
+</style>
+</head>
+<body>
+
+<h1>Viaje del Color</h1>
+<div class="subtitle">Código Soberana · Workshop completo · 2026</div>
+
+<!-- FASE 1 -->
+<div class="fase-sep">
+  <div class="fase-label">Fase 1 — El problema</div>
+  <div class="fase-sep-line"></div>
+</div>
+
+<div class="lecciones">
+
+  <!-- L1 -->
+  <div class="leccion-row">
+    <div class="color-block" style="background:#3D0C11;">
+      <div class="l-num" style="color:#C97080;">Lección 01</div>
+      <div class="l-hex" style="color:#C97080;">#3D0C11</div>
+      <div class="l-nombre-color" style="color:#C97080;">Vino profundo</div>
+    </div>
+    <div class="info-block">
+      <div class="l-titulo">¿Qué es el Código Soberana?</div>
+      <div class="l-descripcion">El dolor · el punto de partida · la oscuridad máxima</div>
+    </div>
+  </div>
+
+  <div class="arrow-row"><div class="arrow-line"></div></div>
+
+  <!-- L2 -->
+  <div class="leccion-row">
+    <div class="color-block" style="background:#5A1220;">
+      <div class="l-num" style="color:#D4A843;">Lección 02</div>
+      <div class="l-hex" style="color:#D4A843;">#5A1220</div>
+      <div class="l-nombre-color" style="color:#D4A843;">Vino oscuro</div>
+    </div>
+    <div class="info-block">
+      <div class="l-titulo">La Trampa de la Entrega</div>
+      <div class="l-descripcion">La trampa · primer toque de dorado aparece</div>
+    </div>
+  </div>
+
+  <div class="arrow-row"><div class="arrow-line"></div></div>
+
+  <!-- L3 -->
+  <div class="leccion-row">
+    <div class="color-block" style="background:#6B1A2A;">
+      <div class="l-num" style="color:#E8C870;">Lección 03</div>
+      <div class="l-hex" style="color:#E8C870;">#6B1A2A</div>
+      <div class="l-nombre-color" style="color:#E8C870;">Borgoña principal</div>
+    </div>
+    <div class="info-block">
+      <div class="l-titulo">Identidad Soberana primero, habilidades después</div>
+      <div class="l-descripcion">Primer giro · el dorado crece</div>
+    </div>
+  </div>
+
+  <div class="arrow-row"><div class="arrow-line"></div></div>
+
+  <!-- L4 -->
+  <div class="leccion-row">
+    <div class="color-block" style="background:#8B2D3F;">
+      <div class="l-num" style="color:#E8C870;">Lección 04</div>
+      <div class="l-hex" style="color:#E8C870;">#8B2D3F</div>
+      <div class="l-nombre-color" style="color:#E8C870;">Vino medio</div>
+    </div>
+    <div class="info-block">
+      <div class="l-titulo">El único lugar donde tu fuerza produce resultados</div>
+      <div class="l-descripcion">El giro · vino y dorado en equilibrio</div>
+    </div>
+  </div>
+
+</div>
+
+<!-- FASE 2 -->
+<div class="fase-sep">
+  <div class="fase-label">Fase 2 — Los protocolos</div>
+  <div class="fase-sep-line"></div>
+</div>
+
+<div class="lecciones">
+
+  <!-- L5 -->
+  <div class="leccion-row">
+    <div class="color-block" style="background:#7A5C1E;">
+      <div class="l-num" style="color:#F5E4B0;">Lección 05</div>
+      <div class="l-hex" style="color:#F5E4B0;">#7A5C1E</div>
+      <div class="l-nombre-color" style="color:#F5E4B0;">Dorado oscuro</div>
+    </div>
+    <div class="info-block">
+      <div class="l-titulo">Protocolo 1: Lo que piensas — La Dimensión Mental</div>
+      <div class="l-descripcion">El dorado toma el mando</div>
+    </div>
+  </div>
+
+  <div class="arrow-row"><div class="arrow-line"></div></div>
+
+  <!-- L6 -->
+  <div class="leccion-row">
+    <div class="color-block" style="background:#B8892A;">
+      <div class="l-num" style="color:#F5E4B0;">Lección 06</div>
+      <div class="l-hex" style="color:#F5E4B0;">#B8892A</div>
+      <div class="l-nombre-color" style="color:#F5E4B0;">Dorado principal</div>
+    </div>
+    <div class="info-block">
+      <div class="l-titulo">Protocolo 2: Lo que sientes — La Dimensión Emocional</div>
+      <div class="l-descripcion">Dorado pleno · el trabajo en su centro</div>
+    </div>
+  </div>
+
+  <div class="arrow-row"><div class="arrow-line"></div></div>
+
+  <!-- L7 -->
+  <div class="leccion-row">
+    <div class="color-block" style="background:#D4A843;">
+      <div class="l-num" style="color:#3D0C11;">Lección 07</div>
+      <div class="l-hex" style="color:#3D0C11;">#D4A843</div>
+      <div class="l-nombre-color" style="color:#3D0C11;">Dorado luminoso</div>
+    </div>
+    <div class="info-block">
+      <div class="l-titulo">Protocolo 3: Lo que comunicas — La Dimensión Relacional</div>
+      <div class="l-descripcion">Pico del arco · dorado en su máximo</div>
+    </div>
+  </div>
+
+</div>
+
+<!-- FASE 3 -->
+<div class="fase-sep">
+  <div class="fase-label">Fase 3 — La expansión · el 7D</div>
+  <div class="fase-sep-line"></div>
+</div>
+
+<div class="lecciones">
+
+  <!-- L8 -->
+  <div class="leccion-row">
+    <div class="color-block" style="background:#1A4A2E;">
+      <div class="l-num" style="color:#9FE1CB;">Lección 08</div>
+      <div class="l-hex" style="color:#9FE1CB;">#1A4A2E</div>
+      <div class="l-nombre-color" style="color:#9FE1CB;">Verde bosque</div>
+    </div>
+    <div class="info-block">
+      <div class="l-titulo">El Engranaje Completo — Los 3 protocolos en tu vida real</div>
+      <div class="l-descripcion">Verde arriba · integración total · acento dorado</div>
+    </div>
+  </div>
+
+  <div class="arrow-row"><div class="arrow-line"></div></div>
+
+  <!-- L9 -->
+  <div class="leccion-row">
+    <div class="color-block" style="background:#0D2418;">
+      <div class="l-num" style="color:#5DCAA5;">Lección 09</div>
+      <div class="l-hex" style="color:#5DCAA5;">#0D2418</div>
+      <div class="l-nombre-color" style="color:#5DCAA5;">Verde profundo</div>
+    </div>
+    <div class="info-block" style="display:flex;flex-direction:column;gap:4px;">
+      <div class="l-titulo">Esto no termina aquí</div>
+      <div class="l-descripcion">El siguiente nivel · upsell al 7D</div>
+      <span class="upsell-badge">↑ 7 Dimensiones</span>
+    </div>
+  </div>
+
+</div>
+
+<!-- Leyenda -->
+<div class="leyenda">
+  <div class="ley-item">
+    <div class="ley-dot" style="background:#6B1A2A;"></div>
+    <div class="ley-texto">L1–L4 · vino · el problema y el diagnóstico</div>
+  </div>
+  <div class="ley-item">
+    <div class="ley-dot" style="background:#B8892A;"></div>
+    <div class="ley-texto">L5–L7 · dorado · los tres protocolos</div>
+  </div>
+  <div class="ley-item">
+    <div class="ley-dot" style="background:#1A4A2E;"></div>
+    <div class="ley-texto">L8–L9 · verde · integración y expansión</div>
+  </div>
+</div>
+
+</body>
+</html>

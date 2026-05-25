@@ -1,0 +1,364 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<style>
+  body:not(.fonts-loaded) * { animation-play-state: paused !important; transition: none !important; }
+</style>
+<script>
+  document.fonts.ready.then(() => {
+    setTimeout(() => { document.body.classList.add("fonts-loaded"); }, 1500);
+  });
+</script>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=1280, height=720">
+<title>anim_l2_t3_an06 — Trampa vs Código Soberana</title>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,900;1,400&family=Cormorant+Garamond:ital,wght@1,300;1,600&display=swap" rel="stylesheet">
+<style>
+  * { margin:0; padding:0; box-sizing:border-box; }
+  body { width:1280px; height:720px; overflow:hidden; background:#0F0A0B; }
+
+  /* Fondo: grano sutil */
+  .bg {
+    position:absolute; inset:0;
+    background:radial-gradient(ellipse at 50% 40%, #1A0D10 0%, #0F0A0B 70%);
+  }
+
+  /* ── Header fijo ── */
+  .header {
+    position:absolute; top:0; left:0; right:0;
+    height:120px; z-index:10;
+    display:flex; align-items:center;
+    border-bottom:1px solid rgba(232,200,112,.12);
+    opacity:0; animation:fadeIn .6s ease-out .3s forwards;
+  }
+  @keyframes fadeIn { to { opacity:1; } }
+
+  .col-header {
+    flex:1; display:flex; flex-direction:column;
+    align-items:center; justify-content:center; gap:6px;
+  }
+  .col-title {
+    font-family:'Playfair Display',serif;
+    font-weight:900; font-size:46px; line-height:1;
+    text-align:center;
+  }
+  .col-title.trampa   { color:#C97080; }
+  .col-title.soberana { color:#E8C870; }
+
+  .col-icon { font-size:32px; line-height:1; }
+
+  /* Divisor central vertical */
+  .divider {
+    width:1px; height:80px;
+    background:linear-gradient(180deg, transparent, rgba(232,200,112,.35), transparent);
+    flex-shrink:0;
+  }
+
+  /* ── Contador de ítems ── */
+  .contador {
+    position:absolute; bottom:28px; left:50%;
+    transform:translateX(-50%);
+    display:flex; gap:14px; z-index:10;
+    opacity:0; animation:fadeIn .4s ease-out .8s forwards;
+  }
+  .dot {
+    width:10px; height:10px; border-radius:50%;
+    background:rgba(255,255,255,.1);
+    transition:background .3s ease, box-shadow .3s ease;
+  }
+  .dot.on-trampa  { background:#C97080; box-shadow:0 0 8px rgba(201,112,128,.7); }
+  .dot.on-soberana{ background:#E8C870; box-shadow:0 0 8px rgba(232,200,112,.7); }
+
+  /* ── Área de ítems ── */
+  .arena {
+    position:absolute;
+    top:120px; bottom:64px; left:0; right:0;
+    display:flex; align-items:center;
+    overflow:hidden;
+  }
+
+  /* Columnas */
+  .col-trampa, .col-soberana {
+    flex:1; height:100%;
+    display:flex; align-items:center; justify-content:center;
+    padding:0 60px;
+    position:relative; overflow:hidden;
+  }
+
+  /* Línea divisoria central */
+  .divider-v {
+    width:1px; height:100%;
+    background:linear-gradient(180deg, transparent, rgba(232,200,112,.2), transparent);
+    flex-shrink:0;
+  }
+
+  /* ── Tarjeta de ítem ── */
+  .item-card {
+    position:absolute;
+    width:calc(100% - 80px);
+    border-radius:16px;
+    padding:44px 52px;
+    display:flex; flex-direction:column; gap:18px;
+    opacity:0;
+  }
+
+  .item-card.trampa-card {
+    background:linear-gradient(140deg, #2A080D, #3D0C11);
+    border:1px solid rgba(201,112,128,.2);
+    box-shadow:0 12px 48px rgba(61,12,17,.5);
+    transform:translateX(-120%);
+  }
+  .item-card.soberana-card {
+    background:linear-gradient(140deg, #1A1206, #2A1E08);
+    border:1px solid rgba(232,200,112,.2);
+    box-shadow:0 12px 48px rgba(0,0,0,.4);
+    transform:translateX(120%);
+  }
+
+  /* Animaciones de entrada/salida */
+  @keyframes slideInLeft {
+    from { transform:translateX(-120%); opacity:0; }
+    to   { transform:translateX(0);     opacity:1; }
+  }
+  @keyframes slideInRight {
+    from { transform:translateX(120%); opacity:0; }
+    to   { transform:translateX(0);    opacity:1; }
+  }
+  @keyframes slideOutLeft {
+    from { transform:translateX(0);     opacity:1; }
+    to   { transform:translateX(-120%); opacity:0; }
+  }
+  @keyframes slideOutRight {
+    from { transform:translateX(0);    opacity:1; }
+    to   { transform:translateX(120%); opacity:0; }
+  }
+
+  /* Pulso de atención */
+  @keyframes pulseTrampa {
+    0%,100% { box-shadow:0 12px 48px rgba(61,12,17,.5); border-color:rgba(201,112,128,.2); }
+    50%     { box-shadow:0 0 0 6px rgba(201,112,128,.15), 0 12px 48px rgba(61,12,17,.5); border-color:rgba(201,112,128,.65); }
+  }
+  @keyframes pulseSoberana {
+    0%,100% { box-shadow:0 12px 48px rgba(0,0,0,.4); border-color:rgba(232,200,112,.2); }
+    50%     { box-shadow:0 0 0 6px rgba(232,200,112,.14), 0 12px 48px rgba(0,0,0,.4); border-color:rgba(232,200,112,.7); }
+  }
+
+  /* Ícono arriba de la tarjeta */
+  .card-icon {
+    font-size:48px; line-height:1;
+    margin-bottom:4px;
+    opacity:0; transition:opacity .4s ease;
+  }
+
+  /* Texto principal del ítem */
+  .item-texto {
+    font-family:'Cormorant Garamond',serif;
+    font-style:italic; font-size:52px; font-weight:300;
+    line-height:1.2; letter-spacing:.01em;
+  }
+  .trampa-card   .item-texto { color:rgba(249,243,232,.7); }
+  .soberana-card .item-texto { color:rgba(249,243,232,.92); }
+
+  /* Thumb / estrellas */
+  .card-badge {
+    display:flex; gap:5px; align-items:center;
+    opacity:0; transition:opacity .5s ease;
+  }
+  .thumb {
+    font-size:36px; line-height:1;
+    filter:grayscale(.3);
+  }
+  .star {
+    font-size:26px; line-height:1;
+    color:#E8C870;
+  }
+
+  /* Fade out global */
+  #wrapper {
+    position:absolute; inset:0;
+    opacity:0; animation:fadeIn .5s ease-out .1s forwards;
+  }
+  #wrapper.out { animation:fadeOutWrap .8s ease-in forwards; }
+  @keyframes fadeOutWrap { to { opacity:0; } }
+</style>
+</head>
+<body>
+
+<div class="bg"></div>
+
+<div id="wrapper">
+
+  <!-- Header -->
+  <div class="header">
+    <div class="col-header">
+      <div class="col-icon" style="font-family:'Playfair Display',serif;font-weight:900;font-size:38px;color:#C97080;">✕</div>
+      <div class="col-title trampa">Dentro de la Trampa</div>
+    </div>
+    <div class="divider"></div>
+    <div class="col-header">
+      <div class="col-icon" style="font-family:'Cormorant Garamond',serif;font-style:italic;font-size:34px;color:#E8C870;letter-spacing:.08em;">Código Soberana</div>
+      <div class="col-title soberana">Con el Código Soberana</div>
+    </div>
+  </div>
+
+  <!-- Arena de ítems -->
+  <div class="arena">
+    <div class="col-trampa" id="colT">
+      <div class="item-card trampa-card" id="cardT">
+        <div class="card-badge" id="badgeT">
+          <span style="font-family:'Playfair Display',serif;font-weight:900;font-size:52px;color:#C97080;line-height:1;">✕</span>
+        </div>
+        <div class="item-texto" id="textoT"></div>
+      </div>
+    </div>
+
+    <div class="divider-v"></div>
+
+    <div class="col-soberana" id="colS">
+      <div class="item-card soberana-card" id="cardS">
+        <div class="card-badge" id="badgeS">
+          <span style="font-family:'Playfair Display',serif;font-weight:900;font-size:42px;color:#E8C870;line-height:1;letter-spacing:6px;">★★★★★</span>
+        </div>
+        <div class="item-texto" id="textoS"></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Contador dots -->
+  <div class="contador" id="contador"></div>
+
+</div>
+
+<script>
+const PARES = [
+  {
+    trampa:   "Su estado de ánimo calibra el tuyo",
+    soberana: "Tu estado de ánimo viene de tu propio centro"
+  },
+  {
+    trampa:   "Busca aprobación sin darse cuenta",
+    soberana: "Sus estándares son su propia brújula"
+  },
+  {
+    trampa:   "Habla desde la herida acumulada",
+    soberana: "Habla desde la claridad presente"
+  },
+  {
+    trampa:   "Espera que él cambie para estar bien",
+    soberana: "Cambia el sistema y la dinámica se mueve"
+  },
+  {
+    trampa:   "Siente que pierde si él no responde",
+    soberana: "Gana siempre porque actúa en coherencia"
+  },
+  {
+    trampa:   "Confunde entrega con anulación",
+    soberana: "Ama desde la elección, no desde la necesidad"
+  },
+];
+
+/* Tiempos por ítem (ms) */
+const T_ENTRADA   = 600;   /* duración slide in */
+const T_PAUSA     = 2800;  /* tiempo leyendo */
+const T_PULSO     = 1400;  /* duración del pulso */
+const T_SALIDA    = 550;   /* duración slide out */
+const T_ENTRE     = 300;   /* pausa entre salida y entrada */
+
+/* Construir dots */
+const cont = document.getElementById('contador');
+PARES.forEach((_,i) => {
+  const d = document.createElement('div');
+  d.className = 'dot';
+  d.id = `dot${i}`;
+  cont.appendChild(d);
+});
+
+function setDot(i, tipo) {
+  document.querySelectorAll('.dot').forEach(d => {
+    d.classList.remove('on-trampa','on-soberana');
+  });
+  if (tipo) document.getElementById(`dot${i}`).classList.add(`on-${tipo}`);
+}
+
+/* Referencias */
+const cardT  = document.getElementById('cardT');
+const cardS  = document.getElementById('cardS');
+const textoT = document.getElementById('textoT');
+const textoS = document.getElementById('textoS');
+const badgeT = document.getElementById('badgeT');
+const badgeS = document.getElementById('badgeS');
+
+function resetCards() {
+  cardT.style.animation = '';
+  cardS.style.animation = '';
+  cardT.style.transform = 'translateX(-120%)';
+  cardS.style.transform = 'translateX(120%)';
+  cardT.style.opacity = '0';
+  cardS.style.opacity = '0';
+  badgeT.style.opacity = '0';
+  badgeS.style.opacity = '0';
+  cardT.style.animationName = '';
+  cardS.style.animationName = '';
+}
+
+function mostrarPar(idx) {
+  const par = PARES[idx];
+  textoT.textContent = par.trampa;
+  textoS.textContent = par.soberana;
+
+  /* Dot trampa primero */
+  setDot(idx, 'trampa');
+
+  /* Entrada trampa desde izquierda */
+  cardT.style.animation = `slideInLeft ${T_ENTRADA}ms cubic-bezier(.2,0,.1,1) forwards`;
+  cardT.style.opacity = '1';
+
+  /* Entrada soberana desde derecha con pequeño delay */
+  setTimeout(() => {
+    cardS.style.animation = `slideInRight ${T_ENTRADA}ms cubic-bezier(.2,0,.1,1) forwards`;
+    cardS.style.opacity = '1';
+    setDot(idx, 'soberana');
+
+    /* Badges aparecen */
+    setTimeout(() => {
+      badgeT.style.opacity = '1';
+      badgeS.style.opacity = '1';
+    }, T_ENTRADA * .6);
+
+  }, T_ENTRADA * .4);
+
+  /* Pausa lectura → pulso */
+  const tPulso = T_ENTRADA + T_PAUSA;
+  setTimeout(() => {
+    cardT.style.animation = `pulseTrampa ${T_PULSO}ms ease-in-out`;
+    cardS.style.animation = `pulseSoberana ${T_PULSO}ms ease-in-out`;
+  }, tPulso);
+
+  /* Salida */
+  const tSalida = tPulso + T_PULSO;
+  setTimeout(() => {
+    cardT.style.animation = `slideOutLeft ${T_SALIDA}ms cubic-bezier(.9,0,.8,1) forwards`;
+    cardS.style.animation = `slideOutRight ${T_SALIDA}ms cubic-bezier(.9,0,.8,1) forwards`;
+    setDot(idx, null);
+  }, tSalida);
+
+  /* Prepara el siguiente */
+  setTimeout(() => {
+    resetCards();
+    if (idx + 1 < PARES.length) {
+      mostrarPar(idx + 1);
+    } else {
+      /* Último ítem — fade out */
+      setTimeout(() => {
+        document.getElementById('wrapper').classList.add('out');
+      }, 800);
+    }
+  }, tSalida + T_SALIDA + T_ENTRE);
+}
+
+/* Arranque */
+resetCards();
+setTimeout(() => { mostrarPar(0); }, 900);
+</script>
+</body>
+</html>

@@ -1,0 +1,249 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=1280, height=720">
+<title>Pizarra — él llegó tarde</title>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,700;0,900;1,700&family=Cormorant+Garamond:ital,wght@1,400;1,600&family=Inter:wght@300;400;500&family=Patrick+Hand&display=swap" rel="stylesheet">
+<style>
+* { margin: 0; padding: 0; box-sizing: border-box; }
+
+body {
+  width: 1280px;
+  height: 720px;
+  overflow: hidden;
+  background: #EDE3CE;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  position: relative;
+}
+
+/* Cuadrícula */
+body::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background-image:
+    linear-gradient(rgba(180,160,120,.18) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(180,160,120,.18) 1px, transparent 1px);
+  background-size: 44px 44px;
+  pointer-events: none;
+}
+
+/* Bordes decorativos */
+.borde-izq {
+  position: absolute; left: 0; top: 0; bottom: 0; width: 8px;
+  background: linear-gradient(180deg, #6B1A2A, #3D0C11 50%, #8B2D3F);
+  animation: bordeIzqIn .5s ease forwards .2s;
+  transform-origin: left;
+  opacity: 0;
+}
+@keyframes bordeIzqIn { to { opacity: 1; } }
+
+.borde-sup {
+  position: absolute; top: 0; left: 0; right: 0; height: 6px;
+  background: linear-gradient(90deg, #E8C870, #D4A843 50%, #E8C870);
+  animation: bordeSupIn .6s ease forwards .3s;
+  opacity: 0;
+}
+@keyframes bordeSupIn { to { opacity: 1; } }
+
+/* STAGE CENTRAL */
+.stage {
+  position: relative;
+  z-index: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 36px;
+  width: 100%;
+  padding: 0 80px;
+}
+
+/* FRASE PRINCIPAL */
+.frase-principal {
+  text-align: center;
+  opacity: 0;
+  animation: subeIn .7s cubic-bezier(.25,.46,.45,.94) forwards .7s;
+}
+
+@keyframes subeIn {
+  from { opacity: 0; transform: translateY(20px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+.comillas-texto {
+  font-family: 'Playfair Display', serif;
+  font-weight: 900;
+  font-size: 72px;
+  line-height: 1;
+  color: #3D0C11;
+  display: block;
+}
+
+/* Separador */
+.sep {
+  display: flex;
+  align-items: center;
+  gap: 20px;
+  opacity: 0;
+  animation: fadeIn .5s ease forwards 1.3s;
+}
+@keyframes fadeIn { to { opacity: 1; } }
+
+.sep-linea {
+  width: 160px;
+  height: 1px;
+  background: rgba(107,26,42,.3);
+}
+
+.sep-txt {
+  font-family: 'Cormorant Garamond', serif;
+  font-style: italic;
+  font-size: 22px;
+  color: #8B2D3F;
+  letter-spacing: 1px;
+}
+
+/* TARJETA ESTILO DUOLINGO */
+.tarjeta {
+  background: #fff;
+  border-radius: 24px;
+  border: 2px solid rgba(107,26,42,.12);
+  padding: 44px 72px 50px;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 36px;
+  min-width: 760px;
+  opacity: 0;
+  animation: subeIn .7s cubic-bezier(.25,.46,.45,.94) forwards 1.7s;
+  position: relative;
+}
+
+/* Etiqueta de la tarjeta */
+.tarjeta::before {
+  content: 'completa el pensamiento';
+  position: absolute;
+  top: -13px;
+  left: 50%;
+  transform: translateX(-50%);
+  font-family: 'Inter', sans-serif;
+  font-weight: 400;
+  font-size: 11px;
+  letter-spacing: 4px;
+  text-transform: uppercase;
+  color: #8B2D3F;
+  background: #fff;
+  padding: 0 14px;
+  white-space: nowrap;
+}
+
+/* FILAS: cada fila contiene palabras en horizontal */
+.fila {
+  display: flex;
+  flex-direction: row;
+  align-items: flex-end;
+  gap: 40px;
+  width: 100%;
+}
+
+.blank-wrap {
+  position: relative;
+  display: inline-flex;
+  flex-direction: column;
+  align-items: flex-start;
+  padding-bottom: 10px;
+}
+
+.linea-blank {
+  display: block;
+  height: 3.5px;
+  background: #3D0C11;
+  border-radius: 2px;
+}
+
+.palabra {
+  font-family: 'Patrick Hand', cursive;
+  font-weight: 400;
+  font-size: 58px;
+  line-height: 1;
+  color: #1a1a2e;
+  white-space: nowrap;
+  position: absolute;
+  bottom: 8px;
+  left: 0;
+  opacity: 0;
+  letter-spacing: 1px;
+}
+
+/* Animaciones: cada blank-wrap tiene su propio delay */
+.bw-1 .palabra { animation: apareceP .5s cubic-bezier(.25,.46,.45,.94) forwards 2.4s; }
+.bw-2 .palabra { animation: apareceP .5s cubic-bezier(.25,.46,.45,.94) forwards 3.1s; }
+.bw-3 .palabra { animation: apareceP .5s cubic-bezier(.25,.46,.45,.94) forwards 3.8s; }
+.bw-4 .palabra { animation: apareceP .5s cubic-bezier(.25,.46,.45,.94) forwards 4.5s; }
+.bw-5 .palabra { animation: apareceP .5s cubic-bezier(.25,.46,.45,.94) forwards 5.2s; }
+
+@keyframes apareceP {
+  from { opacity: 0; transform: translateY(10px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+</style>
+</head>
+<body>
+
+<div class="borde-izq"></div>
+<div class="borde-sup"></div>
+
+<div class="stage">
+
+  <!-- FRASE GRANDE -->
+  <div class="frase-principal">
+    <span class="comillas-texto">"él llegó tarde"</span>
+  </div>
+
+  <!-- SEPARADOR -->
+  <div class="sep">
+    <div class="sep-linea"></div>
+    <div class="sep-txt">significa que…</div>
+    <div class="sep-linea"></div>
+  </div>
+
+  <!-- TARJETA DUOLINGO — 2 filas horizontales -->
+  <div class="tarjeta">
+
+    <!-- FILA 1: yo · no · soy -->
+    <div class="fila">
+      <div class="blank-wrap bw-1">
+        <div class="linea-blank" style="width: 72px;"></div>
+        <span class="palabra">yo</span>
+      </div>
+      <div class="blank-wrap bw-2">
+        <div class="linea-blank" style="width: 64px;"></div>
+        <span class="palabra">no</span>
+      </div>
+      <div class="blank-wrap bw-3">
+        <div class="linea-blank" style="width: 116px;"></div>
+        <span class="palabra">soy</span>
+      </div>
+    </div>
+
+    <!-- FILA 2: su · prioridad -->
+    <div class="fila">
+      <div class="blank-wrap bw-4">
+        <div class="linea-blank" style="width: 72px;"></div>
+        <span class="palabra">su</span>
+      </div>
+      <div class="blank-wrap bw-5">
+        <div class="linea-blank" style="width: 340px;"></div>
+        <span class="palabra">prioridad</span>
+      </div>
+    </div>
+
+  </div><!-- /tarjeta -->
+
+</div><!-- /stage -->
+
+</body>
+</html>

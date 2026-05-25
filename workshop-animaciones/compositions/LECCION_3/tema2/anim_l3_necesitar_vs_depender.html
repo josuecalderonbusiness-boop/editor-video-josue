@@ -1,0 +1,124 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<style>body:not(.fonts-loaded) * { animation-play-state: paused !important; transition: none !important; }</style>
+<script>document.fonts.ready.then(() => { setTimeout(() => { document.body.classList.add("fonts-loaded"); }, 1500); });</script>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=1280, height=720">
+<title>Necesitar vs Depender</title>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@900&display=swap" rel="stylesheet">
+<style>
+  * { margin:0; padding:0; box-sizing:border-box; }
+  body { width:1280px; height:720px; overflow:hidden; background:#0F0A0B; }
+  .scene { width:1280px; height:720px; position:relative; display:flex; align-items:center; justify-content:center; opacity:0; animation:sceneIn .6s ease-out .1s forwards; }
+  @keyframes sceneIn { to { opacity:1; } }
+  .scene.out { animation:sceneOut 1s ease-in forwards; }
+  @keyframes sceneOut { to { opacity:0; } }
+  .bg-glow { position:absolute; inset:0; pointer-events:none; background:radial-gradient(ellipse at 50% 50%, rgba(107,26,42,.35) 0%, transparent 65%); animation:bgPulse 3s ease-in-out infinite; }
+  @keyframes bgPulse { 0%,100%{opacity:.6} 50%{opacity:1} }
+  .stage { position:relative; display:flex; flex-direction:column; align-items:center; justify-content:center; width:100%; height:100%; }
+  .palabra-necesitar {
+    font-family:'Playfair Display',serif; font-weight:900;
+    font-size:180px; color:#F9F3E8; line-height:1;
+    text-align:center; letter-spacing:-0.02em; position:absolute;
+    opacity:0; transform:scale(.85);
+    text-shadow:0 0 40px rgba(249,243,232,.6),0 0 80px rgba(249,243,232,.3);
+    animation:necesitarIn .7s cubic-bezier(.2,0,.1,1) 0.5s forwards;
+  }
+  @keyframes necesitarIn { to { opacity:1; transform:scale(1); } }
+  .palabra-necesitar.aplastada {
+    transition: transform .25s cubic-bezier(.5,0,.3,1), opacity .3s ease, filter .3s ease;
+    transform: scaleY(.1) scaleX(1.18);
+    opacity: .3;
+    filter: blur(3px);
+  }
+  .palabra-depender {
+    font-family:'Playfair Display',serif; font-weight:900;
+    font-size:220px; color:#E8C870; line-height:1;
+    text-align:center; letter-spacing:-0.02em; position:absolute;
+    opacity:0; transform:translateY(-620px) scale(1.3);
+    text-shadow:0 0 50px rgba(232,200,112,.9),0 0 100px rgba(232,200,112,.5);
+  }
+  .sombra { position:absolute; bottom:calc(50% - 130px); width:0; height:18px; border-radius:50%; background:radial-gradient(ellipse, rgba(0,0,0,.5) 0%, transparent 70%); opacity:0; }
+  .impacto { position:absolute; left:50%; top:50%; transform:translate(-50%,-50%); width:0; height:0; border-radius:50%; background:radial-gradient(ellipse, rgba(232,200,112,.25) 0%, transparent 70%); opacity:0; pointer-events:none; }
+</style>
+</head>
+<body>
+<div class="scene" id="scene">
+  <div class="bg-glow"></div>
+  <div class="stage" id="stage">
+    <div class="sombra" id="sombra"></div>
+    <div class="palabra-necesitar" id="necesitar">NECESITAR</div>
+    <div class="palabra-depender" id="depender">DEPENDER</div>
+  </div>
+</div>
+<script>
+  const DURACION_MS = 9500;
+  const dep = document.getElementById('depender');
+  const nec = document.getElementById('necesitar');
+  const sombra = document.getElementById('sombra');
+
+  // keyframes dinamicos
+  const style = document.createElement('style');
+  style.textContent = `
+    @keyframes dependerPulse {
+      0%,100% { text-shadow: 0 0 40px rgba(232,200,112,.8), 0 0 80px rgba(232,200,112,.4); }
+      50%      { text-shadow: 0 0 80px rgba(255,245,180,1), 0 0 150px rgba(232,200,112,.8), 0 0 220px rgba(220,180,60,.4); }
+    }
+  `;
+  document.head.appendChild(style);
+
+  // FASE 2: DEPENDER cae (2.2s)
+  setTimeout(() => {
+    dep.style.transition = 'opacity .1s ease, transform .55s cubic-bezier(.25,0.1,0.2,1.4)';
+    dep.style.opacity = '1';
+    dep.style.transform = 'translateY(0) scale(1)';
+    sombra.style.transition = 'width .55s ease, opacity .55s ease';
+    sombra.style.width = '620px';
+    sombra.style.opacity = '1';
+  }, 2200);
+
+  // FASE 3: Impacto (2.75s)
+  setTimeout(() => {
+    // NECESITAR aplastada
+    nec.classList.add('aplastada');
+
+    // DEPENDER rebota
+    dep.style.transition = 'transform .1s ease';
+    dep.style.transform = 'translateY(4px) scale(1)';
+    setTimeout(() => { dep.style.transform = 'translateY(0) scale(1)'; }, 110);
+
+    // Onda impacto
+    const imp = document.createElement('div');
+    imp.className = 'impacto';
+    document.getElementById('stage').appendChild(imp);
+    imp.style.transition = 'width .5s ease-out, height .5s ease-out, opacity .5s ease-out';
+    setTimeout(() => { imp.style.opacity='1'; imp.style.width='1100px'; imp.style.height='400px'; }, 10);
+    setTimeout(() => { imp.style.opacity='0'; }, 300);
+
+    // DEPENDER domina con glow pulsante
+    setTimeout(() => {
+      dep.style.transition = 'none';
+      dep.style.animation = 'dependerPulse 2s ease-in-out infinite';
+    }, 150);
+  }, 2750);
+
+  // FASE 4: DEPENDER se encoge y desaparece (4.5s)
+  setTimeout(() => {
+    dep.style.animation = 'none';
+    dep.style.transition = 'transform 1.6s cubic-bezier(.55,0,.8,0.3), opacity 1.6s ease-in, filter 1.6s ease-in';
+    dep.style.transform = 'translateY(0) scale(.04)';
+    dep.style.opacity = '0';
+    dep.style.filter = 'blur(14px)';
+    sombra.style.transition = 'width 1s ease, opacity 1s ease';
+    sombra.style.width = '0';
+    sombra.style.opacity = '0';
+  }, 4500);
+
+  // Fade out escena
+  setTimeout(() => {
+    document.getElementById('scene').classList.add('out');
+  }, DURACION_MS);
+</script>
+</body>
+</html>

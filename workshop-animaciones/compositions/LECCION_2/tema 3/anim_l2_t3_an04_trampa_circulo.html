@@ -1,0 +1,315 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<style>
+  body:not(.fonts-loaded) * { animation-play-state: paused !important; transition: none !important; }
+</style>
+<script>
+  document.fonts.ready.then(() => {
+    setTimeout(() => { document.body.classList.add("fonts-loaded"); }, 1500);
+  });
+</script>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=1280, height=720">
+<title>anim_l2_t3_an04 — La Trampa no se mueve</title>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,700;0,900;1,400&family=Cormorant+Garamond:ital,wght@1,300;1,400&display=swap" rel="stylesheet">
+<style>
+  * { margin:0; padding:0; box-sizing:border-box; }
+  body { width:1280px; height:720px; overflow:hidden; background:#000; }
+
+  .scene {
+    width:1280px; height:720px; background:#000;
+    position:relative; display:flex;
+    align-items:center; justify-content:center;
+    opacity:0; animation:sceneIn .9s ease-out .1s forwards;
+  }
+  @keyframes sceneIn { to{opacity:1} }
+  .scene.out { animation:fadeOut .9s ease-in forwards; }
+  @keyframes fadeOut { to{opacity:0} }
+
+  /* Glow de fondo borgoña */
+  .bg-glow {
+    position:absolute; left:-80px; top:50%; transform:translateY(-50%);
+    width:780px; height:680px;
+    background:radial-gradient(ellipse at 38% 50%, rgba(107,26,42,.48) 0%, rgba(61,12,17,.26) 38%, transparent 68%);
+    animation:pulseGlow 3.8s ease-in-out infinite; pointer-events:none;
+  }
+  @keyframes pulseGlow {
+    0%,100%{opacity:.7;transform:translateY(-50%) scale(1)}
+    50%{opacity:1;transform:translateY(-50%) scale(1.06)}
+  }
+
+  /* Layout: texto izquierda, gráfico derecha */
+  .layout {
+    display:flex; align-items:center; justify-content:space-between;
+    width:1160px; position:relative; z-index:2;
+    gap:60px;
+  }
+
+  /* Columna texto */
+  .col-texto {
+    flex:1; display:flex; flex-direction:column; align-items:flex-start;
+  }
+  .quote-marks {
+    font-family:'Playfair Display',Georgia,serif;
+    font-size:130px; font-weight:900; color:#E8C870;
+    line-height:.75; margin-bottom:8px; letter-spacing:-0.05em;
+    opacity:0; transform:translateY(-10px);
+    animation:marksIn .55s ease-out .4s forwards, marksGlow 2.8s ease-in-out 1s infinite;
+    display:block;
+  }
+  @keyframes marksIn { to{opacity:1;transform:translateY(0)} }
+  @keyframes marksGlow {
+    0%,100%{text-shadow:0 0 15px rgba(232,200,112,1),0 0 40px rgba(220,180,60,.8),0 0 80px rgba(220,180,60,.4)}
+    50%{text-shadow:0 0 30px rgba(255,248,180,1),0 0 70px rgba(232,200,112,1),0 0 130px rgba(220,180,60,.6)}
+  }
+  .frase-main {
+    font-family:'Playfair Display',Georgia,serif;
+    font-size:68px; font-weight:900; color:#FFF; line-height:1.08; letter-spacing:-0.015em;
+    max-width:580px;
+  }
+  .frase-italic {
+    font-family:'Playfair Display',Georgia,serif;
+    font-size:54px; font-weight:400; font-style:italic;
+    color:#F9F3E8; line-height:1.18; margin-top:6px;
+    max-width:580px;
+  }
+  .word {
+    display:inline-block; opacity:0; filter:blur(10px);
+    transform:translateY(16px) scale(.96); white-space:pre;
+  }
+  .word.visible {
+    transition:opacity .42s ease,filter .42s ease,transform .42s ease;
+    opacity:1; filter:blur(0); transform:translateY(0) scale(1);
+  }
+  .frase-main .word.visible {
+    text-shadow:0 0 20px rgba(255,255,255,1),0 0 50px rgba(255,255,255,.7),0 0 90px rgba(255,255,255,.4);
+  }
+  .frase-italic .word.visible {
+    text-shadow:0 0 22px rgba(249,243,232,.50),0 0 55px rgba(249,243,232,.22);
+  }
+  .gold-line-wrap { margin-top:24px; position:relative; height:14px; width:300px; display:none; }
+  .gold-line {
+    position:absolute; bottom:0; left:0; height:3px; width:0; border-radius:2px;
+    background:linear-gradient(90deg,transparent 0%,#B8892A 8%,#E8C870 35%,#FFF5B0 52%,#E8C870 68%,#D4A843 88%,transparent 100%);
+    animation:growLine .85s cubic-bezier(.15,0,.1,1) forwards;
+  }
+  .gold-glow {
+    position:absolute; bottom:-3px; left:0; height:9px; width:0; border-radius:10px;
+    background:linear-gradient(90deg,transparent,rgba(232,200,112,.4),transparent);
+    animation:growLine .85s cubic-bezier(.15,0,.1,1) .05s forwards, glowPulse 2.5s ease-in-out 1s infinite;
+  }
+  .gold-spark {
+    position:absolute; bottom:-4px; left:-30px; width:55px; height:11px;
+    background:radial-gradient(ellipse,rgba(255,245,190,1) 0%,rgba(245,228,176,.55) 45%,transparent 75%);
+    border-radius:50%; animation:sparkSweep 1s ease-in-out .75s forwards; opacity:0;
+  }
+  @keyframes growLine { to{width:300px} }
+  @keyframes glowPulse { 0%,100%{opacity:.55}50%{opacity:1} }
+  @keyframes sparkSweep {
+    0%{left:-55px;opacity:0}12%{opacity:1}88%{opacity:.9}100%{left:310px;opacity:0}
+  }
+  .author {
+    margin-top:14px; font-family:'Cormorant Garamond',Georgia,serif;
+    font-style:italic; font-size:34px; font-weight:300;
+    color:#E8C870; letter-spacing:.05em; opacity:0; transform:translateY(8px);
+    text-shadow:0 0 18px rgba(232,200,112,.65),0 0 45px rgba(220,180,60,.30);
+  }
+
+  /* Columna gráfico — punto atrapado en círculo */
+  .col-grafico {
+    width:380px; height:380px; position:relative; flex-shrink:0;
+    display:flex; align-items:center; justify-content:center;
+    opacity:0; animation:fadeIn .7s ease-out 0.5s forwards;
+  }
+  @keyframes fadeIn { to{opacity:1} }
+
+  .trap-svg {
+    width:360px; height:360px;
+  }
+
+  /* El círculo trampa se dibuja */
+  .trap-circle {
+    fill:none; stroke:#6B1A2A; stroke-width:5;
+    stroke-dasharray:980; stroke-dashoffset:980;
+    animation:drawCircle 1.2s ease-out 0.8s forwards;
+    filter:drop-shadow(0 0 12px rgba(107,26,42,.8));
+  }
+  @keyframes drawCircle {
+    to{ stroke-dashoffset:0; }
+  }
+
+  /* Círculo interior pulsante */
+  .trap-circle-inner {
+    fill:none; stroke:rgba(107,26,42,.35); stroke-width:2;
+    stroke-dasharray:630; stroke-dashoffset:630;
+    animation:drawCircle 1.0s ease-out 1.5s forwards;
+  }
+
+  /* Segmentos de barras de la jaula */
+  .bar1, .bar2, .bar3, .bar4 {
+    stroke:#6B1A2A; stroke-width:3.5; stroke-linecap:round;
+    stroke-dasharray:220; stroke-dashoffset:220;
+    opacity:0.55;
+  }
+  .bar1 { animation:drawBar 0.5s ease-out 1.8s forwards; }
+  .bar2 { animation:drawBar 0.5s ease-out 2.0s forwards; }
+  .bar3 { animation:drawBar 0.5s ease-out 2.2s forwards; }
+  .bar4 { animation:drawBar 0.5s ease-out 2.4s forwards; }
+  @keyframes drawBar { to{ stroke-dashoffset:0; } }
+
+  /* El punto — se mueve intentando salir */
+  .dot-group {
+    animation:dotTrap 4.5s ease-in-out 2.8s infinite;
+  }
+  @keyframes dotTrap {
+    0%   { transform:translate(180px,180px); }
+    10%  { transform:translate(180px,110px); }  /* sube */
+    20%  { transform:translate(180px,112px); }  /* choca */
+    22%  { transform:translate(182px,114px); }  /* rebote */
+    30%  { transform:translate(240px,140px); }  /* intenta derecha-arriba */
+    40%  { transform:translate(238px,142px); }  /* choca */
+    42%  { transform:translate(236px,144px); }  /* rebote */
+    52%  { transform:translate(180px,250px); }  /* baja */
+    62%  { transform:translate(182px,248px); }  /* choca */
+    64%  { transform:translate(180px,246px); }  /* rebote */
+    74%  { transform:translate(130px,200px); }  /* izquierda */
+    84%  { transform:translate(132px,198px); }  /* choca */
+    86%  { transform:translate(134px,200px); }  /* rebote */
+    100% { transform:translate(180px,180px); }  /* vuelve al centro */
+  }
+
+  .dot-circle {
+    fill:#E8C870;
+    filter:drop-shadow(0 0 10px rgba(232,200,112,.95)) drop-shadow(0 0 20px rgba(232,200,112,.6));
+    animation:dotPulse 1.8s ease-in-out infinite;
+  }
+  @keyframes dotPulse {
+    0%,100%{ r:12; opacity:1; }
+    50%{ r:14; opacity:.85; }
+  }
+
+  /* Chispas de choque en el círculo */
+  .spark {
+    fill:none; stroke:rgba(201,112,128,.75); stroke-width:2;
+    opacity:0;
+  }
+  .spark1 { animation:sparkFlash 4.5s ease-in-out 3.5s infinite; }
+  .spark2 { animation:sparkFlash 4.5s ease-in-out 4.2s infinite; }
+  .spark3 { animation:sparkFlash 4.5s ease-in-out 5.0s infinite; }
+  @keyframes sparkFlash {
+    0%,8%,100% { opacity:0; }
+    3%,5% { opacity:1; }
+  }
+
+  /* Label "sin salida" */
+  .no-exit {
+    font-family:'Cormorant Garamond',Georgia,serif;
+    font-size:22px; font-style:italic;
+    fill:rgba(201,112,128,.6);
+    opacity:0;
+    animation:fadeIn .5s ease-out 4s forwards;
+  }
+</style>
+</head>
+<body>
+<div class="scene" id="scene">
+  <div class="bg-glow"></div>
+  <div class="layout">
+
+    <!-- Texto izquierda -->
+    <div class="col-texto">
+      <span class="quote-marks">&#8220;</span>
+      <p class="frase-main" id="lineaMain"></p>
+      <p class="frase-italic" id="lineaItalic"></p>
+      <div class="gold-line-wrap" id="lineaWrap">
+        <div class="gold-glow"></div>
+        <div class="gold-line"></div>
+        <div class="gold-spark"></div>
+      </div>
+      <p class="author" id="author">— Josué Calderón</p>
+    </div>
+
+    <!-- Gráfico derecha: punto atrapado en círculo -->
+    <div class="col-grafico">
+      <svg class="trap-svg" viewBox="0 0 360 360" xmlns="http://www.w3.org/2000/svg">
+
+        <!-- Círculo exterior (la trampa) -->
+        <circle class="trap-circle" cx="180" cy="180" r="155"/>
+
+        <!-- Círculo interior (espacio pequeño) -->
+        <circle class="trap-circle-inner" cx="180" cy="180" r="100"/>
+
+        <!-- Barras internas de jaula -->
+        <line class="bar1" x1="180" y1="25" x2="180" y2="335"/>
+        <line class="bar2" x1="25" y1="180" x2="335" y2="180"/>
+        <line class="bar3" x1="70" y1="70" x2="290" y2="290"/>
+        <line class="bar4" x1="290" y1="70" x2="70" y2="290"/>
+
+        <!-- Chispas de choque -->
+        <g class="spark spark1">
+          <line x1="175" y1="18" x2="162" y2="6" stroke-width="2.5"/>
+          <line x1="180" y1="15" x2="180" y2="2" stroke-width="2.5"/>
+          <line x1="185" y1="18" x2="198" y2="6" stroke-width="2.5"/>
+        </g>
+        <g class="spark spark2">
+          <line x1="332" y1="145" x2="344" y2="133" stroke-width="2.5"/>
+          <line x1="335" y1="150" x2="348" y2="150" stroke-width="2.5"/>
+          <line x1="332" y1="155" x2="344" y2="167" stroke-width="2.5"/>
+        </g>
+        <g class="spark spark3">
+          <line x1="175" y1="338" x2="162" y2="350" stroke-width="2.5"/>
+          <line x1="180" y1="340" x2="180" y2="353" stroke-width="2.5"/>
+          <line x1="185" y1="338" x2="198" y2="350" stroke-width="2.5"/>
+        </g>
+
+        <!-- Label sin salida -->
+        <text class="no-exit" x="180" y="195" text-anchor="middle">sin salida</text>
+
+        <!-- El punto que intenta escapar -->
+        <g class="dot-group">
+          <circle class="dot-circle" cx="0" cy="0" r="12"/>
+        </g>
+      </svg>
+    </div>
+
+  </div>
+</div>
+
+<script>
+  const LINEA_MAIN   = "Mientras siga atrapada en la Trampa,";
+  const LINEA_ITALIC = "la dinámica no va a cambiar.";
+  const DURACION_MS  = 9000;
+  const DELAY_INICIO = 750;
+  const MS_POR_PALABRA = 260;
+
+  function buildWords(texto, id) {
+    const el = document.getElementById(id);
+    texto.split(' ').forEach((w,i,arr) => {
+      const span = document.createElement('span');
+      span.className = 'word';
+      span.textContent = w + (i < arr.length-1 ? ' ' : '');
+      el.appendChild(span);
+    });
+    return el.querySelectorAll('.word');
+  }
+
+  const wMain   = buildWords(LINEA_MAIN,   'lineaMain');
+  const wItalic = buildWords(LINEA_ITALIC, 'lineaItalic');
+
+  let t = DELAY_INICIO;
+  wMain.forEach(w   => { setTimeout(() => w.classList.add('visible'), t); t += MS_POR_PALABRA; });
+  t += 300;
+  wItalic.forEach(w => { setTimeout(() => w.classList.add('visible'), t); t += MS_POR_PALABRA; });
+
+  const fin = t + 300;
+  setTimeout(() => { document.getElementById('lineaWrap').style.display = 'block'; }, fin);
+  setTimeout(() => {
+    const a = document.getElementById('author');
+    a.style.transition = 'opacity .6s ease,transform .6s ease';
+    a.style.opacity='1'; a.style.transform='translateY(0)';
+  }, fin + 520);
+  setTimeout(() => { document.getElementById('scene').classList.add('out'); }, DURACION_MS);
+</script>
+</body>
+</html>

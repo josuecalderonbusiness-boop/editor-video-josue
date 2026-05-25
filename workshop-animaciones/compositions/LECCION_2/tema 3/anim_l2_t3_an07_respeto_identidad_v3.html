@@ -1,0 +1,455 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<style>
+  body:not(.fonts-loaded) * { animation-play-state: paused !important; transition: none !important; }
+</style>
+<script>
+  document.fonts.ready.then(() => {
+    setTimeout(() => { document.body.classList.add("fonts-loaded"); }, 1500);
+  });
+</script>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=1280, height=720">
+<title>anim_l2_t3_an07 — Respeto e Identidad v3</title>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,900;1,400&family=Cormorant+Garamond:ital,wght@1,300;1,600&display=swap" rel="stylesheet">
+<style>
+  * { margin:0; padding:0; box-sizing:border-box; }
+  body { width:1280px; height:720px; overflow:hidden; background:#000; }
+
+  canvas { position:absolute; inset:0; z-index:0; }
+
+  /* Cada fase cubre toda la pantalla */
+  .fase {
+    position:absolute; inset:0; z-index:2;
+    display:flex; flex-direction:column;
+    align-items:center; justify-content:center;
+    opacity:0; pointer-events:none;
+  }
+  .fase.activa { opacity:1; }
+
+  /* Fade scene global */
+  #wrapper {
+    position:absolute; inset:0; z-index:2;
+    opacity:0; animation:wrapIn .8s ease-out .3s forwards;
+  }
+  @keyframes wrapIn  { to { opacity:1; } }
+  #wrapper.out { animation:wrapOut .9s ease-in forwards; }
+  @keyframes wrapOut { to { opacity:0; } }
+
+  /* Transición entre fases */
+  @keyframes fadeInFase  { 0%{opacity:0;transform:translateY(18px)} 100%{opacity:1;transform:translateY(0)} }
+  @keyframes fadeOutFase { 0%{opacity:1;transform:translateY(0)} 100%{opacity:0;transform:translateY(-18px)} }
+
+  /* ─── Tipografía ─── */
+
+  /* Prefacio pequeño arriba */
+  .prefacio {
+    font-family:'Cormorant Garamond',serif;
+    font-style:italic; font-size:38px; font-weight:300;
+    color:rgba(249,243,232,.3);
+    letter-spacing:.03em;
+    margin-bottom:20px;
+    opacity:0; transition:opacity 1s ease;
+  }
+  .prefacio.v { opacity:1; }
+
+  /* Palabra de impacto — máximo protagonismo */
+  .impacto {
+    font-family:'Playfair Display',serif;
+    font-weight:900; line-height:.9;
+    text-align:center;
+    color:rgba(249,243,232,.05);
+    transition:color 1.3s ease, text-shadow 1.3s ease;
+    white-space:nowrap;
+  }
+  .impacto.blanco {
+    color:#F9F3E8;
+    text-shadow:0 0 80px rgba(249,243,232,.18), 0 0 160px rgba(249,243,232,.07);
+  }
+  .impacto.dorado {
+    color:#E8C870;
+    text-shadow:0 0 70px rgba(232,200,112,.45), 0 0 140px rgba(232,200,112,.2);
+  }
+  .impacto.vino {
+    color:#C97080;
+    text-shadow:0 0 60px rgba(201,112,128,.4), 0 0 120px rgba(201,112,128,.18);
+  }
+
+  /* Subtítulo debajo de la palabra */
+  .subtitulo {
+    font-family:'Cormorant Garamond',serif;
+    font-style:italic; font-size:42px; font-weight:300;
+    color:rgba(249,243,232,0);
+    transition:color .9s ease;
+    letter-spacing:.05em;
+    margin-top:18px;
+    text-align:center;
+  }
+  .subtitulo.v { color:rgba(249,243,232,.5); }
+  .subtitulo.gold { color:rgba(232,200,112,.6); }
+
+  /* ─── Conector vertical: flecha + label ─── */
+  .conector-v {
+    display:flex; flex-direction:column;
+    align-items:center; gap:6px;
+    opacity:0; transition:opacity .7s ease;
+    margin:14px 0;
+  }
+  .conector-v.v { opacity:1; }
+
+  .flecha-label {
+    font-family:'Cormorant Garamond',serif;
+    font-style:italic; font-size:32px; font-weight:300;
+    color:rgba(232,200,112,.6);
+    letter-spacing:.06em;
+  }
+
+  /* ─── Fila de ecuación (para fase 3) ─── */
+  .fila-eq {
+    display:flex; align-items:center;
+    gap:40px;
+    justify-content:center;
+  }
+
+  .eq-palabra {
+    font-family:'Playfair Display',serif;
+    font-weight:900; font-size:88px; line-height:.9;
+    text-align:center;
+    color:rgba(249,243,232,.05);
+    white-space:nowrap;
+    transition:color 1.1s ease, text-shadow 1.1s ease;
+  }
+  .eq-palabra.v-blanco {
+    color:rgba(249,243,232,.38);
+  }
+  .eq-palabra.v-vino {
+    color:#C97080;
+    text-shadow:0 0 50px rgba(201,112,128,.35);
+  }
+  .eq-palabra.v-dorado {
+    color:#E8C870;
+    text-shadow:0 0 50px rgba(232,200,112,.4);
+  }
+
+  .eq-verbo {
+    font-family:'Cormorant Garamond',serif;
+    font-style:italic; font-size:46px; font-weight:300;
+    color:rgba(249,243,232,0);
+    transition:color .9s ease;
+    white-space:nowrap;
+    text-align:center;
+  }
+  .eq-verbo.v { color:rgba(249,243,232,.6); }
+
+  /* Flecha horizontal SVG */
+  .flecha-h {
+    opacity:0; transition:opacity .5s ease;
+    display:flex; align-items:center; flex-direction:column; gap:4px;
+  }
+  .flecha-h.v { opacity:1; }
+  .fh-label {
+    font-family:'Cormorant Garamond',serif;
+    font-style:italic; font-size:28px; font-weight:300;
+    color:rgba(232,200,112,.55);
+    letter-spacing:.05em;
+  }
+
+  /* ─── Frase cierre ─── */
+  .frase-cierre {
+    font-family:'Cormorant Garamond',serif;
+    font-style:italic; font-size:56px; font-weight:300;
+    color:rgba(249,243,232,0); transition:color 1.2s ease;
+    text-align:center; line-height:1.3;
+    letter-spacing:.02em;
+    max-width:1100px;
+  }
+  .frase-cierre.v { color:rgba(249,243,232,.85); }
+  .frase-cierre strong {
+    font-family:'Playfair Display',serif;
+    font-weight:900; font-style:normal;
+    color:rgba(232,200,112,0); transition:color 1.2s ease;
+  }
+  .frase-cierre.v strong { color:#E8C870; }
+
+  .firma {
+    font-family:'Cormorant Garamond',serif;
+    font-style:italic; font-size:30px; font-weight:300;
+    color:rgba(232,200,112,0); transition:color 1s ease;
+    margin-top:24px; letter-spacing:.1em;
+  }
+  .firma.v { color:rgba(232,200,112,.45); }
+
+  /* Línea dorada decorativa inferior */
+  .linea-base {
+    position:absolute; bottom:0; left:0; right:0; height:2px;
+    background:linear-gradient(90deg, transparent, rgba(232,200,112,.18), transparent);
+  }
+</style>
+</head>
+<body>
+
+<canvas id="cvs" width="1280" height="720"></canvas>
+
+<div id="wrapper">
+
+  <!-- ══ FASE 1: La premisa ══ -->
+  <div class="fase" id="f1">
+    <div class="prefacio" id="p1">El hombre no responde a la gratitud.</div>
+    <div class="impacto" id="imp1" style="font-size:220px;">RESPETO</div>
+    <div class="subtitulo" id="sub1">es lo único que él procesa</div>
+  </div>
+
+  <!-- ══ FASE 2: RESPETO nace de IDENTIDAD ══ -->
+  <div class="fase" id="f2">
+    <!-- RESPETO ya establecido, más pequeño arriba -->
+    <div style="display:flex; flex-direction:column; align-items:center;">
+      <div class="impacto" id="imp2a" style="font-size:100px;">RESPETO</div>
+      <div class="subtitulo" id="sub2a" style="font-size:36px; margin-top:8px;">la premisa</div>
+
+      <!-- Conector vertical -->
+      <div class="conector-v" id="cv1" style="margin:20px 0;">
+        <div class="flecha-label">nace de</div>
+        <svg width="40" height="70" viewBox="0 0 40 70">
+          <line x1="20" y1="0" x2="20" y2="54"
+            stroke="#E8C870" stroke-width="3" stroke-linecap="round"
+            stroke-dasharray="58" stroke-dashoffset="58" id="vl1"/>
+          <polyline points="8,42 20,58 32,42"
+            fill="none" stroke="#E8C870" stroke-width="3"
+            stroke-linecap="round" stroke-linejoin="round"
+            stroke-dasharray="34" stroke-dashoffset="34" id="vh1"/>
+        </svg>
+      </div>
+
+      <div class="impacto" id="imp2b" style="font-size:190px;">IDENTIDAD</div>
+      <div class="subtitulo" id="sub2b">saber quién eres</div>
+    </div>
+  </div>
+
+  <!-- ══ FASE 3: IDENTIDAD nace de CENTRO PROPIO ══ -->
+  <div class="fase" id="f3">
+    <div style="display:flex; flex-direction:column; align-items:center;">
+      <div class="impacto" id="imp3a" style="font-size:100px;">IDENTIDAD</div>
+      <div class="subtitulo" id="sub3a" style="font-size:36px; margin-top:8px;">el origen del respeto</div>
+
+      <div class="conector-v" id="cv2" style="margin:20px 0;">
+        <div class="flecha-label">nace de tener</div>
+        <svg width="40" height="70" viewBox="0 0 40 70">
+          <line x1="20" y1="0" x2="20" y2="54"
+            stroke="#E8C870" stroke-width="3" stroke-linecap="round"
+            stroke-dasharray="58" stroke-dashoffset="58" id="vl2"/>
+          <polyline points="8,42 20,58 32,42"
+            fill="none" stroke="#E8C870" stroke-width="3"
+            stroke-linecap="round" stroke-linejoin="round"
+            stroke-dasharray="34" stroke-dashoffset="34" id="vh2"/>
+        </svg>
+      </div>
+
+      <div class="impacto" id="imp3b" style="font-size:168px; line-height:.88;">CENTRO<br>PROPIO</div>
+      <div class="subtitulo" id="sub3b">con él — y sin él</div>
+    </div>
+  </div>
+
+  <!-- ══ FASE 4: Su humor no define el tuyo ══ -->
+  <div class="fase" id="f4">
+    <div class="fila-eq" style="align-items:flex-end; gap:30px;">
+      <div style="display:flex; flex-direction:column; align-items:center; gap:10px;">
+        <div class="eq-palabra" id="eq4a" style="font-size:100px;">SU<br>HUMOR</div>
+      </div>
+
+      <div class="eq-verbo" id="eq4v">no define</div>
+
+      <div style="display:flex; flex-direction:column; align-items:center; gap:10px;">
+        <div class="eq-palabra" id="eq4b" style="font-size:100px;">EL<br>TUYO.</div>
+      </div>
+    </div>
+    <div class="subtitulo" id="sub4" style="margin-top:40px; font-size:40px;">
+      su estado de ánimo no es tu centro
+    </div>
+  </div>
+
+  <!-- ══ FASE 5: Cierre ══ -->
+  <div class="fase" id="f5">
+    <div class="frase-cierre" id="cierre">
+      El respeto nace de una mujer<br>con <strong>centro propio.</strong>
+    </div>
+    <div class="firma" id="firma">— Josué Calderón</div>
+  </div>
+
+  <div class="linea-base"></div>
+</div>
+
+<script>
+/* ── Partículas ── */
+(function(){
+  const cv = document.getElementById('cvs');
+  const ctx = cv.getContext('2d');
+  const W=1280, H=720;
+  const pts = Array.from({length:55}, ()=>({
+    x:Math.random()*W, y:Math.random()*H,
+    r:Math.random()*1.4+.3,
+    vx:(Math.random()-.5)*.18, vy:(Math.random()-.5)*.12,
+    a:Math.random()*.16+.03,
+    gold:Math.random()>.62
+  }));
+  function tick(){
+    ctx.clearRect(0,0,W,H);
+    pts.forEach(p=>{
+      p.x+=p.vx; p.y+=p.vy;
+      if(p.x<0)p.x=W; if(p.x>W)p.x=0;
+      if(p.y<0)p.y=H; if(p.y>H)p.y=0;
+      ctx.beginPath();
+      ctx.arc(p.x,p.y,p.r,0,Math.PI*2);
+      ctx.fillStyle=p.gold?`rgba(232,200,112,${p.a})`:`rgba(249,243,232,${p.a*.6})`;
+      ctx.fill();
+    });
+    requestAnimationFrame(tick);
+  }
+  tick();
+})();
+
+/* ── Helpers ── */
+function vis(id)   { document.getElementById(id).classList.add('v'); }
+function col(id,c) { const el=document.getElementById(id); el.style.transition='color 1.2s ease,text-shadow 1.2s ease'; el.style.color=c; }
+function ts(id,s)  { document.getElementById(id).style.textShadow=s; }
+
+function mostrarFase(id) {
+  const el=document.getElementById(id);
+  el.style.animation='fadeInFase .6s ease-out forwards';
+  el.classList.add('activa');
+}
+function ocultarFase(id) {
+  const el=document.getElementById(id);
+  el.style.animation='fadeOutFase .5s ease-in forwards';
+  setTimeout(()=>{ el.classList.remove('activa'); el.style.animation=''; }, 500);
+}
+
+function drawV(lineId, headId, delay) {
+  setTimeout(()=>{
+    const l=document.getElementById(lineId);
+    const h=document.getElementById(headId);
+    l.style.transition='stroke-dashoffset .5s ease-out';
+    l.style.strokeDashoffset='0';
+    setTimeout(()=>{
+      h.style.transition='stroke-dashoffset .3s ease-out';
+      h.style.strokeDashoffset='0';
+    }, 380);
+  }, delay);
+}
+
+/* ── SECUENCIA ── */
+
+/* FASE 1: RESPETO — la premisa (0ms) */
+setTimeout(()=>{
+  mostrarFase('f1');
+  vis('p1');
+  setTimeout(()=>{
+    const el=document.getElementById('imp1');
+    el.style.transition='color 1.5s ease, text-shadow 1.5s ease';
+    el.style.color='#F9F3E8';
+    el.style.textShadow='0 0 100px rgba(249,243,232,.18), 0 0 200px rgba(249,243,232,.07)';
+  }, 800);
+  setTimeout(()=>{ vis('sub1'); }, 1600);
+}, 400);
+
+/* FASE 2: RESPETO → IDENTIDAD (4500ms) */
+setTimeout(()=>{
+  ocultarFase('f1');
+  setTimeout(()=>{
+    mostrarFase('f2');
+
+    /* RESPETO ya encendido (menor protagonismo) */
+    const e2a=document.getElementById('imp2a');
+    e2a.style.transition='color 1s ease';
+    e2a.style.color='rgba(249,243,232,.4)';
+    vis('sub2a');
+
+    /* conector */
+    setTimeout(()=>{
+      vis('cv1');
+      drawV('vl1','vh1', 100);
+    }, 500);
+
+    /* IDENTIDAD grande se enciende */
+    setTimeout(()=>{
+      const el=document.getElementById('imp2b');
+      el.style.transition='color 1.3s ease, text-shadow 1.3s ease';
+      el.style.color='#F9F3E8';
+      el.style.textShadow='0 0 80px rgba(249,243,232,.2), 0 0 160px rgba(249,243,232,.08)';
+      vis('sub2b');
+    }, 1200);
+  }, 550);
+}, 4500);
+
+/* FASE 3: IDENTIDAD → CENTRO PROPIO (9500ms) */
+setTimeout(()=>{
+  ocultarFase('f2');
+  setTimeout(()=>{
+    mostrarFase('f3');
+
+    const e3a=document.getElementById('imp3a');
+    e3a.style.transition='color 1s ease';
+    e3a.style.color='rgba(249,243,232,.38)';
+    vis('sub3a');
+
+    setTimeout(()=>{
+      vis('cv2');
+      drawV('vl2','vh2', 100);
+    }, 500);
+
+    setTimeout(()=>{
+      const el=document.getElementById('imp3b');
+      el.style.transition='color 1.3s ease, text-shadow 1.3s ease';
+      el.style.color='#E8C870';
+      el.style.textShadow='0 0 80px rgba(232,200,112,.45), 0 0 160px rgba(232,200,112,.2)';
+      vis('sub3b');
+    }, 1200);
+  }, 550);
+}, 9500);
+
+/* FASE 4: SU HUMOR no define EL TUYO (14800ms) */
+setTimeout(()=>{
+  ocultarFase('f3');
+  setTimeout(()=>{
+    mostrarFase('f4');
+
+    /* SU HUMOR */
+    setTimeout(()=>{
+      const el=document.getElementById('eq4a');
+      el.style.transition='color 1.1s ease, text-shadow 1.1s ease';
+      el.style.color='#C97080';
+      el.style.textShadow='0 0 50px rgba(201,112,128,.4)';
+    }, 350);
+
+    /* no define */
+    setTimeout(()=>{ vis('eq4v'); }, 1100);
+
+    /* EL TUYO */
+    setTimeout(()=>{
+      const el=document.getElementById('eq4b');
+      el.style.transition='color 1.1s ease, text-shadow 1.1s ease';
+      el.style.color='#E8C870';
+      el.style.textShadow='0 0 50px rgba(232,200,112,.45)';
+    }, 1700);
+
+    setTimeout(()=>{ vis('sub4'); }, 2300);
+  }, 550);
+}, 14800);
+
+/* FASE 5: Cierre (20000ms) */
+setTimeout(()=>{
+  ocultarFase('f4');
+  setTimeout(()=>{
+    mostrarFase('f5');
+    setTimeout(()=>{ vis('cierre'); }, 300);
+    setTimeout(()=>{ vis('firma'); }, 1200);
+  }, 550);
+}, 20000);
+
+/* Fade out total (25000ms) */
+setTimeout(()=>{
+  document.getElementById('wrapper').classList.add('out');
+}, 25000);
+</script>
+</body>
+</html>

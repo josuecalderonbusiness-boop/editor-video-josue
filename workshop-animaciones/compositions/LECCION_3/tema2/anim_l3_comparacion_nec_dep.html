@@ -1,0 +1,210 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<style>body:not(.fonts-loaded) * { animation-play-state: paused !important; transition: none !important; }</style>
+<script>document.fonts.ready.then(() => { setTimeout(() => { document.body.classList.add("fonts-loaded"); }, 1500); });</script>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=1280, height=720">
+<title>Necesitar vs Depender — Par a par</title>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@900&family=Cormorant+Garamond:ital,wght@1,400;1,600&display=swap" rel="stylesheet">
+<style>
+  * { margin:0; padding:0; box-sizing:border-box; }
+  body { width:1280px; height:720px; overflow:hidden; }
+
+  .fondo {
+    position:absolute; inset:0;
+    background:linear-gradient(135deg, #0F0A0B 0%, #1A0810 45%, #3D0C11 100%);
+  }
+
+  /* Cada slide ocupa toda la pantalla */
+  .slide {
+    position:absolute; inset:0;
+    display:flex; flex-direction:column;
+    align-items:center; justify-content:center;
+    opacity:0; pointer-events:none;
+  }
+
+  /* Encabezado tipo label arriba */
+  .slide-label {
+    font-family:'Playfair Display',serif; font-weight:900;
+    font-size:32px; letter-spacing:.18em;
+    margin-bottom:28px; opacity:0;
+    text-transform:uppercase;
+  }
+  .label-nec { color:rgba(249,243,232,.5); }
+  .label-dep { color:rgba(232,200,112,.5); }
+
+  /* Línea accent izquierda */
+  .accent-bar {
+    position:absolute; left:0; top:50%; transform:translateY(-50%);
+    width:7px; height:0; border-radius:0 4px 4px 0;
+    background:linear-gradient(180deg, transparent, #E8C870, #D4A843, #E8C870, transparent);
+    box-shadow:0 0 18px rgba(232,200,112,.7);
+  }
+
+  /* Frase principal grande */
+  .frase-grande {
+    font-family:'Cormorant Garamond',serif; font-style:italic;
+    font-size:86px; line-height:1.12; text-align:center;
+    max-width:1000px; letter-spacing:.01em;
+    opacity:0; transform:translateY(24px);
+  }
+  .frase-nec { color:#F9F3E8; text-shadow:0 0 40px rgba(249,243,232,.2); }
+  .frase-dep { color:#E8C870; text-shadow:0 0 40px rgba(232,200,112,.3); }
+
+  /* Tag debajo de la frase */
+  .frase-tag {
+    font-family:'Cormorant Garamond',serif; font-style:italic;
+    font-size:34px; letter-spacing:.1em; margin-top:22px;
+    opacity:0;
+  }
+  .tag-nec { color:rgba(249,243,232,.45); }
+  .tag-dep { color:rgba(232,200,112,.45); animation:tagPulse 2s ease-in-out infinite; }
+  @keyframes tagPulse { 0%,100%{opacity:.45} 50%{opacity:.8} }
+
+  /* Línea dorada bajo frase */
+  .frase-linea {
+    height:2px; width:0; margin-top:20px; border-radius:2px;
+  }
+  .linea-nec { background:linear-gradient(90deg,transparent,rgba(249,243,232,.4),transparent); }
+  .linea-dep { background:linear-gradient(90deg,transparent,rgba(232,200,112,.6),transparent); }
+
+  /* Animaciones de entrada/salida */
+  @keyframes slideEntra { 0%{opacity:0;transform:translateY(32px)} 100%{opacity:1;transform:translateY(0)} }
+  @keyframes slideSale  { 0%{opacity:1;transform:translateY(0)} 100%{opacity:0;transform:translateY(-32px)} }
+  @keyframes barGrow    { to{height:260px} }
+  @keyframes lineaGrow  { to{width:480px} }
+  @keyframes fadeLabel  { to{opacity:1} }
+</style>
+</head>
+<body>
+<div class="fondo"></div>
+
+<!-- PAR 1 — NECESITAR -->
+<div class="slide" id="p1n">
+  <div class="accent-bar" id="b1n"></div>
+  <div class="slide-label label-nec" id="l1n">NECESITAR</div>
+  <div class="frase-grande frase-nec" id="f1n">"Necesito y valoro<br>la conexión con él"</div>
+  <div class="frase-linea linea-nec" id="ln1n"></div>
+  <div class="frase-tag tag-nec">Preferencia legítima y comunicable</div>
+</div>
+
+<!-- PAR 1 — DEPENDER -->
+<div class="slide" id="p1d">
+  <div class="accent-bar" id="b1d" style="background:linear-gradient(180deg,transparent,#6B1A2A,#3D0C11,#6B1A2A,transparent);box-shadow:0 0 18px rgba(107,26,42,.7);"></div>
+  <div class="slide-label label-dep" id="l1d">DEPENDER</div>
+  <div class="frase-grande frase-dep" id="f1d">"Sin su conexión<br>no puedo estar bien"</div>
+  <div class="frase-linea linea-dep" id="ln1d"></div>
+  <div class="frase-tag tag-dep">Cadena invisible</div>
+</div>
+
+<!-- PAR 2 — NECESITAR -->
+<div class="slide" id="p2n">
+  <div class="accent-bar" id="b2n"></div>
+  <div class="slide-label label-nec" id="l2n">NECESITAR</div>
+  <div class="frase-grande frase-nec" id="f2n">"Me importa mucho<br>recibir su afecto"</div>
+  <div class="frase-linea linea-nec" id="ln2n"></div>
+  <div class="frase-tag tag-nec">Preferencia legítima y comunicable</div>
+</div>
+
+<!-- PAR 2 — DEPENDER -->
+<div class="slide" id="p2d">
+  <div class="accent-bar" id="b2d" style="background:linear-gradient(180deg,transparent,#6B1A2A,#3D0C11,#6B1A2A,transparent);box-shadow:0 0 18px rgba(107,26,42,.7);"></div>
+  <div class="slide-label label-dep" id="l2d">DEPENDER</div>
+  <div class="frase-grande frase-dep" id="f2d">"Si no me da afecto,<br>no valgo"</div>
+  <div class="frase-linea linea-dep" id="ln2d"></div>
+  <div class="frase-tag tag-dep">Cadena invisible</div>
+</div>
+
+<!-- PAR 3 — NECESITAR -->
+<div class="slide" id="p3n">
+  <div class="accent-bar" id="b3n"></div>
+  <div class="slide-label label-nec" id="l3n">NECESITAR</div>
+  <div class="frase-grande frase-nec" id="f3n">"Quiero que<br>me apoye en esto"</div>
+  <div class="frase-linea linea-nec" id="ln3n"></div>
+  <div class="frase-tag tag-nec">Preferencia legítima y comunicable</div>
+</div>
+
+<!-- PAR 3 — DEPENDER -->
+<div class="slide" id="p3d">
+  <div class="accent-bar" id="b3d" style="background:linear-gradient(180deg,transparent,#6B1A2A,#3D0C11,#6B1A2A,transparent);box-shadow:0 0 18px rgba(107,26,42,.7);"></div>
+  <div class="slide-label label-dep" id="l3d">DEPENDER</div>
+  <div class="frase-grande frase-dep" id="f3d">"Sin su apoyo<br>no puedo avanzar"</div>
+  <div class="frase-linea linea-dep" id="ln3d"></div>
+  <div class="frase-tag tag-dep">Cadena invisible</div>
+</div>
+
+<script>
+  const DUR_SLIDE = 3800; // cuánto permanece cada slide
+  const TRANS = 450;      // duración del fade out
+
+  const secuencia = ['p1n','p1d','p2n','p2d','p3n','p3d'];
+
+  function entrar(id) {
+    const el = document.getElementById(id);
+    el.style.opacity = '1';
+    el.style.pointerEvents = 'auto';
+
+    // Barra lateral crece
+    const bar = el.querySelector('.accent-bar');
+    bar.style.animation = 'barGrow .5s ease-out .1s forwards';
+
+    // Label
+    const label = el.querySelector('.slide-label');
+    label.style.animation = 'fadeLabel .4s ease-out .2s forwards';
+
+    // Frase entra
+    const frase = el.querySelector('.frase-grande');
+    frase.style.animation = 'slideEntra .55s cubic-bezier(.2,0,.1,1) .3s forwards';
+
+    // Línea crece
+    const linea = el.querySelector('.frase-linea');
+    linea.style.animation = 'lineaGrow .6s ease-out .7s forwards';
+
+    // Tag
+    const tag = el.querySelector('.frase-tag');
+    tag.style.transition = 'opacity .4s ease';
+    setTimeout(() => { tag.style.opacity = '1'; }, 900);
+  }
+
+  function salir(id, cb) {
+    const el = document.getElementById(id);
+    el.style.animation = `slideSale ${TRANS}ms ease-in forwards`;
+    setTimeout(() => {
+      el.style.opacity = '0';
+      el.style.animation = '';
+      el.style.pointerEvents = 'none';
+      // reset
+      el.querySelector('.accent-bar').style.animation = '';
+      el.querySelector('.accent-bar').style.height = '0';
+      el.querySelector('.slide-label').style.animation = '';
+      el.querySelector('.slide-label').style.opacity = '0';
+      el.querySelector('.frase-grande').style.animation = '';
+      el.querySelector('.frase-grande').style.opacity = '0';
+      el.querySelector('.frase-grande').style.transform = 'translateY(24px)';
+      el.querySelector('.frase-linea').style.animation = '';
+      el.querySelector('.frase-linea').style.width = '0';
+      el.querySelector('.frase-tag').style.opacity = '0';
+      if (cb) cb();
+    }, TRANS);
+  }
+
+  let idx = 0;
+
+  function siguiente() {
+    if (idx >= secuencia.length) return;
+    const id = secuencia[idx];
+    entrar(id);
+    idx++;
+    setTimeout(() => {
+      salir(id, () => {
+        setTimeout(siguiente, 80);
+      });
+    }, DUR_SLIDE);
+  }
+
+  // Arrancar después del delay de fuentes
+  setTimeout(siguiente, 800);
+</script>
+</body>
+</html>

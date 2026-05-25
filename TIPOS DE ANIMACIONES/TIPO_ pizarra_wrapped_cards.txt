@@ -1,0 +1,310 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<style>
+  body:not(.fonts-loaded) * { animation-play-state: paused !important; transition: none !important; }
+</style>
+<script>
+  document.fonts.ready.then(() => {
+    setTimeout(() => { document.body.classList.add("fonts-loaded"); }, 1500);
+  });
+</script>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=1280, height=720">
+<title>anim_l1_an3 — ¿Cómo terminó?</title>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,900;1,900&family=Cormorant+Garamond:ital,wght@1,600&display=swap" rel="stylesheet">
+<style>
+  * { margin:0; padding:0; box-sizing:border-box; }
+  body { width:1280px; height:720px; overflow:hidden; }
+
+  /* ── Pizarra base ── */
+  .pizarra {
+    position:absolute; inset:0;
+    background:#F0E8D5;
+    background-image:
+      linear-gradient(rgba(139,100,60,.13) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(139,100,60,.13) 1px, transparent 1px);
+    background-size:56px 56px;
+  }
+  /* Borde izquierdo borgoña */
+  .pizarra::before {
+    content:''; position:absolute; left:0; top:0; bottom:0;
+    width:8px;
+    background:linear-gradient(180deg, #3D0C11, #6B1A2A, #3D0C11);
+  }
+  /* Línea dorada superior */
+  .pizarra::after {
+    content:''; position:absolute; top:0; left:0; right:0;
+    height:4px;
+    background:linear-gradient(90deg, #6B1A2A, #E8C870, #E8C870, #6B1A2A);
+  }
+  /* Textura papel sutil */
+  .papel-texture {
+    position:absolute; inset:0; pointer-events:none;
+    background:radial-gradient(ellipse at 20% 50%, rgba(255,245,220,.6) 0%, transparent 60%),
+               radial-gradient(ellipse at 80% 50%, rgba(220,200,160,.3) 0%, transparent 60%);
+  }
+
+  /* ── Slides ── */
+  .slide {
+    position:absolute; inset:0;
+    display:flex; align-items:center; justify-content:center;
+    opacity:0; pointer-events:none; z-index:2;
+  }
+
+  @keyframes cardIn {
+    0%   { opacity:0; transform:translateY(60px) rotate(-1.5deg) scale(.94); }
+    70%  { transform:translateY(-8px) rotate(.4deg) scale(1.01); }
+    100% { opacity:1; transform:translateY(0) rotate(0deg) scale(1); }
+  }
+  @keyframes cardOut {
+    0%   { opacity:1; transform:translateY(0) scale(1); }
+    100% { opacity:0; transform:translateY(-60px) scale(.95); }
+  }
+  @keyframes slideInLeft {
+    0%   { opacity:0; transform:translateX(-50px); }
+    100% { opacity:1; transform:translateX(0); }
+  }
+  @keyframes lineGrow {
+    0%   { width:0; opacity:0; }
+    100% { width:100%; opacity:1; }
+  }
+  @keyframes fadeIn {
+    to { opacity:1; }
+  }
+  @keyframes checkDraw {
+    to { stroke-dashoffset:0; }
+  }
+
+  /* ── Tarjeta grande ── */
+  .card {
+    border-radius:16px;
+    padding:48px 72px;
+    position:relative;
+    box-shadow: 6px 8px 0px rgba(61,12,17,.25), 0 20px 50px rgba(61,12,17,.15);
+    display:flex; flex-direction:column; align-items:flex-start;
+    min-width:860px;
+    opacity:0;
+  }
+  /* Sombra de "pegado" en la pizarra */
+  .card::after {
+    content:''; position:absolute;
+    inset:-2px; border-radius:18px;
+    box-shadow:inset 0 0 0 1px rgba(255,255,255,.15);
+    pointer-events:none;
+  }
+
+  .card-vino    { background:linear-gradient(135deg, #3D0C11, #6B1A2A); }
+  .card-negro   { background:linear-gradient(135deg, #0F0A0B, #1C1114); }
+  .card-dorado  { background:linear-gradient(135deg, #7A5C1E, #B8892A); }
+  .card-medio   { background:linear-gradient(135deg, #6B1A2A, #8B2D3F); }
+  .card-oscuro  { background:linear-gradient(135deg, #1A0810, #3D0C11); }
+
+  .card-numero {
+    font-family:'Playfair Display',serif; font-weight:900;
+    font-size:18px; letter-spacing:.25em;
+    color:rgba(255,255,255,.25); margin-bottom:16px;
+    opacity:0; animation:fadeIn .3s ease-out forwards;
+  }
+  .card-palabra {
+    font-family:'Playfair Display',serif; font-weight:900;
+    font-size:148px; color:#F9F3E8; line-height:.85;
+    text-shadow:0 4px 30px rgba(0,0,0,.3);
+  }
+  .card-palabra.dorado-text { color:#F9F3E8; }
+  .card-contexto {
+    font-family:'Cormorant Garamond',serif; font-style:italic;
+    font-size:46px; color:rgba(249,243,232,.65);
+    margin-top:14px; line-height:1.2;
+    opacity:0; animation:fadeIn .4s ease-out forwards;
+  }
+  .card-linea {
+    height:3px; background:rgba(232,200,112,.5);
+    border-radius:2px; margin:20px 0 0;
+    width:0; animation:lineGrow .5s ease-out forwards;
+  }
+
+  /* Check en esquina */
+  .card-check {
+    position:absolute; bottom:32px; right:40px;
+    opacity:0; animation:fadeIn .3s ease-out forwards;
+  }
+  .card-check svg { width:48px; height:48px; }
+  .c-circle {
+    fill:none; stroke:rgba(232,200,112,.7); stroke-width:2;
+    stroke-dasharray:110; stroke-dashoffset:110;
+    animation:checkDraw .4s ease-out forwards;
+  }
+  .c-mark {
+    fill:none; stroke:#F9F3E8; stroke-width:3;
+    stroke-linecap:round; stroke-linejoin:round;
+    stroke-dasharray:30; stroke-dashoffset:30;
+    animation:checkDraw .3s ease-out forwards;
+  }
+
+  /* ── SLIDE 0: Pregunta en pizarra directa ── */
+  #s0 .titulo-pizarra {
+    font-family:'Playfair Display',serif; font-weight:900;
+    font-size:118px; color:#3D0C11; text-align:center; line-height:1.0;
+    opacity:0; animation:cardIn .6s ease-out .3s forwards;
+    text-shadow:2px 3px 0 rgba(61,12,17,.12);
+  }
+  #s0 .linea-titulo {
+    height:5px; width:0;
+    background:linear-gradient(90deg, #6B1A2A, #E8C870, #6B1A2A);
+    border-radius:3px; margin:20px auto 0;
+    animation:lineGrow .6s ease-out .9s forwards;
+  }
+
+  /* ── SLIDE FINAL ── */
+  #sfinal .card-final {
+    background:linear-gradient(135deg, #0F0A0B, #3D0C11);
+    border-radius:20px; padding:56px 80px;
+    box-shadow: 8px 10px 0px rgba(61,12,17,.3), 0 30px 70px rgba(0,0,0,.3);
+    min-width:1000px; text-align:center;
+    opacity:0; animation:cardIn .7s ease-out .3s forwards;
+  }
+  #sfinal .frase-final {
+    font-family:'Playfair Display',serif; font-style:italic; font-weight:900;
+    font-size:82px; color:#F9F3E8; line-height:1.1;
+  }
+  #sfinal .frase-final em { color:#E8C870; }
+  #sfinal .linea-final {
+    height:3px; width:0; margin:24px auto 0;
+    background:linear-gradient(90deg, transparent, #E8C870, transparent);
+    border-radius:2px;
+    animation:lineGrow .6s ease-out 1.0s forwards;
+  }
+</style>
+</head>
+<body>
+
+<div class="pizarra"></div>
+<div class="papel-texture"></div>
+
+<!-- S0: Pregunta -->
+<div class="slide" id="s0">
+  <div style="text-align:center;">
+    <p class="titulo-pizarra">¿Cómo<br>terminó?</p>
+    <div class="linea-titulo" style="width:500px;"></div>
+  </div>
+</div>
+
+<!-- S1: SILENCIO -->
+<div class="slide" id="s1">
+  <div class="card card-vino" style="animation:cardIn .55s cubic-bezier(.2,0,.1,1) .2s forwards; opacity:0;">
+    <div class="card-numero" style="animation-delay:.5s;">01 — Lo que quedó</div>
+    <div class="card-palabra">SILENCIO</div>
+    <div class="card-contexto" style="animation-delay:.75s;">Hablabas. Él no estaba.</div>
+    <div class="card-linea" style="animation-delay:.9s; width:280px;"></div>
+    <div class="card-check" style="animation-delay:1.1s;">
+      <svg viewBox="0 0 48 48">
+        <circle class="c-circle" cx="24" cy="24" r="20" style="animation-delay:1.1s;"/>
+        <polyline class="c-mark" points="14,24 21,32 34,16" style="animation-delay:1.5s;"/>
+      </svg>
+    </div>
+  </div>
+</div>
+
+<!-- S2: LA PELEA -->
+<div class="slide" id="s2">
+  <div class="card card-negro" style="animation:cardIn .55s cubic-bezier(.2,0,.1,1) .2s forwards; opacity:0;">
+    <div class="card-numero" style="animation-delay:.5s;">02 — Lo que pasó</div>
+    <div class="card-palabra">LA<br>PELEA</div>
+    <div class="card-contexto" style="animation-delay:.75s;">Que no resolvió nada.</div>
+    <div class="card-linea" style="animation-delay:.9s; background:rgba(232,200,112,.4);"></div>
+    <div class="card-check" style="animation-delay:1.1s;">
+      <svg viewBox="0 0 48 48">
+        <circle class="c-circle" cx="24" cy="24" r="20" style="animation-delay:1.1s;"/>
+        <polyline class="c-mark" points="14,24 21,32 34,16" style="animation-delay:1.5s;"/>
+      </svg>
+    </div>
+  </div>
+</div>
+
+<!-- S3: DEMASIADO -->
+<div class="slide" id="s3">
+  <div class="card card-medio" style="animation:cardIn .55s cubic-bezier(.2,0,.1,1) .2s forwards; opacity:0;">
+    <div class="card-numero" style="animation-delay:.5s;">03 — Lo que te dijeron</div>
+    <div class="card-palabra" style="font-size:130px;">DEMASIADO</div>
+    <div class="card-contexto" style="animation-delay:.75s; font-size:52px; color:#E8C870;">de todo.</div>
+    <div class="card-linea" style="animation-delay:.9s;"></div>
+    <div class="card-check" style="animation-delay:1.1s;">
+      <svg viewBox="0 0 48 48">
+        <circle class="c-circle" cx="24" cy="24" r="20" style="animation-delay:1.1s;"/>
+        <polyline class="c-mark" points="14,24 21,32 34,16" style="animation-delay:1.5s;"/>
+      </svg>
+    </div>
+  </div>
+</div>
+
+<!-- S4: EL VACÍO -->
+<div class="slide" id="s4">
+  <div class="card card-oscuro" style="animation:cardIn .55s cubic-bezier(.2,0,.1,1) .2s forwards; opacity:0;">
+    <div class="card-numero" style="animation-delay:.5s;">04 — Lo que quedó adentro</div>
+    <div class="card-palabra">EL VACÍO</div>
+    <div class="card-contexto" style="animation-delay:.75s; color:rgba(232,200,112,.65);">"Ya ni sé por qué lo intento."</div>
+    <div class="card-linea" style="animation-delay:.9s;"></div>
+    <div class="card-check" style="animation-delay:1.1s;">
+      <svg viewBox="0 0 48 48">
+        <circle class="c-circle" cx="24" cy="24" r="20" style="animation-delay:1.1s;"/>
+        <polyline class="c-mark" points="14,24 21,32 34,16" style="animation-delay:1.5s;"/>
+      </svg>
+    </div>
+  </div>
+</div>
+
+<!-- FINAL -->
+<div class="slide" id="sfinal">
+  <div class="card-final">
+    <p class="frase-final">"Ya ni sé por qué<br>lo sigo <em>intentando."</em></p>
+    <div class="linea-final" style="width:560px;"></div>
+  </div>
+</div>
+
+<script>
+  const SLIDES = [
+    { id:'s0',     dur:2500 },
+    { id:'s1',     dur:4200 },
+    { id:'s2',     dur:4200 },
+    { id:'s3',     dur:4200 },
+    { id:'s4',     dur:4200 },
+    { id:'sfinal', dur:6000 },
+  ];
+  const TRANS = 380;
+  let current = 0;
+
+  function show(idx) {
+    const el = document.getElementById(SLIDES[idx].id);
+    el.style.opacity = '1';
+    el.style.pointerEvents = 'auto';
+  }
+
+  function hide(idx) {
+    const el = document.getElementById(SLIDES[idx].id);
+    el.style.animation = `cardOut ${TRANS}ms ease-in forwards`;
+    setTimeout(() => {
+      el.style.opacity = '0';
+      el.style.pointerEvents = 'none';
+      el.style.animation = '';
+    }, TRANS);
+  }
+
+  function next() {
+    hide(current);
+    current++;
+    if (current < SLIDES.length) {
+      setTimeout(() => {
+        show(current);
+        if (current < SLIDES.length - 1) {
+          setTimeout(next, SLIDES[current].dur);
+        }
+      }, TRANS);
+    }
+  }
+
+  show(0);
+  setTimeout(next, SLIDES[0].dur);
+</script>
+</body>
+</html>

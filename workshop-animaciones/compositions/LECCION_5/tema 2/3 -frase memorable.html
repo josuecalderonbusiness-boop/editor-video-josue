@@ -1,0 +1,144 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<style>body:not(.fonts-loaded) * { animation-play-state: paused !important; transition: none !important; }</style>
+<script>document.fonts.ready.then(() => { setTimeout(() => { document.body.classList.add("fonts-loaded"); }, 1500); });</script>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=1280, height=720">
+<title>Frase — No puedes exigirle</title>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,700;0,900;1,400&family=Cormorant+Garamond:ital,wght@1,300;1,400&display=swap" rel="stylesheet">
+<style>
+  * { margin:0; padding:0; box-sizing:border-box; }
+  body { width:1280px; height:720px; overflow:hidden; background:#0F0A0B; }
+  .scene {
+    width:1280px; height:720px; background:#0F0A0B;
+    position:relative; display:flex; flex-direction:column;
+    align-items:flex-start; justify-content:center;
+    padding:0 110px 0 110px;
+    opacity:0; animation:sceneIn .8s ease-out .1s forwards;
+  }
+  @keyframes sceneIn { to{opacity:1} }
+  .scene.out { animation:fadeOut .9s ease-in forwards; }
+  @keyframes fadeOut { to{opacity:0} }
+
+  .bg-glow {
+    position:absolute; left:-80px; top:50%; transform:translateY(-50%);
+    width:900px; height:700px;
+    background:radial-gradient(ellipse at 38% 50%, rgba(107,26,42,.5) 0%, rgba(61,12,17,.25) 38%, transparent 68%);
+    animation:pulseGlow 3.5s ease-in-out infinite; pointer-events:none;
+  }
+  @keyframes pulseGlow { 0%,100%{opacity:.75;transform:translateY(-50%) scale(1)} 50%{opacity:1;transform:translateY(-50%) scale(1.06)} }
+
+  .comillas {
+    font-family:'Playfair Display',Georgia,serif;
+    font-size:120px; font-weight:900; color:#E8C870;
+    line-height:.75; letter-spacing:-0.05em;
+    display:block; margin-bottom:12px;
+    opacity:0; transform:translateY(-10px);
+    animation:marksIn .55s ease-out .4s forwards, marksGlow 2.8s ease-in-out 1.2s infinite;
+  }
+  @keyframes marksIn { to{opacity:1;transform:translateY(0)} }
+  @keyframes marksGlow {
+    0%,100%{text-shadow:0 0 15px rgba(232,200,112,1),0 0 40px rgba(220,180,60,.8)}
+    50%{text-shadow:0 0 35px rgba(255,248,180,1),0 0 80px rgba(232,200,112,1)}
+  }
+
+  .text-block { position:relative; z-index:2; max-width:1060px; }
+
+  /* Línea 1 — normal */
+  .l1 {
+    font-family:'Playfair Display',Georgia,serif;
+    font-size:58px; font-weight:900; color:#F9F3E8; line-height:1.12;
+    letter-spacing:-.01em;
+  }
+  /* Línea 2 — destacada en dorado */
+  .l2 {
+    font-family:'Playfair Display',Georgia,serif;
+    font-size:56px; font-weight:900; font-style:italic; color:#E8C870;
+    line-height:1.15; letter-spacing:-.01em; margin-top:6px;
+    animation:goldPulse 2.6s ease-in-out 3s infinite;
+  }
+  @keyframes goldPulse {
+    0%,100%{text-shadow:0 0 18px rgba(232,200,112,.4)}
+    50%{text-shadow:0 0 50px rgba(255,245,180,1),0 0 100px rgba(232,200,112,.7)}
+  }
+  /* Línea 3 — normal más pequeña */
+  .l3 {
+    font-family:'Cormorant Garamond',Georgia,serif;
+    font-size:50px; font-style:italic; font-weight:400; color:rgba(249,243,232,.78);
+    line-height:1.18; margin-top:4px;
+  }
+
+  .word { display:inline-block; opacity:0; filter:blur(8px); transform:translateY(14px); white-space:pre; }
+  .word.v {
+    transition:opacity .4s ease,filter .4s ease,transform .4s ease;
+    opacity:1; filter:blur(0); transform:translateY(0);
+  }
+  .l1 .word.v { text-shadow:0 0 20px rgba(255,255,255,.9),0 0 50px rgba(255,255,255,.5); }
+  .l2 .word.v { text-shadow:0 0 25px rgba(232,200,112,.8),0 0 60px rgba(232,200,112,.4); }
+  .l3 .word.v { text-shadow:0 0 15px rgba(249,243,232,.3); }
+
+  .gold-line-wrap { margin-top:26px; position:relative; height:10px; width:560px; display:none; }
+  .gold-line { position:absolute; bottom:0; left:0; height:3px; width:0; border-radius:2px; background:linear-gradient(90deg,transparent,#B8892A,#E8C870,#FFF5B0,#E8C870,#D4A843,transparent); animation:growLine .9s cubic-bezier(.15,0,.1,1) forwards; }
+  .gold-spark { position:absolute; bottom:-4px; left:-30px; width:55px; height:11px; background:radial-gradient(ellipse,rgba(255,245,190,1) 0%,rgba(245,228,176,.55) 45%,transparent 75%); border-radius:50%; animation:sparkSweep 1s ease-in-out .8s forwards; opacity:0; }
+  @keyframes growLine { to{width:560px} }
+  @keyframes sparkSweep { 0%{left:-55px;opacity:0}12%{opacity:1}88%{opacity:.9}100%{left:570px;opacity:0} }
+</style>
+</head>
+<body>
+<div class="scene" id="scene">
+  <div class="bg-glow"></div>
+  <span class="comillas">&#8220;</span>
+  <div class="text-block">
+    <p class="l1" id="l1"></p>
+    <p class="l2" id="l2"></p>
+    <p class="l3" id="l3"></p>
+  </div>
+  <div class="gold-line-wrap" id="lineaWrap">
+    <div class="gold-line"></div>
+    <div class="gold-spark"></div>
+  </div>
+</div>
+<script>
+  const LINEAS = [
+    { id:"l1", txt:" El problema es que tú reaccionas" },
+    { id:"l2", txt:"  a esa historia como si fuera un hecho " },
+    { id:"l3", txt:" verificable y definitivo " },
+  ];
+  const DURACION_MS = 12500;
+  const DELAY = 750;
+  const MS = 200;
+
+  function buildWords(txt, id) {
+    const el = document.getElementById(id);
+    txt.split(" ").forEach((w, i, a) => {
+      const s = document.createElement("span");
+      s.className = "word";
+      s.textContent = w + (i < a.length - 1 ? " " : "");
+      el.appendChild(s);
+    });
+    return el.querySelectorAll(".word");
+  }
+
+  let t = DELAY;
+  LINEAS.forEach((linea, li) => {
+    const words = buildWords(linea.txt, linea.id);
+    words.forEach(w => {
+      setTimeout(() => w.classList.add("v"), t);
+      t += MS;
+    });
+    t += 280; // pausa entre líneas
+  });
+
+  // Línea dorada
+  setTimeout(() => {
+    document.getElementById("lineaWrap").style.display = "block";
+  }, t + 200);
+
+  // Fade out
+  setTimeout(() => {
+    document.getElementById("scene").classList.add("out");
+  }, DURACION_MS);
+</script>
+</body>
+</html>

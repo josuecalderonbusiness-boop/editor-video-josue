@@ -1,0 +1,246 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<style>body:not(.fonts-loaded) * { animation-play-state: paused !important; transition: none !important; }</style>
+<script>document.fonts.ready.then(() => { setTimeout(() => { document.body.classList.add("fonts-loaded"); }, 1500); });</script>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=1280, height=720">
+<title>Cerebro — Tribunal permanente</title>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,900;1,400&family=Cormorant+Garamond:ital,wght@1,400;1,600&display=swap" rel="stylesheet">
+<style>
+  * { margin:0; padding:0; box-sizing:border-box; }
+  body { width:1280px; height:720px; overflow:hidden; }
+
+  .fondo {
+    position:absolute; inset:0;
+    background:linear-gradient(135deg,#0F0A0B 0%,#1A0810 45%,#3D0C11 100%);
+  }
+
+  /* ── ESCENA 1: setup ── */
+  .escena { position:absolute; inset:0; display:flex; align-items:center; justify-content:center; opacity:0; pointer-events:none; }
+  @keyframes sceneIn { to{opacity:1} }
+  @keyframes sceneOut { to{opacity:0} }
+
+  /* ── ESCENA 2: cerebro + órbitas ── */
+  #e2 { flex-direction:column; }
+
+  .cerebro-wrap {
+    position:relative; width:820px; height:500px;
+    display:flex; align-items:center; justify-content:center;
+  }
+
+  /* Cerebro SVG central */
+  .cerebro-svg { position:absolute; z-index:3; filter:drop-shadow(0 0 24px rgba(107,26,42,.8)); }
+  .cerebro-path { fill:none; stroke:#6B1A2A; stroke-width:3; stroke-linecap:round; }
+  .cerebro-inner { fill:rgba(61,12,17,.6); }
+  /* Pulso del cerebro */
+  @keyframes cerebroPulse {
+    0%,100%{ filter:drop-shadow(0 0 18px rgba(107,26,42,.7)); }
+    50%    { filter:drop-shadow(0 0 45px rgba(201,112,128,.9)) drop-shadow(0 0 80px rgba(107,26,42,.5)); }
+  }
+  .cerebro-svg { animation:cerebroPulse 2.2s ease-in-out infinite; }
+
+  /* Signo de procesamiento dentro del cerebro */
+  .proc-txt {
+    position:absolute; z-index:4;
+    font-family:'Cormorant Garamond',serif; font-style:italic;
+    font-size:28px; color:rgba(232,200,112,.6); letter-spacing:.08em;
+    text-align:center; line-height:1.4;
+    animation:procPulse 1.8s ease-in-out infinite;
+  }
+  @keyframes procPulse { 0%,100%{opacity:.5} 50%{opacity:1} }
+
+  /* ── ÓRBITAS ── */
+  .orbita {
+    position:absolute; border-radius:50%;
+    border:1px solid rgba(107,26,42,.35);
+    animation:rotar linear infinite;
+  }
+  @keyframes rotar { from{transform:rotate(0deg)} to{transform:rotate(360deg)} }
+  @keyframes rotarInv { from{transform:rotate(0deg)} to{transform:rotate(-360deg)} }
+
+  .o1 { width:280px; height:280px; animation-duration:6s; }
+  .o2 { width:420px; height:420px; animation-duration:10s; animation-direction:reverse; }
+  .o3 { width:560px; height:560px; animation-duration:15s; }
+  .o4 { width:700px; height:700px; animation-duration:22s; animation-direction:reverse; }
+
+  /* Palabras que orbitan */
+  .palabra-orbit {
+    position:absolute; white-space:nowrap;
+    font-family:'Playfair Display',serif; font-weight:900;
+    border-radius:6px; padding:6px 16px;
+    transform-origin:center center;
+  }
+  /* Contrarrotar para que el texto quede legible */
+  .o1 .palabra-orbit { animation:contrarotar 6s linear infinite; }
+  .o2 .palabra-orbit { animation:contrarotar2 10s linear infinite; }
+  .o3 .palabra-orbit { animation:contrarotar3 15s linear infinite; }
+  .o4 .palabra-orbit { animation:contrarotar4 22s linear infinite; }
+  @keyframes contrarotar  { from{transform:rotate(0deg)}   to{transform:rotate(-360deg)} }
+  @keyframes contrarotar2 { from{transform:rotate(0deg)}   to{transform:rotate(360deg)} }
+  @keyframes contrarotar3 { from{transform:rotate(0deg)}   to{transform:rotate(-360deg)} }
+  @keyframes contrarotar4 { from{transform:rotate(0deg)}   to{transform:rotate(360deg)} }
+
+  /* Estilos de palabras — según intensidad */
+  .p-alta  { font-size:32px; color:#E8C870; background:rgba(61,12,17,.85); border:1px solid rgba(232,200,112,.4); box-shadow:0 0 18px rgba(232,200,112,.35); }
+  .p-media { font-size:26px; color:#F9F3E8; background:rgba(61,12,17,.7); border:1px solid rgba(249,243,232,.2); }
+  .p-baja  { font-size:22px; color:rgba(249,243,232,.55); background:rgba(30,10,15,.6); border:1px solid rgba(249,243,232,.1); }
+
+  /* ── ESCENA 3: revelación tribunal ── */
+  #e3 { flex-direction:column; padding:0 80px; }
+  .tribunal-wrap {
+    text-align:center; opacity:0;
+    animation:tribunalIn .7s cubic-bezier(.2,0,.1,1) forwards;
+  }
+  @keyframes tribunalIn { 0%{opacity:0;transform:scale(.9)} 100%{opacity:1;transform:scale(1)} }
+  .pre-txt {
+    font-family:'Cormorant Garamond',serif; font-style:italic;
+    font-size:42px; color:rgba(249,243,232,.5); margin-bottom:12px;
+    opacity:0; animation:fadeUp .5s ease-out .3s forwards;
+  }
+  @keyframes fadeUp { to{opacity:1;transform:translateY(0)} }
+  .tribunal-txt {
+    font-family:'Playfair Display',serif; font-weight:900;
+    font-size:110px; color:#F9F3E8; line-height:.95; text-align:center;
+  }
+  .tribunal-em {
+    font-family:'Playfair Display',serif; font-weight:900; font-style:italic;
+    font-size:118px; color:#E8C870; line-height:.95;
+    opacity:0; transform:scale(.85);
+    animation:goldExplode .6s cubic-bezier(.2,0,.1,1.4) .8s forwards, goldPulse 2.5s ease-in-out 1.6s infinite;
+  }
+  @keyframes goldExplode { to{opacity:1;transform:scale(1)} }
+  @keyframes goldPulse { 0%,100%{text-shadow:0 0 30px rgba(232,200,112,.6)} 50%{text-shadow:0 0 70px rgba(255,245,180,1),0 0 130px rgba(232,200,112,.7)} }
+  .sub-txt {
+    font-family:'Cormorant Garamond',serif; font-style:italic;
+    font-size:44px; color:rgba(249,243,232,.6); margin-top:12px;
+    opacity:0; animation:fadeUp .5s ease-out 1.4s forwards;
+    transform:translateY(10px);
+  }
+  .linea-final {
+    height:3px; width:0; margin:20px auto 0; border-radius:2px;
+    background:linear-gradient(90deg,transparent,#E8C870,transparent);
+    animation:lineGrow .7s ease-out 1.8s forwards; opacity:0;
+  }
+  @keyframes lineGrow { to{width:580px;opacity:1} }
+  @keyframes fadeIn { to{opacity:1} }
+</style>
+</head>
+<body>
+<div class="fondo"></div>
+
+<!-- ESCENA 1: texto intro -->
+<div class="escena" id="e1" style="flex-direction:column; padding:0 120px;">
+  <p style="font-family:'Cormorant Garamond',serif;font-style:italic;font-size:54px;color:rgba(249,243,232,.7);text-align:center;line-height:1.2;opacity:0;animation:fadeIn .6s ease-out .4s forwards;">
+    Tu mente procesa la relación<br>de manera <span style="color:#E8C870;">constante.</span>
+  </p>
+  <div style="height:3px;width:0;background:linear-gradient(90deg,transparent,rgba(232,200,112,.5),transparent);border-radius:2px;margin:22px auto 0;animation:lineGrow .6s ease-out 1.2s forwards;opacity:0;"></div>
+</div>
+
+<!-- ESCENA 2: cerebro con órbitas -->
+<div class="escena" id="e2">
+  <div class="cerebro-wrap">
+
+    <!-- Órbitas (anillos) -->
+    <div class="orbita o1" style="top:50%;left:50%;transform:translate(-50%,-50%) rotate(0deg);">
+      <!-- Palabra en punto de órbita top -->
+      <div class="palabra-orbit p-alta" style="position:absolute;top:-22px;left:50%;transform:translateX(-50%);">
+        ¿qué dijo?
+      </div>
+    </div>
+
+    <div class="orbita o2" style="top:50%;left:50%;transform:translate(-50%,-50%);">
+      <div class="palabra-orbit p-media" style="position:absolute;top:-20px;left:50%;transform:translateX(-50%);">
+        ¿cómo lo dijo?
+      </div>
+      <div class="palabra-orbit p-baja" style="position:absolute;bottom:-20px;left:50%;transform:translateX(-50%);">
+        ¿me quiere?
+      </div>
+    </div>
+
+    <div class="orbita o3" style="top:50%;left:50%;transform:translate(-50%,-50%);">
+      <div class="palabra-orbit p-alta" style="position:absolute;top:-20px;left:50%;transform:translateX(-50%);">
+        ¿qué quiso decir?
+      </div>
+      <div class="palabra-orbit p-baja" style="position:absolute;bottom:-20px;left:50%;transform:translateX(-50%);">
+        ¿por qué ese tono?
+      </div>
+    </div>
+
+    <div class="orbita o4" style="top:50%;left:50%;transform:translate(-50%,-50%);">
+      <div class="palabra-orbit p-media" style="position:absolute;top:-20px;left:50%;transform:translateX(-50%);">
+        ¿está bien o mal?
+      </div>
+      <div class="palabra-orbit p-baja" style="position:absolute;right:-30px;top:50%;transform:translateY(-50%);">
+        ¿debí callarme?
+      </div>
+      <div class="palabra-orbit p-baja" style="position:absolute;bottom:-20px;left:50%;transform:translateX(-50%);">
+        ¿lo molesté?
+      </div>
+    </div>
+
+    <!-- Cerebro emoji -->
+    <div style="font-size:160px; line-height:1; position:relative; z-index:3;
+      filter:drop-shadow(0 0 24px rgba(201,112,128,.6));
+      animation:cerebroPulse 2.2s ease-in-out infinite;">🧠</div>
+
+    <!-- Texto procesando dentro -->
+    <div class="proc-txt" style="z-index:5;">
+      analizando<br>· · ·
+    </div>
+
+  </div>
+</div>
+
+<!-- ESCENA 3: tribunal permanente -->
+<div class="escena" id="e3">
+  <div class="tribunal-wrap">
+    <div class="pre-txt">Tu mente es un</div>
+    <div class="tribunal-txt">TRIBUNAL</div>
+    <div class="tribunal-em">permanente.</div>
+    <div class="sub-txt">donde él está siempre en juicio.</div>
+    <div class="linea-final" style="width:580px;"></div>
+  </div>
+</div>
+
+<script>
+  const TRANS = 500;
+  const ESCENAS = [
+    {id:'e1', dur:3000},
+    {id:'e2', dur:6500},
+    {id:'e3', dur:6000},
+  ];
+  let cur = 0;
+
+  function show(i) {
+    const e = document.getElementById(ESCENAS[i].id);
+    e.style.animation = `sceneIn .6s ease-out forwards`;
+    e.style.opacity = '1';
+    e.style.pointerEvents = 'auto';
+  }
+  function hide(i, cb) {
+    const e = document.getElementById(ESCENAS[i].id);
+    e.style.animation = `sceneOut ${TRANS}ms ease-in forwards`;
+    setTimeout(() => {
+      e.style.opacity = '0';
+      e.style.pointerEvents = 'none';
+      if (cb) cb();
+    }, TRANS);
+  }
+  function next() {
+    hide(cur, () => {
+      cur++;
+      if (cur < ESCENAS.length) {
+        setTimeout(() => {
+          show(cur);
+          if (cur < ESCENAS.length - 1) setTimeout(next, ESCENAS[cur].dur);
+        }, 100);
+      }
+    });
+  }
+
+  show(0);
+  setTimeout(next, ESCENAS[0].dur);
+</script>
+</body>
+</html>

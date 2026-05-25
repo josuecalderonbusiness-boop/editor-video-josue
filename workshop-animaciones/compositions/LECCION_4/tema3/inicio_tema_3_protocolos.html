@@ -1,0 +1,174 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<style>
+  body:not(.fonts-loaded) * { animation-play-state: paused !important; transition: none !important; }
+</style>
+<script>
+  document.fonts.ready.then(() => {
+    setTimeout(() => { document.body.classList.add("fonts-loaded"); }, 1500);
+  });
+</script>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=1280, height=720">
+<title>INICIO TEMA — Los 3 Protocolos del Código Soberana</title>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@1,300;1,500&display=swap" rel="stylesheet">
+<style>
+  * { margin:0; padding:0; box-sizing:border-box; }
+  body { width:1280px; height:720px; overflow:hidden; background:#0F0A0B; }
+
+  .scene {
+    width:1280px; height:720px; position:relative;
+    display:flex; flex-direction:column;
+    align-items:flex-start; justify-content:center;
+    padding-left:100px; background:#0F0A0B;
+    opacity:0; animation:sceneIn .5s ease-out .1s forwards;
+  }
+  @keyframes sceneIn { to{opacity:1} }
+  .scene.out { animation:sceneOut .7s ease-in forwards; }
+  @keyframes sceneOut { to{opacity:0} }
+
+  /* Banda borgoña */
+  .band {
+    position:absolute; left:0; top:50%; transform:translateY(-50%);
+    width:0; height:260px;
+    background:linear-gradient(90deg, rgba(61,12,17,.72) 0%, rgba(61,12,17,.45) 70%, transparent 100%);
+    animation:expandBand .5s cubic-bezier(.2,0,.1,1) .2s forwards;
+  }
+  @keyframes expandBand { to{width:1180px} }
+
+  /* Barra dorada izquierda */
+  .left-bar {
+    position:absolute; left:0; top:50%; transform:translateY(-50%);
+    width:6px; height:0;
+    background:linear-gradient(180deg, transparent, #E8C870, #D4A843, #E8C870, transparent);
+    box-shadow:0 0 16px rgba(232,200,112,.7), 0 0 35px rgba(232,200,112,.3);
+    animation:growBar .5s ease-out .5s forwards;
+  }
+  @keyframes growBar { to{height:260px} }
+
+  .content { position:relative; z-index:2; padding-left:28px; }
+
+  /* Dos líneas — tamaño controlado para que no se corten */
+  .linea {
+    font-family:'Cormorant Garamond', Georgia, serif;
+    font-style:italic; font-weight:300;
+    color:#F9F3E8; line-height:1.12;
+    text-shadow:0 0 40px rgba(249,243,232,.22), 0 0 80px rgba(249,243,232,.08);
+    display:block; white-space:nowrap; overflow:hidden;
+  }
+  /* Línea 1: "Los 3 Protocolos" — más grande */
+  .linea-1 { font-size:96px; }
+  /* Línea 2: "del Código Soberana" — un poco más pequeña para que quepa */
+  .linea-2 { font-size:82px; margin-top:2px; }
+
+  .letter { opacity:0; display:inline; transition:opacity .06s ease; }
+
+  /* Cursor dorado parpadeante */
+  .cursor {
+    display:inline-block; width:4px; height:.82em;
+    background:#E8C870; margin-left:3px; vertical-align:middle;
+    animation:blink .5s step-end infinite; opacity:0;
+    box-shadow:0 0 10px rgba(232,200,112,.9);
+  }
+  @keyframes blink { 0%,100%{opacity:1} 50%{opacity:0} }
+</style>
+</head>
+<body>
+<div class="scene" id="scene">
+  <div class="band"></div>
+  <div class="left-bar"></div>
+  <div class="content">
+    <!-- Línea 1 -->
+    <span class="linea linea-1" id="linea1"></span>
+    <!-- Línea 2 + cursor -->
+    <span class="linea linea-2" id="linea2"><span class="cursor" id="cursor" style="display:none;"></span></span>
+  </div>
+</div>
+
+<script>
+  const LINEA_1   = "Los 3 Protocolos";
+  const LINEA_2   = "del Código Soberana";
+
+  const DELAY_INICIO  = 900;
+  const VEL_1         = 52;   // ms por letra línea 1
+  const PAUSA_LINEAS  = 280;  // pausa entre línea 1 y línea 2
+  const VEL_2         = 52;   // ms por letra línea 2
+  const DURACION_VISIBLE = 3200;
+
+  // ── Construir spans por letra ──────────────────────────
+  function buildLetters(texto, containerId) {
+    const el = document.getElementById(containerId);
+    texto.split('').forEach(char => {
+      const span = document.createElement('span');
+      span.className = 'letter';
+      span.textContent = char === ' ' ? '\u00A0' : char;
+      el.prepend(span); // insertar antes del cursor si existe
+      el.insertBefore(span, el.firstChild);
+    });
+    // reordenar: appendChild para que queden en orden
+    el.innerHTML = '';
+    texto.split('').forEach(char => {
+      const span = document.createElement('span');
+      span.className = 'letter';
+      span.textContent = char === ' ' ? '\u00A0' : char;
+      el.appendChild(span);
+    });
+    return el.querySelectorAll('.letter');
+  }
+
+  const letters1 = buildLetters(LINEA_1, 'linea1');
+
+  // Para línea 2 el cursor va al final
+  const cont2 = document.getElementById('linea2');
+  cont2.innerHTML = ''; // limpiar
+  const letters2 = [];
+  LINEA_2.split('').forEach(char => {
+    const span = document.createElement('span');
+    span.className = 'letter';
+    span.textContent = char === ' ' ? '\u00A0' : char;
+    cont2.appendChild(span);
+    letters2.push(span);
+  });
+  // cursor al final de línea 2
+  const cursorEl = document.createElement('span');
+  cursorEl.className = 'cursor';
+  cursorEl.id = 'cursor';
+  cont2.appendChild(cursorEl);
+
+  // ── Secuencia de animación ─────────────────────────────
+
+  // Cursor aparece antes que las letras de línea 1
+  setTimeout(() => { cursorEl.style.opacity = '1'; }, DELAY_INICIO - 200);
+
+  // Línea 1 — letras aparecen
+  let t = DELAY_INICIO;
+  letters1.forEach(l => {
+    setTimeout(() => { l.style.opacity = '1'; }, t);
+    t += VEL_1;
+  });
+
+  // Pausa entre líneas
+  t += PAUSA_LINEAS;
+
+  // Línea 2 — letras aparecen
+  letters2.forEach(l => {
+    setTimeout(() => { l.style.opacity = '1'; }, t);
+    t += VEL_2;
+  });
+
+  const finEscritura = t;
+
+  // Cursor se apaga al terminar
+  setTimeout(() => {
+    cursorEl.style.animation = 'none';
+    cursorEl.style.opacity   = '0';
+  }, finEscritura + 500);
+
+  // Fade out de la escena
+  setTimeout(() => {
+    document.getElementById('scene').classList.add('out');
+  }, finEscritura + DURACION_VISIBLE);
+</script>
+</body>
+</html>

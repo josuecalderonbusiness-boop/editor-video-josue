@@ -1,0 +1,164 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<style>body:not(.fonts-loaded) * { animation-play-state: paused !important; transition: none !important; }</style>
+<script>document.fonts.ready.then(() => { setTimeout(() => { document.body.classList.add("fonts-loaded"); }, 1500); });</script>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=1280, height=720">
+<title>Lista checks — Necesitas</title>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@900&family=Cormorant+Garamond:ital,wght@1,400;1,600&display=swap" rel="stylesheet">
+<style>
+  * { margin:0; padding:0; box-sizing:border-box; }
+  body { width:1280px; height:720px; overflow:hidden; }
+
+  .pizarra {
+    position:absolute; inset:0; background:#F0E8D5;
+    background-image:linear-gradient(rgba(139,100,60,.13) 1px,transparent 1px),linear-gradient(90deg,rgba(139,100,60,.13) 1px,transparent 1px);
+    background-size:56px 56px;
+  }
+  .pizarra::before { content:''; position:absolute; left:0; top:0; bottom:0; width:8px; background:linear-gradient(180deg,#3D0C11,#6B1A2A,#3D0C11); }
+  .pizarra::after  { content:''; position:absolute; top:0; left:0; right:0; height:4px; background:linear-gradient(90deg,#6B1A2A,#E8C870,#E8C870,#6B1A2A); }
+
+  .scene {
+    position:absolute; inset:0;
+    display:flex; flex-direction:column;
+    align-items:flex-start; justify-content:center;
+    padding:0 80px 0 96px;
+    opacity:0; animation:sceneIn .5s ease-out .1s forwards;
+  }
+  @keyframes sceneIn { to{opacity:1} }
+  .scene.out { animation:sceneOut .8s ease-in forwards; }
+  @keyframes sceneOut { to{opacity:0} }
+
+  /* Título */
+  .titulo {
+    font-family:'Playfair Display',serif; font-weight:900;
+    font-size:72px; color:#3D0C11; line-height:1.0;
+    margin-bottom:32px; letter-spacing:-.01em;
+    opacity:0; transform:translateY(-16px);
+    text-shadow:2px 3px 0 rgba(61,12,17,.1);
+  }
+  .titulo-linea {
+    display:block; height:4px; width:0;
+    background:linear-gradient(90deg,#6B1A2A,#E8C870,#6B1A2A);
+    border-radius:2px; margin-top:10px;
+  }
+
+  /* Items */
+  .item {
+    display:flex; align-items:center; gap:28px;
+    margin-bottom:22px; opacity:0; transform:translateX(-30px);
+  }
+  .item.visible {
+    transition: opacity .45s ease, transform .45s cubic-bezier(.2,0,.1,1);
+    opacity:1; transform:translateX(0);
+  }
+
+  /* Check SVG */
+  .check-wrap { flex-shrink:0; width:58px; height:58px; }
+  .c-circle { fill:none; stroke:#6B1A2A; stroke-width:2.5; stroke-dasharray:150; stroke-dashoffset:150; }
+  .c-mark   { fill:none; stroke:#E8C870; stroke-width:3.5; stroke-linecap:round; stroke-linejoin:round; stroke-dasharray:40; stroke-dashoffset:40; }
+  .c-circle.draw { animation:drawCircle .4s ease-out forwards; }
+  .c-mark.draw   { animation:drawMark .3s ease-out .35s forwards; }
+  @keyframes drawCircle { to{stroke-dashoffset:0} }
+  @keyframes drawMark   { to{stroke-dashoffset:0} }
+
+  /* Texto item */
+  .item-txt {
+    font-family:'Cormorant Garamond',serif; font-style:italic;
+    font-size:62px; color:#3D0C11; line-height:1.0; letter-spacing:.01em;
+  }
+  .item-txt.gold { color:#6B1A2A; }
+
+  /* Pulse en palabra destacada */
+  @keyframes wordPulse {
+    0%,100% { text-shadow:none; }
+    50%      { text-shadow:0 0 20px rgba(107,26,42,.5), 0 0 40px rgba(107,26,42,.25); }
+  }
+  .pulse { animation:wordPulse 2s ease-in-out infinite; display:inline; }
+</style>
+</head>
+<body>
+<div class="pizarra"></div>
+<div class="scene" id="scene">
+  <div class="titulo" id="titulo">
+    Necesitas
+    <span class="titulo-linea" id="tituloLinea"></span>
+  </div>
+
+  <div class="item" id="i1">
+    <svg class="check-wrap" viewBox="0 0 58 58">
+      <circle class="c-circle" id="c1c" cx="29" cy="29" r="24"/>
+      <polyline class="c-mark" id="c1m" points="17,29 25,38 41,20"/>
+    </svg>
+    <span class="item-txt"><span class="pulse">Compañía</span></span>
+  </div>
+
+  <div class="item" id="i2">
+    <svg class="check-wrap" viewBox="0 0 58 58">
+      <circle class="c-circle" id="c2c" cx="29" cy="29" r="24"/>
+      <polyline class="c-mark" id="c2m" points="17,29 25,38 41,20"/>
+    </svg>
+    <span class="item-txt"><span class="pulse">Conexión</span></span>
+  </div>
+
+  <div class="item" id="i3">
+    <svg class="check-wrap" viewBox="0 0 58 58">
+      <circle class="c-circle" id="c3c" cx="29" cy="29" r="24"/>
+      <polyline class="c-mark" id="c3m" points="17,29 25,38 41,20"/>
+    </svg>
+    <span class="item-txt"><span class="pulse">Afecto</span></span>
+  </div>
+
+  <div class="item" id="i4">
+    <svg class="check-wrap" viewBox="0 0 58 58">
+      <circle class="c-circle" id="c4c" cx="29" cy="29" r="24"/>
+      <polyline class="c-mark" id="c4m" points="17,29 25,38 41,20"/>
+    </svg>
+    <span class="item-txt">Ser <span class="pulse">vista</span> y <span class="pulse">escuchada</span></span>
+  </div>
+
+</div>
+
+<script>
+  const DURACION_MS = 11000;
+  const ITEMS = [
+    { id:'i1', cc:'c1c', cm:'c1m', delay:1200 },
+    { id:'i2', cc:'c2c', cm:'c2m', delay:2400 },
+    { id:'i3', cc:'c3c', cm:'c3m', delay:3600 },
+    { id:'i4', cc:'c4c', cm:'c4m', delay:4800 },
+  ];
+
+  // Título entra primero
+  setTimeout(() => {
+    const t = document.getElementById('titulo');
+    t.style.transition = 'opacity .5s ease, transform .5s ease';
+    t.style.opacity = '1';
+    t.style.transform = 'translateY(0)';
+    setTimeout(() => {
+      const l = document.getElementById('tituloLinea');
+      l.style.transition = 'width .6s ease-out';
+      l.style.width = '260px';
+    }, 400);
+  }, 600);
+
+  // Items aparecen uno a uno
+  ITEMS.forEach(item => {
+    setTimeout(() => {
+      const el = document.getElementById(item.id);
+      el.classList.add('visible');
+      // Check se dibuja 250ms después de que aparece el item
+      setTimeout(() => {
+        document.getElementById(item.cc).classList.add('draw');
+        document.getElementById(item.cm).classList.add('draw');
+      }, 250);
+    }, item.delay);
+  });
+
+  // Fade out
+  setTimeout(() => {
+    document.getElementById('scene').classList.add('out');
+  }, DURACION_MS);
+</script>
+</body>
+</html>

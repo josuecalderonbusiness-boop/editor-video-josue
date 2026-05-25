@@ -1,0 +1,315 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<title>FRASE_MEMORABLE — Hábitos Soberana</title>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,700;0,900;1,400;1,700&family=Cormorant+Garamond:ital,wght@1,400&family=Inter:wght@300&display=swap" rel="stylesheet">
+<style>
+* { margin:0; padding:0; box-sizing:border-box; }
+
+body {
+  width: 1280px;
+  height: 720px;
+  overflow: hidden;
+  background: #000;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-family: 'Inter', sans-serif;
+}
+
+.scene {
+  width: 1280px;
+  height: 720px;
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  opacity: 0;
+  animation: sceneFade 18s ease forwards;
+}
+
+@keyframes sceneFade {
+  0%   { opacity: 0; }
+  4%   { opacity: 1; }
+  88%  { opacity: 1; }
+  100% { opacity: 0; }
+}
+
+/* Glow fondo borgoña pulsante izquierda */
+.bg-glow {
+  position: absolute;
+  left: -200px;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 700px;
+  height: 700px;
+  border-radius: 50%;
+  background: radial-gradient(circle, rgba(107,26,42,0.28) 0%, rgba(61,12,17,0.10) 50%, transparent 75%);
+  animation: glowPulse 3.5s ease-in-out infinite;
+  pointer-events: none;
+}
+
+@keyframes glowPulse {
+  0%, 100% { opacity: 0.7; transform: translateY(-50%) scale(1); }
+  50%       { opacity: 1;   transform: translateY(-50%) scale(1.08); }
+}
+
+/* Contenido central */
+.content {
+  position: relative;
+  z-index: 2;
+  width: 1060px;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 0;
+}
+
+/* Comilla apertura */
+.comilla {
+  font-family: 'Playfair Display', serif;
+  font-weight: 900;
+  font-size: 138px;
+  color: #E8C870;
+  line-height: 0.6;
+  margin-bottom: 10px;
+  opacity: 0;
+  animation: comillaIn 0.8s ease forwards 0.3s,
+             comillaGlow 2.8s ease-in-out infinite 1.2s;
+}
+
+@keyframes comillaIn {
+  from { opacity: 0; transform: translateY(12px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes comillaGlow {
+  0%, 100% { text-shadow: 0 0 18px rgba(232,200,112,0.35); }
+  50%       { text-shadow: 0 0 44px rgba(232,200,112,0.85), 0 0 80px rgba(232,200,112,0.25); }
+}
+
+/* Líneas de texto */
+.linea-1,
+.linea-2,
+.linea-especial {
+  overflow: hidden;
+  margin-bottom: 8px;
+}
+
+.linea-1 .word,
+.linea-2 .word,
+.linea-especial .word {
+  display: inline-block;
+  opacity: 0;
+}
+
+/* Línea 1 — Playfair 900 blanco con glow */
+.linea-1 .word {
+  font-family: 'Playfair Display', serif;
+  font-weight: 900;
+  font-size: 68px;
+  color: #FFFFFF;
+  text-shadow:
+    0 0 12px rgba(255,255,255,0.6),
+    0 0 28px rgba(255,255,255,0.3),
+    0 0 55px rgba(255,255,255,0.15),
+    0 0 90px rgba(255,255,255,0.06);
+  margin-right: 14px;
+  line-height: 1.15;
+}
+
+/* Línea 2 — Playfair 400 italic crema */
+.linea-2 .word {
+  font-family: 'Playfair Display', serif;
+  font-weight: 400;
+  font-style: italic;
+  font-size: 56px;
+  color: #F9F3E8;
+  margin-right: 12px;
+  line-height: 1.18;
+}
+
+/* Línea especial — Playfair 700 italic dorado */
+.linea-especial .word {
+  font-family: 'Playfair Display', serif;
+  font-weight: 700;
+  font-style: italic;
+  font-size: 56px;
+  color: #E8C870;
+  text-shadow:
+    0 0 18px rgba(232,200,112,0.55),
+    0 0 40px rgba(232,200,112,0.25);
+  margin-right: 12px;
+  line-height: 1.18;
+}
+
+/* Línea dorada separadora */
+.linea-dorada-wrap {
+  position: relative;
+  width: 100%;
+  height: 2px;
+  margin: 22px 0 18px 0;
+  overflow: visible;
+}
+
+.linea-dorada {
+  height: 1.5px;
+  background: #E8C870;
+  width: 0;
+  border-radius: 1px;
+}
+
+.chispa {
+  position: absolute;
+  top: 50%;
+  left: 0;
+  transform: translateY(-50%);
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: #fff;
+  box-shadow: 0 0 10px 4px rgba(232,200,112,0.9), 0 0 22px 8px rgba(232,200,112,0.4);
+  opacity: 0;
+}
+
+/* Firma */
+.firma {
+  font-family: 'Cormorant Garamond', serif;
+  font-style: italic;
+  font-size: 32px;
+  color: #E8C870;
+  opacity: 0;
+  letter-spacing: 1.5px;
+  margin-top: 6px;
+}
+
+</style>
+</head>
+<body>
+
+<div class="scene" id="scene">
+  <div class="bg-glow"></div>
+
+  <div class="content">
+    <div class="comilla">&ldquo;</div>
+
+    <!-- Línea 1: "No te enfocas en tener los hábitos de una mujer soberana." -->
+    <div class="linea-1" id="l1">
+      <span class="word">No</span>
+      <span class="word">te</span>
+      <span class="word">enfocas</span>
+      <span class="word">en</span>
+      <span class="word">tener</span>
+      <span class="word">los</span>
+      <span class="word">hábitos</span>
+      <span class="word">de</span>
+      <span class="word">una</span>
+      <span class="word">mujer</span>
+      <span class="word">soberana.</span>
+    </div>
+
+    <!-- Línea 2: "Te enfocas en ser la mujer soberana." -->
+    <div class="linea-2" id="l2">
+      <span class="word">Te</span>
+      <span class="word">enfocas</span>
+      <span class="word">en</span>
+      <span class="word">ser</span>
+      <span class="word">la</span>
+      <span class="word">mujer</span>
+      <span class="word">soberana.</span>
+    </div>
+
+    <!-- Línea dorada -->
+    <div class="linea-dorada-wrap">
+      <div class="linea-dorada" id="lineaDorada"></div>
+      <div class="chispa" id="chispa"></div>
+    </div>
+
+    <!-- Línea especial dorada: "Los hábitos vienen solos cuando la raíz cambió." -->
+    <div class="linea-especial" id="l3">
+      <span class="word">Los</span>
+      <span class="word">hábitos</span>
+      <span class="word">vienen</span>
+      <span class="word">solos</span>
+      <span class="word">cuando</span>
+      <span class="word">la</span>
+      <span class="word">raíz</span>
+      <span class="word">cambió.</span>
+    </div>
+
+    <div class="firma" id="firma">— Código Soberana</div>
+  </div>
+</div>
+
+<script>
+document.fonts.ready.then(() => {
+  setTimeout(start, 1500);
+});
+
+function animateWords(containerId, startDelay, interval, style) {
+  const words = document.querySelectorAll('#' + containerId + ' .word');
+  words.forEach((w, i) => {
+    const t = startDelay + i * interval;
+    setTimeout(() => {
+      w.style.transition = 'opacity 0.45s ease, filter 0.45s ease, transform 0.45s ease';
+      w.style.filter = 'blur(8px)';
+      w.style.transform = 'translateY(18px)';
+      w.offsetHeight;
+      requestAnimationFrame(() => {
+        w.style.opacity = '1';
+        w.style.filter = 'blur(0)';
+        w.style.transform = 'translateY(0)';
+      });
+    }, t);
+  });
+}
+
+function animateLineDorada(startDelay) {
+  const line = document.getElementById('lineaDorada');
+  const spark = document.getElementById('chispa');
+  const totalWidth = 680;
+  const duration = 1200;
+  const steps = 60;
+
+  setTimeout(() => {
+    spark.style.opacity = '1';
+    let step = 0;
+    const interval = setInterval(() => {
+      step++;
+      const progress = step / steps;
+      const currentW = Math.round(totalWidth * progress);
+      line.style.width = currentW + 'px';
+      spark.style.left = currentW + 'px';
+      if (step >= steps) {
+        clearInterval(interval);
+        spark.style.transition = 'opacity 0.4s';
+        spark.style.opacity = '0';
+      }
+    }, duration / steps);
+  }, startDelay);
+}
+
+function start() {
+  // L1: 11 palabras × 120ms apart, start 200ms
+  animateWords('l1', 200, 120, 'primary');
+
+  // L2: 7 palabras, start after L1 ~1700ms
+  animateWords('l2', 1700, 130, 'secondary');
+
+  // Línea dorada: start ~2800ms
+  animateLineDorada(2800);
+
+  // L3 (especial dorada): start 4100ms
+  animateWords('l3', 4100, 140, 'special');
+
+  // Firma
+  setTimeout(() => {
+    const firma = document.getElementById('firma');
+    firma.style.transition = 'opacity 1s ease';
+    firma.style.opacity = '1';
+  }, 5400);
+}
+</script>
+</body>
+</html>

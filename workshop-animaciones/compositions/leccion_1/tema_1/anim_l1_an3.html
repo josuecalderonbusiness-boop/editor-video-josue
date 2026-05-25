@@ -1,0 +1,142 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<style>
+  body:not(.fonts-loaded) * { animation-play-state: paused !important; transition: none !important; }
+  html, body { background:#00FF00 !important; }
+  .bg-glow { display:none !important; }
+</style>
+<script>
+  document.fonts.ready.then(() => {
+    setTimeout(() => { document.body.classList.add("fonts-loaded"); }, 200);
+  });
+</script>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=1280, height=720">
+<title>anim_l1_an3 — DATO INTERNO pizarra</title>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@1,400;1,600&family=Playfair+Display:wght@700&display=swap" rel="stylesheet">
+<style>
+  * { margin:0; padding:0; box-sizing:border-box; }
+  body { width:1280px; height:720px; overflow:hidden; }
+  .scene {
+    width:1280px; height:720px; position:relative;
+    background:#00FF00;
+    background-image:
+      linear-gradient(rgba(160,135,90,.22) 1px,transparent 1px),
+      linear-gradient(90deg,rgba(160,135,90,.22) 1px,transparent 1px);
+    background-size:52px 52px;
+    display:flex; align-items:center; justify-content:center;
+  }
+  .scene::before {
+    content:''; position:absolute; left:0;top:0;bottom:0;
+    width:7px; background:linear-gradient(180deg,#3D0C11,#6B1A2A,#3D0C11);
+  }
+  .scene::after {
+    content:''; position:absolute; top:0;left:0;right:0;
+    height:3px; background:linear-gradient(90deg,#6B1A2A,#E8C870,#E8C870,#E8C870,#6B1A2A);
+  }
+  .board { width:980px; padding:44px 64px; position:relative; z-index:2; }
+  .titulo {
+    font-family:'Playfair Display',Georgia,serif;
+    font-size:58px; font-weight:700; color:#3D0C11;
+    border-bottom:3px solid #E8C870; padding-bottom:16px; margin-bottom:28px;
+    opacity:0; transform:translateX(-16px);
+    animation:slideIn .5s ease-out .3s forwards;
+  }
+  @keyframes slideIn { to{opacity:1;transform:translateX(0)} }
+  .items { display:flex; flex-direction:column; gap:16px; }
+  .item {
+    display:flex; align-items:flex-start; gap:18px;
+    opacity:0; transform:translateX(-14px);
+  }
+  .item:nth-child(1){animation:slideIn .4s ease-out 1.0s forwards}
+  .item:nth-child(2){animation:slideIn .4s ease-out 2.5s forwards}
+  .item:nth-child(3){animation:slideIn .4s ease-out 4.0s forwards}
+  .item:nth-child(4){animation:slideIn .4s ease-out 5.5s forwards}
+  .item:nth-child(5){animation:slideIn .4s ease-out 7.0s forwards}
+
+  .check { flex-shrink:0; width:32px; height:32px; margin-top:3px; }
+  .check-circle {
+    fill:none; stroke:#E8C870; stroke-width:2.5;
+    stroke-dasharray:100; stroke-dashoffset:100;
+    animation:drawC .35s ease-out forwards;
+  }
+  .check-mark {
+    fill:none; stroke:#6B1A2A; stroke-width:3;
+    stroke-linecap:round; stroke-linejoin:round;
+    stroke-dasharray:28; stroke-dashoffset:28;
+    animation:drawM .25s ease-out .32s forwards;
+  }
+  .item:nth-child(1) .check-circle{animation-delay:1.0s}
+  .item:nth-child(1) .check-mark{animation-delay:1.32s}
+  .item:nth-child(2) .check-circle{animation-delay:2.5s}
+  .item:nth-child(2) .check-mark{animation-delay:2.82s}
+  .item:nth-child(3) .check-circle{animation-delay:4.0s}
+  .item:nth-child(3) .check-mark{animation-delay:4.32s}
+  .item:nth-child(4) .check-circle{animation-delay:5.5s}
+  .item:nth-child(4) .check-mark{animation-delay:5.82s}
+  .item:nth-child(5) .check-circle{animation-delay:7.0s}
+  .item:nth-child(5) .check-mark{animation-delay:7.32s}
+  @keyframes drawC{to{stroke-dashoffset:0}}
+  @keyframes drawM{to{stroke-dashoffset:0}}
+
+  .item-text {
+    font-family:'Cormorant Garamond',Georgia,serif;
+    font-style:italic; font-size:30px; font-weight:400;
+    color:#2D1F23; line-height:1.35;
+  }
+
+  /* Frase final pantalla completa */
+  .frase-final {
+    position:absolute; inset:0;
+    display:flex; align-items:center; justify-content:center;
+    background:#00FF00;
+    background-image:
+      linear-gradient(rgba(160,135,90,.18) 1px,transparent 1px),
+      linear-gradient(90deg,rgba(160,135,90,.18) 1px,transparent 1px);
+    background-size:52px 52px;
+    z-index:10; opacity:0; pointer-events:none;
+    animation:showFinal .7s ease-out 9.0s forwards;
+  }
+  @keyframes showFinal{to{opacity:1}}
+  .frase-final p {
+    font-family:'Cormorant Garamond',Georgia,serif;
+    font-style:italic; font-size:66px; font-weight:600;
+    color:#3D0C11; text-align:center; padding:0 140px; line-height:1.3;
+  }
+  .frase-final p em { color:#6B1A2A; }
+</style>
+</head>
+<body>
+<div class="scene">
+  <div class="board">
+    <h2 class="titulo">¿Cómo terminó?</h2>
+    <div class="items">
+      <div class="item">
+        <svg class="check" viewBox="0 0 32 32"><circle class="check-circle" cx="16" cy="16" r="13"/><polyline class="check-mark" points="9,16 13,21 23,11"/></svg>
+        <p class="item-text">¿Con silencio? ¿Con él cerrándose mientras le hablabas a una pared?</p>
+      </div>
+      <div class="item">
+        <svg class="check" viewBox="0 0 32 32"><circle class="check-circle" cx="16" cy="16" r="13"/><polyline class="check-mark" points="9,16 13,21 23,11"/></svg>
+        <p class="item-text">¿Con una pelea que no resolvió nada y dejó el ambiente más pesado?</p>
+      </div>
+      <div class="item">
+        <svg class="check" viewBox="0 0 32 32"><circle class="check-circle" cx="16" cy="16" r="13"/><polyline class="check-mark" points="9,16 13,21 23,11"/></svg>
+        <p class="item-text">¿Sintiéndote demasiado intensa, demasiado emocional, demasiado de todo?</p>
+      </div>
+      <div class="item">
+        <svg class="check" viewBox="0 0 32 32"><circle class="check-circle" cx="16" cy="16" r="13"/><polyline class="check-mark" points="9,16 13,21 23,11"/></svg>
+        <p class="item-text">¿Con ese vacío adentro…?</p>
+      </div>
+      <div class="item">
+        <svg class="check" viewBox="0 0 32 32"><circle class="check-circle" cx="16" cy="16" r="13"/><polyline class="check-mark" points="9,16 13,21 23,11"/></svg>
+        <p class="item-text">¿Con ese "ya ni sé por qué lo sigo intentando"?</p>
+      </div>
+    </div>
+  </div>
+  <div class="frase-final">
+    <p>"Ya ni sé por qué<br>lo sigo <em>intentando."</em></p>
+  </div>
+</div>
+</body>
+</html>

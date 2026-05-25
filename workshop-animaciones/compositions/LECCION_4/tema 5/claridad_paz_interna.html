@@ -1,0 +1,367 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<style>
+  body:not(.fonts-loaded) * { animation-play-state: paused !important; transition: none !important; }
+</style>
+<script>
+  document.fonts.ready.then(() => {
+    setTimeout(() => { document.body.classList.add("fonts-loaded"); }, 1500);
+  });
+</script>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=1280, height=720">
+<title>Claridad y Paz Interna — FRASE MEMORABLE</title>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,900;0,400;1,400;1,900&family=Cormorant+Garamond:ital,wght@1,300;1,400;1,600&display=swap" rel="stylesheet">
+<style>
+* { margin:0; padding:0; box-sizing:border-box; }
+body { width:1280px; height:720px; overflow:hidden; background:#000; }
+
+.scene {
+  width:1280px; height:720px; background:#000;
+  position:relative; display:flex; flex-direction:column;
+  align-items:flex-start; justify-content:center;
+  padding:0 120px 0 110px;
+  opacity:0; animation:sceneIn .8s ease-out .1s forwards;
+}
+@keyframes sceneIn { to{opacity:1} }
+
+/* Glow borgoña izquierda */
+.bg-glow {
+  position:absolute; left:-180px; top:50%; transform:translateY(-50%);
+  width:900px; height:700px;
+  background:radial-gradient(ellipse at 38% 50%,
+    rgba(107,26,42,.55) 0%,
+    rgba(61,12,17,.30) 38%,
+    transparent 68%);
+  animation:pulseGlow 3.8s ease-in-out infinite; pointer-events:none;
+}
+@keyframes pulseGlow {
+  0%,100%{opacity:.8;transform:translateY(-50%) scale(1)}
+  50%{opacity:1;transform:translateY(-50%) scale(1.06)}
+}
+
+/* Glow derecho suave — paz */
+.bg-glow-right {
+  position:absolute; right:-200px; top:50%; transform:translateY(-50%);
+  width:700px; height:600px;
+  background:radial-gradient(ellipse at 65% 50%,
+    rgba(232,200,112,.08) 0%,
+    transparent 65%);
+  pointer-events:none; opacity:0;
+  animation:glowRightIn 2s ease-out 8s forwards;
+}
+@keyframes glowRightIn { to{opacity:1} }
+
+/* Comillas */
+.quote-marks {
+  font-family:'Playfair Display',Georgia,serif;
+  font-size:130px; font-weight:900; color:#E8C870;
+  line-height:.75; margin-bottom:12px; letter-spacing:-0.05em;
+  opacity:0; transform:translateY(-10px);
+  animation:marksIn .55s ease-out .5s forwards, marksGlow 3s ease-in-out 1.2s infinite;
+  display:block;
+}
+@keyframes marksIn { to{opacity:1;transform:translateY(0)} }
+@keyframes marksGlow {
+  0%,100%{text-shadow:0 0 14px rgba(232,200,112,1),0 0 38px rgba(220,180,60,.8),0 0 75px rgba(220,180,60,.4)}
+  50%{text-shadow:0 0 28px rgba(255,248,180,1),0 0 65px rgba(232,200,112,1),0 0 120px rgba(220,180,60,.55)}
+}
+
+/* ── BLOQUE OBJETIVO ── */
+.texto-bloque { position:relative; max-width:1040px; }
+
+.linea-objetivo {
+  font-family:'Playfair Display',Georgia,serif;
+  font-size:66px; font-weight:900; color:#FFF;
+  line-height:1.06; letter-spacing:-0.01em;
+}
+.linea-objetivo-2 {
+  font-family:'Playfair Display',Georgia,serif;
+  font-size:66px; font-weight:900; color:#FFF;
+  line-height:1.06; letter-spacing:-0.01em;
+  margin-top:2px;
+}
+
+/* palabras que aparecen con blur */
+.word {
+  display:inline-block; opacity:0; filter:blur(10px);
+  transform:translateY(16px) scale(.96); white-space:pre;
+}
+.word.vis {
+  transition:opacity .4s ease, filter .4s ease, transform .4s ease;
+  opacity:1; filter:blur(0); transform:translateY(0) scale(1);
+}
+.linea-objetivo .word.vis,
+.linea-objetivo-2 .word.vis {
+  text-shadow:0 0 18px rgba(255,255,255,1),0 0 45px rgba(255,255,255,.65),0 0 85px rgba(255,255,255,.35);
+}
+
+/* ── BLOQUE NEGACIONES ── */
+.negaciones-wrap {
+  display:flex; flex-direction:row; gap:38px;
+  margin-top:22px; align-items:baseline;
+  opacity:0;
+}
+.neg {
+  font-family:'Playfair Display',Georgia,serif;
+  font-style:italic; font-size:46px; font-weight:400;
+  color:rgba(249,243,232,.4);
+  position:relative; display:inline-block;
+  opacity:0; transform:translateY(10px);
+  transition:opacity .35s ease, transform .35s ease;
+}
+.neg.vis {
+  opacity:1; transform:translateY(0);
+}
+/* tachado que aparece después */
+.neg-strike {
+  position:absolute; left:0; right:0; top:50%; transform:translateY(-50%);
+  height:2px; background:rgba(201,112,128,.75);
+  width:0; border-radius:1px;
+  transition:width .3s ease;
+}
+.neg.struck .neg-strike { width:100%; }
+.sep {
+  font-family:'Cormorant Garamond',Georgia,serif;
+  font-style:italic; font-size:40px; font-weight:300;
+  color:rgba(249,243,232,.18);
+  opacity:0; transform:translateY(10px);
+  transition:opacity .3s ease, transform .3s ease;
+}
+.sep.vis { opacity:1; transform:translateY(0); }
+
+/* ── BIEN — la palabra que lo dice todo ── */
+.bien-wrap {
+  position:absolute; inset:0;
+  display:flex; flex-direction:column;
+  align-items:flex-start; justify-content:center;
+  padding:0 120px 0 110px;
+  opacity:0; pointer-events:none;
+}
+.bien-word {
+  font-family:'Playfair Display',Georgia,serif;
+  font-size:220px; font-weight:900; color:#F9F3E8;
+  line-height:.85; letter-spacing:-0.02em;
+  opacity:0; transform:scale(.92) translateY(20px);
+  filter:blur(12px);
+}
+.bien-word.vis {
+  transition:opacity .55s cubic-bezier(.2,0,.1,1),
+             filter .55s ease,
+             transform .55s cubic-bezier(.2,0,.1,1);
+  opacity:1; filter:blur(0); transform:scale(1) translateY(0);
+  text-shadow:
+    0 0 30px rgba(255,255,255,1),
+    0 0 70px rgba(255,255,255,.6),
+    0 0 140px rgba(255,255,255,.3);
+}
+.bien-sub {
+  font-family:'Playfair Display',Georgia,serif;
+  font-style:italic; font-size:62px; font-weight:400;
+  color:#E8C870; margin-top:8px; line-height:1.1;
+  opacity:0; transform:translateY(14px);
+}
+.bien-sub.vis {
+  transition:opacity .6s ease .2s, transform .6s ease .2s;
+  opacity:1; transform:translateY(0);
+  text-shadow:0 0 22px rgba(232,200,112,.8),0 0 55px rgba(232,200,112,.4);
+}
+
+/* Línea dorada */
+.gold-line-wrap {
+  margin-top:24px; position:relative; height:14px; width:360px;
+  display:none;
+}
+.gold-line {
+  position:absolute; bottom:0; left:0; height:3px; width:0; border-radius:2px;
+  background:linear-gradient(90deg,
+    transparent 0%,#B8892A 8%,#E8C870 35%,#FFF5B0 52%,#E8C870 68%,#D4A843 88%,transparent 100%);
+  animation:growLine .9s cubic-bezier(.15,0,.1,1) forwards;
+}
+.gold-glow {
+  position:absolute; bottom:-3px; left:0; height:9px; width:0; border-radius:10px;
+  background:linear-gradient(90deg,transparent,rgba(232,200,112,.45),transparent);
+  animation:growLine .9s cubic-bezier(.15,0,.1,1) .05s forwards,
+             glowPulse 2.5s ease-in-out 1s infinite;
+}
+.gold-spark {
+  position:absolute; bottom:-4px; left:-30px; width:55px; height:11px;
+  background:radial-gradient(ellipse,rgba(255,245,190,1) 0%,rgba(245,228,176,.55) 45%,transparent 75%);
+  border-radius:50%; animation:sparkSweep 1s ease-in-out .8s forwards; opacity:0;
+}
+@keyframes growLine   { to{width:360px} }
+@keyframes glowPulse  { 0%,100%{opacity:.5}50%{opacity:1} }
+@keyframes sparkSweep {
+  0%{left:-55px;opacity:0}12%{opacity:1}88%{opacity:.9}100%{left:375px;opacity:0}
+}
+
+.author {
+  margin-top:18px;
+  font-family:'Cormorant Garamond',Georgia,serif;
+  font-style:italic; font-size:36px; font-weight:300;
+  color:#E8C870; letter-spacing:.05em;
+  opacity:0; transform:translateY(8px);
+  text-shadow:0 0 18px rgba(232,200,112,.65),0 0 45px rgba(220,180,60,.30);
+}
+
+.scene.out { animation:fadeOut 1s ease-in forwards; }
+@keyframes fadeOut { to{opacity:0} }
+</style>
+</head>
+<body>
+<div class="scene" id="scene">
+  <div class="bg-glow"></div>
+  <div class="bg-glow-right"></div>
+
+  <!-- FASE 1 + 2: objetivo + negaciones -->
+  <span class="quote-marks">&#8220;</span>
+
+  <div class="texto-bloque" id="bloqueObjetivo">
+    <p class="linea-objetivo"  id="linea1"></p>
+    <p class="linea-objetivo-2" id="linea2"></p>
+
+    <!-- Negaciones -->
+    <div class="negaciones-wrap" id="negWrap">
+      <span class="neg" id="n1">Ni fría<span class="neg-strike"></span></span>
+      <span class="sep" id="sep1">·</span>
+      <span class="neg" id="n2">Ni indiferente<span class="neg-strike"></span></span>
+      <span class="sep" id="sep2">·</span>
+      <span class="neg" id="n3">Ni desconectada<span class="neg-strike"></span></span>
+    </div>
+  </div>
+
+  <div class="gold-line-wrap" id="lineaWrap">
+    <div class="gold-glow"></div>
+    <div class="gold-line"></div>
+    <div class="gold-spark"></div>
+  </div>
+  <p class="author" id="author">— Josué Calderón</p>
+</div>
+
+<!-- FASE 3+4: BIEN — en paz -->
+<div class="bien-wrap" id="bienWrap">
+  <div class="bg-glow" style="opacity:.6;"></div>
+  <p class="bien-word" id="bienWord">Bien.</p>
+  <p class="bien-sub" id="bienSub">En paz con tu propia vida.</p>
+  <div class="gold-line-wrap" id="lineaWrap2" style="display:none;">
+    <div class="gold-glow"></div>
+    <div class="gold-line"></div>
+    <div class="gold-spark"></div>
+  </div>
+  <p class="author" id="author2" style="margin-top:18px;">— Josué Calderón</p>
+</div>
+
+<script>
+  // ── TEXTOS ──
+  const TEXTO_L1 = "que llegues a un punto de tal claridad";
+  const TEXTO_L2 = "y solidez interna — que estés bien.";
+
+  const DURACION_TOTAL = 18000; // 18s total
+  const D0 = 700;   // delay inicio
+  const WPM = 240;  // ms por palabra línea 1+2
+
+  // ── Construir palabras ──
+  function buildWords(text, id) {
+    const el = document.getElementById(id);
+    text.split(' ').forEach((w, i, arr) => {
+      const sp = document.createElement('span');
+      sp.className = 'word';
+      sp.textContent = w + (i < arr.length - 1 ? '\u00a0' : '');
+      el.appendChild(sp);
+    });
+    return el.querySelectorAll('.word');
+  }
+
+  const wL1 = buildWords(TEXTO_L1, 'linea1');
+  const wL2 = buildWords(TEXTO_L2, 'linea2');
+
+  // ── Secuencia ──
+  let t = D0;
+
+  // Línea 1 — palabra por palabra
+  wL1.forEach(w => {
+    setTimeout(() => w.classList.add('vis'), t);
+    t += WPM;
+  });
+  t += 180;
+
+  // Línea 2 — palabra por palabra
+  wL2.forEach(w => {
+    setTimeout(() => w.classList.add('vis'), t);
+    t += WPM;
+  });
+  t += 300;
+
+  // Negaciones aparecen
+  const negStart = t;
+  setTimeout(() => { document.getElementById('negWrap').style.opacity = '1'; }, negStart);
+
+  // n1
+  setTimeout(() => {
+    document.getElementById('n1').classList.add('vis');
+    document.getElementById('sep1').classList.add('vis');
+  }, negStart + 0);
+  // n2
+  setTimeout(() => {
+    document.getElementById('n2').classList.add('vis');
+    document.getElementById('sep2').classList.add('vis');
+  }, negStart + 350);
+  // n3
+  setTimeout(() => {
+    document.getElementById('n3').classList.add('vis');
+  }, negStart + 700);
+
+  // Tachar las 3 negaciones juntas
+  const strikeT = negStart + 1100;
+  setTimeout(() => {
+    document.getElementById('n1').classList.add('struck');
+    document.getElementById('n2').classList.add('struck');
+    document.getElementById('n3').classList.add('struck');
+  }, strikeT);
+
+  // Fade out bloque objetivo
+  setTimeout(() => {
+    const bloque = document.getElementById('bloqueObjetivo');
+    const quotes = document.querySelector('.quote-marks');
+    const lineaW = document.getElementById('lineaWrap');
+    const auth   = document.getElementById('author');
+    [bloque, quotes, lineaW, auth].forEach(el => {
+      if(el) {
+        el.style.transition = 'opacity .6s ease';
+        el.style.opacity = '0';
+      }
+    });
+  }, strikeT + 900);
+
+  // BIEN aparece
+  const bienT = strikeT + 1400;
+  setTimeout(() => {
+    document.getElementById('bienWrap').style.opacity = '1';
+    document.getElementById('bienWrap').style.pointerEvents = 'auto';
+    document.getElementById('bienWord').classList.add('vis');
+  }, bienT);
+
+  // Sub "En paz..."
+  setTimeout(() => {
+    document.getElementById('bienSub').classList.add('vis');
+  }, bienT + 700);
+
+  // Línea dorada + firma
+  setTimeout(() => {
+    document.getElementById('lineaWrap2').style.display = 'block';
+  }, bienT + 1400);
+  setTimeout(() => {
+    const a = document.getElementById('author2');
+    a.style.transition = 'opacity .6s ease, transform .6s ease';
+    a.style.opacity = '1';
+    a.style.transform = 'translateY(0)';
+  }, bienT + 1900);
+
+  // Fade out total
+  setTimeout(() => {
+    document.getElementById('scene').classList.add('out');
+  }, DURACION_TOTAL);
+</script>
+</body>
+</html>

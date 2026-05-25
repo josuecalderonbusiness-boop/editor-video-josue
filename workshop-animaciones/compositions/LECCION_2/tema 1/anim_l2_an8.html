@@ -1,0 +1,121 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<title>anim_l2_an8 — FRASE_MEMORABLE</title>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,900;1,400&family=Cormorant+Garamond:ital,wght@1,400&display=swap" rel="stylesheet">
+<style>
+* { margin:0; padding:0; box-sizing:border-box; }
+body { width:1280px; height:720px; overflow:hidden; background:#000; }
+.scene {
+  width:1280px; height:720px; position:relative;
+  background:#0A0306;
+  display:flex; flex-direction:column; align-items:center; justify-content:center;
+  overflow:hidden;
+  opacity:0; animation: fadeIn 0.6s ease forwards 0.2s, fadeOut 0.5s ease forwards 9.5s;
+}
+@keyframes fadeIn { to { opacity:1; } }
+@keyframes fadeOut { to { opacity:0; } }
+.glow-bg {
+  position:absolute; left:-150px; top:50%; transform:translateY(-50%);
+  width:650px; height:650px;
+  background:radial-gradient(circle, rgba(90,18,32,0.45) 0%, transparent 70%);
+  animation:glowPulse 3.5s ease-in-out infinite; pointer-events:none;
+}
+@keyframes glowPulse {
+  0%,100%{opacity:0.7;transform:translateY(-50%) scale(1)}
+  50%{opacity:1;transform:translateY(-50%) scale(1.08)}
+}
+.glow-bg-r {
+  position:absolute; right:-250px; bottom:0; width:500px; height:500px;
+  background:radial-gradient(circle, rgba(184,137,42,0.1) 0%, transparent 70%);
+  pointer-events:none;
+}
+.comillas {
+  font-family:'Playfair Display',serif; font-weight:900; font-size:130px;
+  color:#E8C870; line-height:0.7;
+  align-self:flex-start; margin-left:140px; margin-bottom:6px;
+  opacity:0; animation:fadeIn 0.5s ease forwards 0.5s, comillasGlow 3s ease-in-out infinite 1s;
+  text-shadow:0 0 30px rgba(232,200,112,0.6),0 0 60px rgba(232,200,112,0.3);
+}
+@keyframes comillasGlow {
+  0%,100%{text-shadow:0 0 30px rgba(232,200,112,0.6),0 0 60px rgba(232,200,112,0.3)}
+  50%{text-shadow:0 0 50px rgba(232,200,112,0.9),0 0 100px rgba(232,200,112,0.5)}
+}
+.texto-wrap { padding:0 140px; text-align:center; position:relative; z-index:10; }
+.word {
+  display:inline-block; opacity:0; filter:blur(6px); transform:translateY(12px);
+  transition:opacity 0.35s ease, filter 0.35s ease, transform 0.35s ease; margin:0 3px;
+}
+.word.visible { opacity:1; filter:blur(0); transform:translateY(0); }
+.linea-1 {
+  font-family:'Playfair Display',serif; font-weight:900; font-size:64px;
+  color:#F9F3E8; line-height:1.15; display:block; margin-bottom:6px;
+  text-shadow:0 0 20px rgba(249,243,232,0.3),0 0 80px rgba(90,18,32,0.5);
+}
+.linea-2 {
+  font-family:'Playfair Display',serif; font-weight:400; font-style:italic;
+  font-size:52px; color:#F9F3E8; opacity:0.88; line-height:1.22; display:block; margin-bottom:6px;
+}
+.linea-gold {
+  font-family:'Playfair Display',serif; font-weight:700; font-style:italic;
+  font-size:50px; color:#E8C870; display:block; line-height:1.25;
+  text-shadow:0 0 25px rgba(232,200,112,0.55),0 0 50px rgba(232,200,112,0.25);
+}
+.linea-decorativa {
+  width:0; height:2px;
+  background:linear-gradient(90deg,transparent,#E8C870,#B8892A,transparent);
+  margin:20px auto; position:relative;
+  box-shadow:0 0 12px rgba(232,200,112,0.5);
+}
+.chispa {
+  position:absolute; top:-3px; left:0; width:8px; height:8px;
+  background:#fff; border-radius:50%; opacity:0;
+  box-shadow:0 0 10px #E8C870,0 0 20px #E8C870;
+}
+.firma {
+  font-family:'Cormorant Garamond',serif; font-style:italic;
+  font-size:30px; color:#E8C870; opacity:0; letter-spacing:1px; margin-top:4px;
+}
+</style>
+</head>
+<body>
+<div class="scene">
+  <div class="glow-bg"></div>
+  <div class="glow-bg-r"></div>
+  <div class="comillas">"</div>
+  <div class="texto-wrap">
+    <span class="linea-1">
+      <span class="word">La</span><span class="word">fe</span><span class="word">sin</span><span class="word">estrategia</span><span class="word">puede</span>
+    </span>
+    <span class="linea-2">
+      <span class="word">convertirse</span><span class="word">en</span><span class="word">una</span><span class="word">condena</span>
+    </span>
+    <span class="linea-gold">
+      <span class="word">disfrazada</span><span class="word">de</span><span class="word">virtud.</span>
+    </span>
+    <div class="linea-decorativa" id="linea"><div class="chispa" id="chispa"></div></div>
+  </div>
+  <div class="firma" id="firma">— Josué Calderón</div>
+</div>
+<script>
+document.fonts.ready.then(() => {
+  setTimeout(() => {
+    const words = document.querySelectorAll('.word');
+    words.forEach((w, i) => { setTimeout(() => w.classList.add('visible'), 600 + i * 130); });
+    setTimeout(() => {
+      const l = document.getElementById('linea');
+      l.style.transition = 'width 0.8s ease'; l.style.width = '480px';
+      const c = document.getElementById('chispa');
+      c.style.transition = 'left 0.8s ease, opacity 0.1s ease'; c.style.opacity = '1';
+      setTimeout(() => { c.style.left = '100%'; setTimeout(() => { c.style.opacity='0'; }, 700); }, 50);
+    }, 600 + 12 * 130);
+    setTimeout(() => {
+      const f = document.getElementById('firma');
+      f.style.transition = 'opacity 0.5s ease'; f.style.opacity = '1';
+    }, 600 + 14 * 130);
+  }, 1500);
+});
+</script>
+</body>
+</html>

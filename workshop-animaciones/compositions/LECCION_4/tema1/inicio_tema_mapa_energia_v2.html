@@ -1,0 +1,162 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<style>
+  body:not(.fonts-loaded) * { animation-play-state: paused !important; transition: none !important; }
+</style>
+<script>
+  document.fonts.ready.then(() => {
+    setTimeout(() => { document.body.classList.add("fonts-loaded"); }, 1500);
+  });
+</script>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=1280, height=720">
+<title>INICIO TEMA — El Mapa de tu Energía</title>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@1,300;1,500&display=swap" rel="stylesheet">
+<style>
+  * { margin:0; padding:0; box-sizing:border-box; }
+  body { width:1280px; height:720px; overflow:hidden; background:#0F0A0B; }
+
+  .scene {
+    width:1280px; height:720px; position:relative;
+    display:flex; flex-direction:column;
+    align-items:flex-start; justify-content:center;
+    padding-left:100px; background:#0F0A0B;
+    opacity:0; animation:sceneIn .5s ease-out .1s forwards;
+  }
+  @keyframes sceneIn { to{opacity:1} }
+  .scene.out { animation:sceneOut .7s ease-in forwards; }
+  @keyframes sceneOut { to{opacity:0} }
+
+  /* Banda borgoña */
+  .band {
+    position:absolute; left:0; top:50%; transform:translateY(-50%);
+    width:0; height:280px;
+    background:linear-gradient(90deg, rgba(61,12,17,.72) 0%, rgba(61,12,17,.45) 70%, transparent 100%);
+    animation:expandBand .5s cubic-bezier(.2,0,.1,1) .2s forwards;
+  }
+  @keyframes expandBand { to{width:1180px} }
+
+  /* Barra dorada izquierda */
+  .left-bar {
+    position:absolute; left:0; top:50%; transform:translateY(-50%);
+    width:6px; height:0;
+    background:linear-gradient(180deg, transparent, #E8C870, #D4A843, #E8C870, transparent);
+    box-shadow:0 0 16px rgba(232,200,112,.7), 0 0 35px rgba(232,200,112,.3);
+    animation:growBar .5s ease-out .5s forwards;
+  }
+  @keyframes growBar { to{height:280px} }
+
+  .content { position:relative; z-index:2; padding-left:28px; }
+
+  /* Línea 1: "El Mapa de" — más pequeña, arriba */
+  .linea-1 {
+    font-family:'Cormorant Garamond', Georgia, serif;
+    font-style:italic; font-weight:300;
+    font-size:72px; color:rgba(249,243,232,.65);
+    line-height:1.05; display:block; white-space:nowrap;
+    text-shadow:0 0 30px rgba(249,243,232,.12);
+  }
+
+  /* Línea 2: "tu Energía" — más grande, dorada */
+  .linea-2 {
+    font-family:'Cormorant Garamond', Georgia, serif;
+    font-style:italic; font-weight:500;
+    font-size:118px; color:#E8C870;
+    line-height:1.0; display:block; white-space:nowrap;
+    text-shadow:
+      0 0 30px rgba(232,200,112,.9),
+      0 0 70px rgba(220,180,60,.5),
+      0 0 130px rgba(220,180,60,.2);
+  }
+
+  .letter { opacity:0; display:inline; transition:opacity .06s ease; }
+
+  /* Cursor dorado parpadeante */
+  .cursor {
+    display:inline-block; width:5px; height:.80em;
+    background:#E8C870; margin-left:4px; vertical-align:middle;
+    opacity:0; box-shadow:0 0 10px rgba(232,200,112,.9);
+    animation:blink .5s step-end infinite;
+  }
+  @keyframes blink { 0%,100%{opacity:1} 50%{opacity:0} }
+</style>
+</head>
+<body>
+<div class="scene" id="scene">
+  <div class="band"></div>
+  <div class="left-bar"></div>
+  <div class="content">
+    <span class="linea-1" id="linea1"></span>
+    <span class="linea-2" id="linea2"></span>
+  </div>
+</div>
+
+<script>
+  const LINEA_1 = "El Mapa de";
+  const LINEA_2 = "tu Energía";
+
+  const DELAY_INICIO  = 900;
+  const VEL_1         = 55;
+  const PAUSA         = 260;
+  const VEL_2         = 62;
+  const DURACION_VISIBLE = 3400;
+
+  function buildLetters(texto, containerId) {
+    const el = document.getElementById(containerId);
+    el.innerHTML = '';
+    texto.split('').forEach(char => {
+      const span = document.createElement('span');
+      span.className = 'letter';
+      span.textContent = char === ' ' ? '\u00A0' : char;
+      el.appendChild(span);
+    });
+    return el.querySelectorAll('.letter');
+  }
+
+  const letters1 = buildLetters(LINEA_1, 'linea1');
+
+  // Línea 2 con cursor al final
+  const cont2 = document.getElementById('linea2');
+  cont2.innerHTML = '';
+  const letters2 = [];
+  LINEA_2.split('').forEach(char => {
+    const span = document.createElement('span');
+    span.className = 'letter';
+    span.textContent = char === ' ' ? '\u00A0' : char;
+    cont2.appendChild(span);
+    letters2.push(span);
+  });
+  const cursorEl = document.createElement('span');
+  cursorEl.className = 'cursor';
+  cont2.appendChild(cursorEl);
+
+  // Secuencia
+  setTimeout(() => { cursorEl.style.opacity = '1'; }, DELAY_INICIO - 200);
+
+  let t = DELAY_INICIO;
+  letters1.forEach(l => {
+    setTimeout(() => { l.style.opacity = '1'; }, t);
+    t += VEL_1;
+  });
+
+  t += PAUSA;
+
+  letters2.forEach(l => {
+    setTimeout(() => { l.style.opacity = '1'; }, t);
+    t += VEL_2;
+  });
+
+  const finEscritura = t;
+
+  setTimeout(() => {
+    cursorEl.style.animation = 'none';
+    cursorEl.style.opacity = '0';
+  }, finEscritura + 500);
+
+  setTimeout(() => {
+    document.getElementById('scene').classList.add('out');
+  }, finEscritura + DURACION_VISIBLE);
+</script>
+</body>
+</html>
